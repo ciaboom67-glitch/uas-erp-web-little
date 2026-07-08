@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html class="dark" lang="id">
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Little Story POS - Produk</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@100..900&amp;display=swap" rel="stylesheet">
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-primary-container": "#d6ad6e",
+                        "on-primary-fixed-variant": "#5e410c",
+                        "primary-container": "#5d400b",
+                        "surface-variant": "#353535",
+                        "on-surface-variant": "#d2c4b5",
+                        "on-error-container": "#ffdad6",
+                        "secondary": "#634eba",
+                        "surface": "#131313",
+                        "primary-fixed-dim": "#ebc080",
+                        "on-primary": "#432c00",
+                        "surface-container-high": "#2a2a2a",
+                        "on-error": "#690005",
+                        "on-secondary-fixed-variant": "#483890",
+                        "surface-container": "#1f1f1f",
+                        "secondary-container": "#4b3a93",
+                        "inverse-on-surface": "#303030",
+                        "inverse-surface": "#e2e2e2",
+                        "inverse-primary": "#795923",
+                        "on-background": "#e2e2e2",
+                        "surface-container-low": "#1b1b1b",
+                        "on-secondary-container": "#bcaeff",
+                        "tertiary-fixed": "#e2e2e2",
+                        "tertiary-container": "#444646",
+                        "primary-fixed": "#ffddaf",
+                        "on-tertiary-fixed-variant": "#454747",
+                        "tertiary-fixed-dim": "#c6c6c7",
+                        "on-secondary": "#321e79",
+                        "background": "#000000",
+                        "surface-bright": "#393939",
+                        "on-tertiary-container": "#b3b4b4",
+                        "surface-tint": "#ebc080",
+                        "on-tertiary": "#2f3131",
+                        "on-secondary-fixed": "#1c0062",
+                        "outline-variant": "#4e453a",
+                        "secondary-fixed": "#e6deff",
+                        "primary": "#ebc080",
+                        "error": "#ffb4ab",
+                        "on-surface": "#e2e2e2",
+                        "surface-container-lowest": "#0e0e0e",
+                        "on-primary-fixed": "#281800",
+                        "error-container": "#93000a",
+                        "surface-container-highest": "#353535",
+                        "secondary-fixed-dim": "#cabeff",
+                        "tertiary": "#c6c6c7",
+                        "on-tertiary-fixed": "#1a1c1c",
+                        "surface-dim": "#131313",
+                        "outline": "#9b8f81"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "8px",
+                        "xl": "12px",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "grid-gutter": "24px",
+                        "card-padding": "16px",
+                        "sidebar-width": "240px",
+                        "section-margin": "32px",
+                        "element-gap": "12px"
+                    },
+                    "fontFamily": {
+                        "headline-lg": ["Plus Jakarta Sans"],
+                        "price-display": ["Plus Jakarta Sans"],
+                        "body-md": ["Plus Jakarta Sans"],
+                        "headline-md": ["Plus Jakarta Sans"],
+                        "label-caps": ["Plus Jakarta Sans"],
+                        "body-lg": ["Plus Jakarta Sans"]
+                    },
+                    "fontSize": {
+                        "headline-lg": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
+                        "price-display": ["18px", {"lineHeight": "24px", "fontWeight": "800"}],
+                        "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "500"}],
+                        "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "700"}],
+                        "label-caps": ["10px", {"lineHeight": "14px", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                        "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "600"}]
+                    }
+                },
+            },
+        }
+    </script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        html, body {
+            height: 100%;
+            overflow: hidden;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #000000;
+        }
+        .content-scroll::-webkit-scrollbar { 
+            width: 6px; 
+        }
+        .content-scroll::-webkit-scrollbar-track { 
+            background: #000000; 
+        }
+        .content-scroll::-webkit-scrollbar-thumb { 
+            background: #ebc080; 
+            border-radius: 3px; 
+        }
+        .content-scroll::-webkit-scrollbar-thumb:hover {
+            background: #d6ad6e;
+        }
+        .no-scrollbar::-webkit-scrollbar { 
+            display: none; 
+        }
+        .no-scrollbar { 
+            -ms-overflow-style: none; 
+            scrollbar-width: none; 
+        }
+        .main-wrapper {
+            height: 100vh;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+    <div class="main-wrapper flex">
+        <!-- Sidebar -->
+        <aside class="w-sidebar-width h-full flex-shrink-0 bg-primary-container flex flex-col py-6 z-50 overflow-y-auto no-scrollbar">
+            <div class="px-6 mb-10 flex items-center gap-3 flex-shrink-0">
+                <div class="w-10 h-10 bg-on-primary-fixed-variant rounded-lg flex items-center justify-center">
+                    <span class="material-symbols-outlined text-primary" style="font-variation-settings: &quot;FILL&quot; 1;">coffee</span>
+                </div>
+                <div>
+                    <h1 class="font-headline-md text-headline-md font-bold text-on-primary-container leading-none">Little Story</h1>
+                    <span class="font-label-caps text-label-caps text-on-primary-container/60 uppercase tracking-widest">ENTERPRISE ERP</span>
+                </div>
+            </div>
+            <nav class="flex-1 space-y-1">
+                <a class="text-on-primary-container/70 hover:bg-white/5 hover:text-on-primary-container mx-2 flex items-center gap-element-gap p-3 transition-colors active:scale-95 duration-150" href="s.html">
+                    <span class="material-symbols-outlined">dashboard</span>
+                    <span class="font-body-md text-body-md">Dashboard</span>
+                </a>
+                <a class="text-on-primary-container/70 hover:bg-white/5 hover:text-on-primary-container mx-2 flex items-center gap-element-gap p-3 transition-colors active:scale-95 duration-150" href="transaksi.html">
+                    <span class="material-symbols-outlined">point_of_sale</span>
+                    <span class="font-body-md text-body-md">Transaksi</span>
+                </a>
+                <a class="bg-white/10 text-on-primary-container rounded-lg mx-2 flex items-center gap-element-gap p-3 transition-colors active:scale-95 duration-150" href="p.html">
+                    <span class="material-symbols-outlined" style="font-variation-settings: &quot;FILL&quot; 1;">inventory_2</span>
+                    <span class="font-body-md text-body-md">Produk</span>
+                </a>
+                <a class="text-on-primary-container/70 hover:bg-white/5 hover:text-on-primary-container mx-2 flex items-center gap-element-gap p-3 transition-colors active:scale-95 duration-150" href="riwayat.html">
+                    <span class="material-symbols-outlined">history</span>
+                    <span class="font-body-md text-body-md">Riwayat Transaksi</span>
+                </a>
+                <a class="text-on-primary-container/70 hover:bg-white/5 hover:text-on-primary-container mx-2 flex items-center gap-element-gap p-3 transition-colors active:scale-95 duration-150" href="sift.html">
+                    <span class="material-symbols-outlined">schedule</span>
+                    <span class="font-body-md text-body-md">Shift Kasir</span>
+                </a>
+                <a class="text-on-primary-container/70 hover:bg-white/5 hover:text-on-primary-container mx-2 flex items-center gap-element-gap p-3 transition-colors active:scale-95 duration-150" href="pengaturan.html">
+                    <span class="material-symbols-outlined">settings</span>
+                    <span class="font-body-md text-body-md">Pengaturan</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 flex flex-col min-w-0 h-full">
+            <!-- Top Bar -->
+            <header class="h-20 w-full flex-shrink-0 bg-background flex justify-between items-center px-grid-gutter border-b border-white/5">
+                <div class="flex-1 max-w-md">
+                    <div class="relative group">
+                        <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant group-focus-within:text-primary transition-colors">search</span>
+                        <input class="w-full bg-surface-container-high border-none rounded-full py-2.5 pl-12 pr-4 text-on-surface font-body-md focus:ring-2 focus:ring-primary/50 transition-all" placeholder="Cari nama produk atau SKU..." type="text" id="searchInput">
+                    </div>
+                </div>
+                <div class="flex items-center gap-6">
+                    <div class="flex items-center gap-4 border-l border-white/10 pl-6">
+                        <div class="text-right">
+                            <p class="font-label-caps text-on-surface-variant uppercase tracking-tighter">Kasir</p>
+                            <p class="font-body-lg text-on-surface" id="cashierNameDisplay">Sarah Wijaya</p>
+                        </div>
+                        <img class="w-10 h-10 rounded-full object-cover border border-primary/20" id="cashierAvatarDisplay" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAYTZwsiM_474tkqVJwk7LI3d_fa4RfQ6jOu2AvL5GcMV-Bqg823Y7Vg_iqC4ol8PiPr1liLPCA0FsntKwylC0mE0eIw6ecFBSYwRztKsiSQkajYOlPVataAMp9qGmTAoYeeON0qiBJ9CruYwcwMEO8E7ayGcReE18EJjgAzUUEaWf3SjsSi1BH-Ybsha2ed21I9T4pkLM65TJSOikrYFLH56NluOJqYUMs91nJnVwlaHVkg72HO2FERzYIoTC4y75pSTy1QHyspX-Q">
+                        <button class="text-on-surface-variant hover:text-primary transition-colors">
+                            <span class="material-symbols-outlined">notifications</span>
+                        </button>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Main Content Area -->
+            <div class="flex-1 p-grid-gutter overflow-y-auto content-scroll">
+                <!-- Statistics & Filter Row -->
+                <div class="grid grid-cols-12 gap-6 mb-8">
+                    <div class="col-span-9 bg-surface-container rounded-xl p-6 shadow-sm flex flex-col justify-between border border-white/5">
+                        <div class="flex items-center space-x-4 mb-6">
+                            <span class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest flex-shrink-0">Kategori:</span>
+                            <div class="flex flex-wrap gap-2" id="filterContainer">
+                                <button class="px-4 py-1.5 rounded-full bg-primary text-on-primary text-sm font-semibold" data-category="Semua">Semua</button>
+                                <button class="px-4 py-1.5 rounded-full bg-white/10 text-on-surface text-sm font-semibold hover:bg-white/20 transition-colors" data-category="Minuman">Minuman</button>
+                                <button class="px-4 py-1.5 rounded-full bg-white/10 text-on-surface text-sm font-semibold hover:bg-white/20 transition-colors" data-category="Makanan">Makanan</button>
+                                <button class="px-4 py-1.5 rounded-full bg-white/10 text-on-surface text-sm font-semibold hover:bg-white/20 transition-colors" data-category="Coffee (Hot)">Coffee (Hot)</button>
+                                <button class="px-4 py-1.5 rounded-full bg-white/10 text-on-surface text-sm font-semibold hover:bg-white/20 transition-colors" data-category="Coffee (Ice)">Coffee (Ice)</button>
+                                <button class="px-4 py-1.5 rounded-full bg-white/10 text-on-surface text-sm font-semibold hover:bg-white/20 transition-colors" data-category="Pastry">Pastry</button>
+                            </div>
+                        </div>
+                        <div class="flex justify-end space-x-2">
+                            <button class="p-2 bg-white/5 rounded-lg border border-white/10 hover:bg-white/10 transition-colors text-on-surface-variant">
+                                <span class="material-symbols-outlined text-sm">filter_list</span>
+                            </button>
+                            <button class="p-2 bg-white/5 rounded-lg border border-white/10 hover:bg-white/10 transition-colors text-on-surface-variant">
+                                <span class="material-symbols-outlined text-sm">view_list</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="col-span-3 bg-surface-container rounded-xl p-6 shadow-sm flex items-center justify-around border border-white/5">
+                        <div class="text-center">
+                            <p class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest mb-1">Total</p>
+                            <p class="font-headline-lg text-headline-lg text-primary font-extrabold" id="totalProducts">0</p>
+                        </div>
+                        <div class="w-px h-10 bg-white/10"></div>
+                        <div class="text-center">
+                            <p class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest mb-1">Habis</p>
+                            <p class="font-headline-lg text-headline-lg text-error font-extrabold" id="outOfStockCount">0</p>
+                        </div>
+                        <div class="w-px h-10 bg-white/10"></div>
+                        <div class="text-center">
+                            <p class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest mb-1">Restock</p>
+                            <p class="font-headline-lg text-headline-lg text-primary font-extrabold" id="restockCount">0</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product Table Section -->
+                <section class="bg-surface-container rounded-xl overflow-hidden shadow-sm border border-white/5 mb-8">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-white/5 border-b border-white/10">
+                                    <th class="px-6 py-4 font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest">Produk</th>
+                                    <th class="px-6 py-4 font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest">Kategori</th>
+                                    <th class="px-6 py-4 font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest">Harga Jual</th>
+                                    <th class="px-6 py-4 font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest">Status Stok</th>
+                                    <th class="px-6 py-4 font-label-caps text-label-caps text-on-surface-variant uppercase tracking-widest text-right">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-white/5" id="productTableBody">
+                                <!-- Data produk akan di-render oleh JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="px-6 py-4 flex items-center justify-between bg-white/2 border-t border-white/10 flex-wrap gap-2">
+                        <p class="font-body-md text-on-surface-variant" id="paginationInfo">Menampilkan 0 dari 0 produk</p>
+                        <div class="flex items-center space-x-1">
+                            <button class="p-1.5 text-on-surface-variant hover:text-primary transition-colors" id="prevPage">
+                                <span class="material-symbols-outlined">chevron_left</span>
+                            </button>
+                            <button class="w-8 h-8 flex items-center justify-center rounded-lg bg-primary text-on-primary font-body-md font-bold" data-page="1">1</button>
+                            <button class="p-1.5 text-on-surface-variant hover:text-primary transition-colors" id="nextPage">
+                                <span class="material-symbols-outlined">chevron_right</span>
+                            </button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Info Boxes -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-surface-container border border-primary/20 rounded-xl p-6 flex items-start space-x-4">
+                        <div class="flex-shrink-0 w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center text-primary">
+                            <span class="material-symbols-outlined">info</span>
+                        </div>
+                        <div>
+                            <h4 class="font-body-lg text-on-surface mb-2">Panduan Kasir</h4>
+                            <p class="font-body-md text-on-surface-variant leading-relaxed">
+                                Gunakan filter kategori untuk mempercepat pencarian item saat pelanggan antri. Produk dengan status "Habis" disarankan untuk segera diinformasikan ke tim bar.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="bg-surface-container border border-primary/20 rounded-xl p-6 flex items-start space-x-4">
+                        <div class="flex-shrink-0 w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center text-primary">
+                            <span class="material-symbols-outlined">sync</span>
+                        </div>
+                        <div>
+                            <h4 class="font-body-lg text-on-surface mb-2">Sinkronisasi Inventaris</h4>
+                            <p class="font-body-md text-on-surface-variant leading-relaxed">
+                                Katalog produk disinkronkan secara otomatis setiap 5 menit dengan gudang pusat. Klik ikon refresh di pojok kanan atas tabel untuk memperbarui data secara instan.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // ===================== GET CASHIER PROFILE =====================
+        function getCashierProfile() {
+            try {
+                const saved = localStorage.getItem('cashier_profile');
+                if (saved) {
+                    const profile = JSON.parse(saved);
+                    if (profile && profile.name) {
+                        return profile;
+                    }
+                }
+                const settings = localStorage.getItem('pos_settings');
+                if (settings) {
+                    const data = JSON.parse(settings);
+                    if (data['cashier-name']) {
+                        return {
+                            name: data['cashier-name'],
+                            avatar: data['cashier-avatar'] || 'https://lh3.googleusercontent.com/aida-public/AB6AXuAYTZwsiM_474tkqVJwk7LI3d_fa4RfQ6jOu2AvL5GcMV-Bqg823Y7Vg_iqC4ol8PiPr1liLPCA0FsntKwylC0mE0eIw6ecFBSYwRztKsiSQkajYOlPVataAMp9qGmTAoYeeON0qiBJ9CruYwcwMEO8E7ayGcReE18EJjgAzUUEaWf3SjsSi1BH-Ybsha2ed21I9T4pkLM65TJSOikrYFLH56NluOJqYUMs91nJnVwlaHVkg72HO2FERzYIoTC4y75pSTy1QHyspX-Q'
+                        };
+                    }
+                }
+            } catch(e) {}
+            return {
+                name: 'Sarah Wijaya',
+                avatar: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAYTZwsiM_474tkqVJwk7LI3d_fa4RfQ6jOu2AvL5GcMV-Bqg823Y7Vg_iqC4ol8PiPr1liLPCA0FsntKwylC0mE0eIw6ecFBSYwRztKsiSQkajYOlPVataAMp9qGmTAoYeeON0qiBJ9CruYwcwMEO8E7ayGcReE18EJjgAzUUEaWf3SjsSi1BH-Ybsha2ed21I9T4pkLM65TJSOikrYFLH56NluOJqYUMs91nJnVwlaHVkg72HO2FERzYIoTC4y75pSTy1QHyspX-Q'
+            };
+        }
+
+        // ===================== UPDATE CASHIER DISPLAY =====================
+        function updateCashierDisplay() {
+            const profile = getCashierProfile();
+            const nameEl = document.getElementById('cashierNameDisplay');
+            const avatarEl = document.getElementById('cashierAvatarDisplay');
+            
+            if (nameEl) nameEl.textContent = profile.name;
+            if (avatarEl) avatarEl.src = profile.avatar;
+        }
+
+        // ===================== DATA PRODUK DEFAULT =====================
+        const DEFAULT_PRODUCTS = [
+            { id: 1, name: 'Thai Tea', sku: 'LS-MIN-001', category: 'Minuman', price: 15000, status: 'tersedia', stock: 45, image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAeeRksBGrTSnK_AP-ZhB3KKB9wtsY5mPBePQ2fG0gDuSSLwgdWR8N7Ks-3mXsdMmCALE91KvHzqRmRzU_k1_BWZofFLalnPeb4PpcP4CqvosdwAAym19AaYwD9f-FXEO1gY44si-ULmG7Zzv9kbhol4KSr0EgIYy07Q_hs4d53_6BJidVcYmWeKvWDea4nheraEodIIadH8nSdkbI8r6GO_4-aDARzf2nlPUFDPaut9RII7Lkb0pSQ9VvIwrTPU-GTYCrgZZb2pxx3' },
+            { id: 2, name: 'Croissant', sku: 'LS-MKN-012', category: 'Makanan', price: 28000, status: 'habis', stock: 0, image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAVl2olZ4aW7kgs791uLRuVCH71Dy1mw5USgAAeTMpJ6UjynjopkJeYdFLk4qIKZCnqsjMtA6y4RzrhMAe4dp8M0wsjd_kzKeV8-wdH2MUAHoCHkK7c4k6HDwvileMMV4ApCGFg9Q4wj2rdm0FW_jbmI4O-PZ6jAU4JCRvFqm3SS1q6hATfy-qqMMvhny565ReHCL1R2q21haeyyX8UPHweub5xIvqDwjCb6PCK-rKplimPAowO_WPXHUBak6k2twOe41lAXjY_UAlN' },
+            { id: 3, name: 'Cappuccino', sku: 'LS-MIN-002', category: 'Minuman', price: 15000, status: 'tersedia', stock: 32, image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuD-yA0jGVbaV2URE3bTc6RPKh41RhP5OAPrSjJfYz_qYQvCP6rpEG4PnhhiXr47x9RBV-u0RkcQIjECRZo-pHF1Fo7RmlFgSgNd05UepbuNiR25fDl6R_uWvEtROZ1p3HVkvQqH4T86rp9RQZZB4xPJd7pU234f6Pa8kKtF4_3VfQeWKoBXzPEH9zk9qF-rTbQUjVPhUqB1lO4GhRlpIehReFkAVpzOJaIPiIrDYAKOrieqqE9-CwJqtlXw-aNhhMbSMb4J29Ep_2TD' },
+            { id: 4, name: 'Matcha Latte', sku: 'LS-MIN-003', category: 'Minuman', price: 17000, status: 'tersedia', stock: 18, image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBs_4iDhOispOAIY4veLDTJCzHm2fChrHjyuQbocTSeY111ZWJo9A2B0I9902fMkjBXd6_YX2_TvK4AidLBwW47XiWFst1_4fAEnZHP8T6xk3rD9LVqW7fQ2lfZ2-vnN4C1gNZhHBbzDNuDeX4tieh7hNYzHvAbr4irh2kDzQCHEvebrXrzYNj4NEkNb9eh6BdWcLw0iQXuiTmKgx1bT5u4fwRLkSl8LaooCPYbD-5e5_8d06fmoPq7ShzXYr4YLQRh5LJmh5ngPIG2' },
+            { id: 5, name: 'Gula Aren', sku: 'LS-MIN-004', category: 'Minuman', price: 20000, status: 'tersedia', stock: 25, image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDLpA_xLSOMopD_9XGlO-zQWD47U-S9yKechHxEJ50i8bnqDyUIfbY8wXgNbV1uYiLuulVsb0tHX9zunTZZ-6G6alWZcvqr5GI7eVASYcgzl5tIqLjQoRkSshpgsWRD1LopHwd7QUBpqc-GwwvsPYHi-PHOXt0C1aZ8rfVnE4GHZE0PA6syJ_HKjO5f-6PWyZiH6NbaiuYbHjcbGGXy4b_8epq0-tT2QFefcNnWvOj13mKapNnOS5O413mr0-kZx_uez2BfmB4bDhQs' },
+            { id: 6, name: 'Americano', sku: 'LS-MIN-005', category: 'Minuman', price: 13000, status: 'tersedia', stock: 30, image: 'https://images.unsplash.com/photo-1551030173-1225a8a0f1f0?w=100&h=100&fit=crop' },
+            { id: 7, name: 'Chocolate Croissant', sku: 'LS-MKN-013', category: 'Makanan', price: 32000, status: 'tersedia', stock: 12, image: 'https://images.unsplash.com/photo-1555507036-ab1f4038808a?w=100&h=100&fit=crop' }
+        ];
+
+        // ===================== LOAD DATA =====================
+        let products = [];
+
+        function loadProductsFromStorage() {
+            try {
+                const saved = localStorage.getItem('pos_products');
+                if (saved) {
+                    const parsed = JSON.parse(saved);
+                    if (parsed && parsed.length > 0) {
+                        products = parsed;
+                        return true;
+                    }
+                }
+            } catch(e) {
+                console.warn('Gagal memuat data dari localStorage:', e);
+            }
+            return false;
+        }
+
+        function saveProductsToStorage() {
+            try {
+                localStorage.setItem('pos_products', JSON.stringify(products));
+            } catch(e) {
+                console.warn('Gagal menyimpan data ke localStorage:', e);
+            }
+        }
+
+        // ===================== RENDER FUNCTIONS =====================
+        function renderProducts(filteredProducts) {
+            const tbody = document.getElementById('productTableBody');
+            const productsToRender = filteredProducts || products;
+            
+            if (productsToRender.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="5" class="px-6 py-12 text-center text-on-surface-variant">
+                            <span class="material-symbols-outlined text-4xl block mb-2">inventory_2</span>
+                            <p class="font-body-lg">Belum ada produk</p>
+                        </td>
+                    </tr>
+                `;
+                updateStats();
+                updatePaginationInfo(0);
+                return;
+            }
+
+            tbody.innerHTML = productsToRender.map(p => {
+                const statusMap = {
+                    'tersedia': { label: `Tersedia (${p.stock} porsi)`, color: 'text-primary', dot: 'bg-primary' },
+                    'in-stock': { label: `Tersedia (${p.stock} porsi)`, color: 'text-primary', dot: 'bg-primary' },
+                    'habis': { label: 'HABIS', color: 'text-error font-bold uppercase tracking-wider', dot: 'bg-error' },
+                    'out-of-stock': { label: 'HABIS', color: 'text-error font-bold uppercase tracking-wider', dot: 'bg-error' },
+                    'restock': { label: 'RESTOCK', color: 'text-primary font-bold uppercase tracking-wider', dot: 'bg-primary' },
+                    'low-stock': { label: `Hampir Habis (${p.stock} porsi)`, color: 'text-warning font-bold uppercase tracking-wider', dot: 'bg-warning' }
+                };
+                const status = statusMap[p.status] || statusMap['tersedia'];
+                const displayStatus = p.status || 'tersedia';
+                
+                return `
+                    <tr class="hover:bg-white/5 transition-colors">
+                        <td class="px-6 py-4">
+                            <div class="flex items-center">
+                                <img alt="${p.name}" class="w-12 h-12 rounded-lg object-cover mr-4 flex-shrink-0" src="${p.image}" onerror="this.src='https://images.unsplash.com/photo-1551030173-1225a8a0f1f0?w=100&h=100&fit=crop'">
+                                <div>
+                                    <p class="font-body-lg text-on-surface">${p.name}</p>
+                                    <p class="font-label-caps text-label-caps text-on-surface-variant">${p.sku}</p>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4">
+                            <span class="px-3 py-1 bg-white/10 rounded-md font-label-caps text-label-caps text-on-surface-variant">${p.category}</span>
+                        </td>
+                        <td class="px-6 py-4 font-body-md text-on-surface">Rp ${p.price.toLocaleString('id-ID')}</td>
+                        <td class="px-6 py-4">
+                            <div class="flex items-center font-body-md ${status.color}">
+                                <span class="w-2 h-2 rounded-full ${status.dot} mr-2 flex-shrink-0"></span>
+                                ${status.label}
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 text-right">
+                            <div class="flex items-center justify-end gap-2">
+                                <button class="text-on-surface-variant hover:text-primary transition-colors view-product" data-id="${p.id}">
+                                    <span class="material-symbols-outlined text-sm">visibility</span>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            updateStats();
+            updatePaginationInfo(productsToRender.length);
+
+            // Event listener untuk tombol view
+            document.querySelectorAll('.view-product').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const id = parseInt(this.dataset.id);
+                    const product = products.find(p => p.id === id);
+                    if (product) {
+                        alert(`📦 DETAIL PRODUK\n\n` +
+                              `🆔 ID: ${product.id}\n` +
+                              `📛 Nama: ${product.name}\n` +
+                              `🏷️ SKU: ${product.sku}\n` +
+                              `📂 Kategori: ${product.category}\n` +
+                              `💰 Harga: Rp ${product.price.toLocaleString('id-ID')}\n` +
+                              `📦 Stok: ${product.stock} porsi\n` +
+                              `📊 Status: ${product.status || 'Tersedia'}`);
+                    }
+                });
+            });
+        }
+
+        function updateStats() {
+            const total = products.length;
+            const outOfStock = products.filter(p => p.status === 'habis' || p.status === 'out-of-stock').length;
+            const restock = products.filter(p => p.status === 'restock' || p.status === 'low-stock').length;
+            document.getElementById('totalProducts').textContent = total;
+            document.getElementById('outOfStockCount').textContent = outOfStock;
+            document.getElementById('restockCount').textContent = restock;
+        }
+
+        function updatePaginationInfo(count) {
+            document.getElementById('paginationInfo').textContent = `Menampilkan ${count || 0} dari ${count || 0} produk`;
+        }
+
+        // ===================== EVENT LISTENERS =====================
+        document.getElementById('searchInput').addEventListener('input', function() {
+            const term = this.value.toLowerCase().trim();
+            const filtered = products.filter(p => 
+                p.name.toLowerCase().includes(term) || 
+                p.sku.toLowerCase().includes(term)
+            );
+            renderProducts(filtered);
+        });
+
+        document.querySelectorAll('#filterContainer button').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('#filterContainer button').forEach(b => {
+                    b.classList.remove('bg-primary', 'text-on-primary');
+                    b.classList.add('bg-white/10', 'text-on-surface');
+                });
+                this.classList.remove('bg-white/10', 'text-on-surface');
+                this.classList.add('bg-primary', 'text-on-primary');
+
+                const category = this.dataset.category;
+                const filtered = category === 'Semua' ? 
+                    products : 
+                    products.filter(p => p.category === category);
+                renderProducts(filtered);
+            });
+        });
+
+        // ===================== LISTEN FOR STORAGE CHANGES =====================
+        window.addEventListener('storage', function(e) {
+            if (e.key === 'cashier_profile' || e.key === 'pos_settings') {
+                updateCashierDisplay();
+            }
+            if (e.key === 'pos_products') {
+                loadProductsFromStorage();
+                renderProducts();
+                // Reset filter to "Semua"
+                document.querySelectorAll('#filterContainer button').forEach(b => {
+                    b.classList.remove('bg-primary', 'text-on-primary');
+                    b.classList.add('bg-white/10', 'text-on-surface');
+                });
+                document.querySelector('#filterContainer button[data-category="Semua"]')?.classList.remove('bg-white/10', 'text-on-surface');
+                document.querySelector('#filterContainer button[data-category="Semua"]')?.classList.add('bg-primary', 'text-on-primary');
+            }
+        });
+
+        // ===================== INITIALIZE =====================
+        updateCashierDisplay();
+
+        // Load data dari localStorage, jika tidak ada gunakan default
+        if (!loadProductsFromStorage()) {
+            products = JSON.parse(JSON.stringify(DEFAULT_PRODUCTS));
+            saveProductsToStorage();
+        }
+        renderProducts();
+
+        // Sinkronisasi otomatis setiap 5 detik (untuk update dari halaman Transaksi)
+        setInterval(() => {
+            if (loadProductsFromStorage()) {
+                renderProducts();
+            }
+            updateCashierDisplay();
+        }, 5000);
+
+        // Micro-interactions
+        document.querySelectorAll('a, button').forEach(el => {
+            el.addEventListener('mousedown', () => {
+                el.classList.add('scale-95');
+            });
+            el.addEventListener('mouseup', () => {
+                el.classList.remove('scale-95');
+            });
+            el.addEventListener('mouseleave', () => {
+                el.classList.remove('scale-95');
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,1143 @@
+<!DOCTYPE html>
+<html class="dark" lang="id">
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Little Story POS - Pengaturan</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries">
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@100..900&amp;display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "on-primary-container": "#d6ad6e",
+                        "on-primary-fixed-variant": "#5e410c",
+                        "primary-container": "#5d400b",
+                        "surface-variant": "#353535",
+                        "on-surface-variant": "#d2c4b5",
+                        "on-error-container": "#ffdad6",
+                        "secondary": "#634eba",
+                        "surface": "#131313",
+                        "primary-fixed-dim": "#ebc080",
+                        "on-primary": "#432c00",
+                        "surface-container-high": "#2a2a2a",
+                        "on-error": "#690005",
+                        "on-secondary-fixed-variant": "#483890",
+                        "surface-container": "#1f1f1f",
+                        "secondary-container": "#4b3a93",
+                        "inverse-on-surface": "#303030",
+                        "inverse-surface": "#e2e2e2",
+                        "inverse-primary": "#795923",
+                        "on-background": "#e2e2e2",
+                        "surface-container-low": "#1b1b1b",
+                        "on-secondary-container": "#bcaeff",
+                        "tertiary-fixed": "#e2e2e2",
+                        "tertiary-container": "#444646",
+                        "primary-fixed": "#ffddaf",
+                        "on-tertiary-fixed-variant": "#454747",
+                        "tertiary-fixed-dim": "#c6c6c7",
+                        "on-secondary": "#321e79",
+                        "background": "#000000",
+                        "surface-bright": "#393939",
+                        "on-tertiary-container": "#b3b4b4",
+                        "surface-tint": "#ebc080",
+                        "on-tertiary": "#2f3131",
+                        "on-secondary-fixed": "#1c0062",
+                        "outline-variant": "#4e453a",
+                        "secondary-fixed": "#e6deff",
+                        "primary": "#ebc080",
+                        "error": "#ffb4ab",
+                        "on-surface": "#e2e2e2",
+                        "surface-container-lowest": "#0e0e0e",
+                        "on-primary-fixed": "#281800",
+                        "error-container": "#93000a",
+                        "surface-container-highest": "#353535",
+                        "secondary-fixed-dim": "#cabeff",
+                        "tertiary": "#c6c6c7",
+                        "on-tertiary-fixed": "#1a1c1c",
+                        "surface-dim": "#131313",
+                        "outline": "#9b8f81"
+                    },
+                    borderRadius: {
+                        DEFAULT: "0.25rem",
+                        lg: "8px",
+                        xl: "12px",
+                        full: "9999px"
+                    },
+                    spacing: {
+                        "grid-gutter": "24px",
+                        "card-padding": "16px",
+                        "sidebar-width": "240px",
+                        "section-margin": "32px",
+                        "element-gap": "12px"
+                    },
+                    fontFamily: {
+                        "headline-lg": ["Plus Jakarta Sans"],
+                        "price-display": ["Plus Jakarta Sans"],
+                        "body-md": ["Plus Jakarta Sans"],
+                        "headline-md": ["Plus Jakarta Sans"],
+                        "label-caps": ["Plus Jakarta Sans"],
+                        "body-lg": ["Plus Jakarta Sans"]
+                    },
+                    fontSize: {
+                        "headline-lg": ["24px", { lineHeight: "32px", fontWeight: "700" }],
+                        "price-display": ["18px", { lineHeight: "24px", fontWeight: "800" }],
+                        "body-md": ["14px", { lineHeight: "20px", fontWeight: "500" }],
+                        "headline-md": ["20px", { lineHeight: "28px", fontWeight: "700" }],
+                        "label-caps": ["10px", { lineHeight: "14px", letterSpacing: "0.05em", fontWeight: "700" }],
+                        "body-lg": ["16px", { lineHeight: "24px", fontWeight: "600" }]
+                    }
+                },
+            },
+        }
+    </script>
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #000000;
+        }
+        .content-scroll::-webkit-scrollbar {
+            width: 6px;
+        }
+        .content-scroll::-webkit-scrollbar-track {
+            background: #000000;
+        }
+        .content-scroll::-webkit-scrollbar-thumb {
+            background: #333333;
+            border-radius: 3px;
+        }
+        .sidebar-active {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: #d6ad6e;
+        }
+        .sidebar-active .material-symbols-outlined {
+            font-variation-settings: 'FILL' 1;
+        }
+        .settings-card {
+            transition: all 0.2s ease;
+        }
+        .settings-card:hover {
+            border-color: rgba(235, 192, 128, 0.3);
+        }
+        .toggle-switch {
+            position: relative;
+            width: 44px;
+            height: 24px;
+            background: #353535;
+            border-radius: 9999px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            flex-shrink: 0;
+        }
+        .toggle-switch.active {
+            background: #ebc080;
+        }
+        .toggle-switch .toggle-knob {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            transition: transform 0.3s ease;
+        }
+        .toggle-switch.active .toggle-knob {
+            transform: translateX(20px);
+        }
+        .notification-toast {
+            animation: slideIn 0.5s ease-out;
+        }
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        /* Highlight perubahan */
+        .setting-changed {
+            border-left: 3px solid #ebc080;
+            padding-left: 12px;
+            background: rgba(235, 192, 128, 0.05);
+            border-radius: 4px;
+        }
+        .setting-changed input,
+        .setting-changed select {
+            border-color: #ebc080 !important;
+        }
+        
+        /* Focus state for inputs */
+        input:focus, select:focus {
+            outline: none;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background">
+    <!-- Sidebar -->
+    <aside class="w-sidebar-width h-full fixed left-0 top-0 bg-primary-container flex flex-col py-6 z-50">
+        <div class="px-6 mb-10 flex items-center gap-3">
+            <div class="w-10 h-10 bg-on-primary-fixed-variant rounded-lg flex items-center justify-center">
+                <span class="material-symbols-outlined text-primary" style="font-variation-settings: &quot;FILL&quot; 1;">coffee</span>
+            </div>
+            <div>
+                <h1 class="font-headline-md text-headline-md font-bold text-on-primary-container leading-none">Little Story</h1>
+                <span class="font-label-caps text-label-caps text-on-primary-container/60 uppercase tracking-widest">ENTERPRISE ERP</span>
+            </div>
+        </div>
+        <nav class="flex-1 space-y-1">
+            <a class="text-on-primary-container/70 hover:bg-white/5 hover:text-on-primary-container mx-2 flex items-center gap-element-gap p-3 transition-colors active:scale-95 duration-150" href="s.html">
+                <span class="material-symbols-outlined">dashboard</span>
+                <span class="font-body-md text-body-md">Dashboard</span>
+            </a>
+            <a class="text-on-primary-container/70 hover:bg-white/5 hover:text-on-primary-container mx-2 flex items-center gap-element-gap p-3 transition-colors active:scale-95 duration-150" href="transaksi.html">
+                <span class="material-symbols-outlined">point_of_sale</span>
+                <span class="font-body-md text-body-md">Transaksi</span>
+            </a>
+            <a class="text-on-primary-container/70 hover:bg-white/5 hover:text-on-primary-container mx-2 flex items-center gap-element-gap p-3 transition-colors active:scale-95 duration-150" href="p.html">
+                <span class="material-symbols-outlined">inventory_2</span>
+                <span class="font-body-md text-body-md">Produk</span>
+            </a>
+            <a class="text-on-primary-container/70 hover:bg-white/5 hover:text-on-primary-container mx-2 flex items-center gap-element-gap p-3 transition-colors active:scale-95 duration-150" href="riwayat.html">
+                <span class="material-symbols-outlined">history</span>
+                <span class="font-body-md text-body-md">Riwayat Transaksi</span>
+            </a>
+            <a class="text-on-primary-container/70 hover:bg-white/5 hover:text-on-primary-container mx-2 flex items-center gap-element-gap p-3 transition-colors active:scale-95 duration-150" href="sift.html">
+                <span class="material-symbols-outlined">schedule</span>
+                <span class="font-body-md text-body-md">Shift Kasir</span>
+            </a>
+            <!-- Pengaturan (Active) -->
+            <a class="sidebar-active mx-2 flex items-center gap-element-gap p-3 transition-colors active:scale-95 duration-150" href="#">
+                <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">settings</span>
+                <span class="font-body-md text-body-md">Pengaturan</span>
+            </a>
+        </nav>
+        <div class="mt-auto">
+            <a class="text-on-primary-container/70 hover:bg-white/5 hover:text-on-primary-container mx-2 flex items-center gap-element-gap p-3 transition-colors" href="login.html">
+                
+                <span class="font-body-md text-body-md">Keluar</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="ml-sidebar-width min-h-screen flex flex-col">
+        <!-- Top Bar -->
+        <header class="h-20 w-full sticky top-0 z-40 bg-background flex justify-between items-center px-grid-gutter border-b border-white/5">
+            <div class="flex-1 max-w-md">
+                <div class="relative group">
+                    <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant group-focus-within:text-primary transition-colors">search</span>
+                    <input class="w-full bg-surface-container-high border-none rounded-full py-2.5 pl-12 pr-4 text-on-surface font-body-md focus:ring-2 focus:ring-primary/50 transition-all" placeholder="Cari pengaturan..." type="text" id="search-settings">
+                </div>
+            </div>
+            <div class="flex items-center gap-6">
+                <div class="flex items-center gap-4 border-l border-white/10 pl-6">
+                    <div class="text-right">
+                        <p class="font-label-caps text-on-surface-variant uppercase tracking-tighter">Kasir</p>
+                        <p class="font-body-lg text-on-surface" id="cashierNameDisplay">Sarah Wijaya</p>
+                    </div>
+                    <img class="w-10 h-10 rounded-full object-cover border border-primary/20" id="cashierAvatarDisplay" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAYTZwsiM_474tkqVJwk7LI3d_fa4RfQ6jOu2AvL5GcMV-Bqg823Y7Vg_iqC4ol8PiPr1liLPCA0FsntKwylC0mE0eIw6ecFBSYwRztKsiSQkajYOlPVataAMp9qGmTAoYeeON0qiBJ9CruYwcwMEO8E7ayGcReE18EJjgAzUUEaWf3SjsSi1BH-Ybsha2ed21I9T4pkLM65TJSOikrYFLH56NluOJqYUMs91nJnVwlaHVkg72HO2FERzYIoTC4y75pSTy1QHyspX-Q">
+                    <button class="text-on-surface-variant hover:text-primary transition-colors">
+                        <span class="material-symbols-outlined">notifications</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content Area -->
+        <div class="flex-1 p-grid-gutter overflow-y-auto content-scroll">
+            <div class="max-w-7xl mx-auto">
+                <!-- Page Header -->
+                <div class="mb-8 flex justify-between items-center">
+                    <div>
+                        <h1 class="text-3xl font-bold text-on-surface">Pengaturan</h1>
+                        <p class="text-on-surface-variant text-sm mt-1">Kelola konfigurasi sistem dan preferensi aplikasi</p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <span class="text-xs text-on-surface-variant" id="last-saved-status">Belum ada perubahan</span>
+                        <span class="w-2 h-2 rounded-full bg-gray-500" id="save-indicator"></span>
+                    </div>
+                </div>
+
+                <!-- Settings Grid -->
+                <div class="grid grid-cols-12 gap-6">
+                    <!-- Left Column: Navigation -->
+                    <div class="col-span-3">
+                        <div class="bg-surface-container rounded-xl border border-white/5 overflow-hidden sticky top-24">
+                            <div class="p-2 space-y-1">
+                                <button class="settings-nav w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-on-surface bg-white/10 transition-colors" data-section="general">
+                                    <span class="material-symbols-outlined text-primary">tune</span>
+                                    Umum
+                                    <span class="ml-auto text-xs text-on-surface-variant" id="nav-general-status"></span>
+                                </button>
+                                <button class="settings-nav w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-on-surface-variant hover:bg-white/5 transition-colors" data-section="payment">
+                                    <span class="material-symbols-outlined">payments</span>
+                                    Pembayaran
+                                    <span class="ml-auto text-xs text-on-surface-variant" id="nav-payment-status"></span>
+                                </button>
+                                <button class="settings-nav w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-on-surface-variant hover:bg-white/5 transition-colors" data-section="tax">
+                                    <span class="material-symbols-outlined">receipt_long</span>
+                                    Pajak &amp; Diskon
+                                    <span class="ml-auto text-xs text-on-surface-variant" id="nav-tax-status"></span>
+                                </button>
+                                <button class="settings-nav w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-on-surface-variant hover:bg-white/5 transition-colors" data-section="printer">
+                                    <span class="material-symbols-outlined">print</span>
+                                    Printer
+                                    <span class="ml-auto text-xs text-on-surface-variant" id="nav-printer-status"></span>
+                                </button>
+                                <button class="settings-nav w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-on-surface-variant hover:bg-white/5 transition-colors" data-section="cashier">
+                                    <span class="material-symbols-outlined">badge</span>
+                                    Kasir
+                                    <span class="ml-auto text-xs text-on-surface-variant" id="nav-cashier-status"></span>
+                                </button>
+                                <button class="settings-nav w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-on-surface-variant hover:bg-white/5 transition-colors" data-section="backup">
+                                    <span class="material-symbols-outlined">backup</span>
+                                    Backup &amp; Data
+                                    <span class="ml-auto text-xs text-on-surface-variant" id="nav-backup-status"></span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Column: Settings Content -->
+                    <div class="col-span-9 space-y-6">
+                        <!-- General Settings -->
+                        <div class="settings-section" id="section-general">
+                            <div class="bg-surface-container rounded-xl border border-white/5 overflow-hidden">
+                                <div class="px-6 py-4 border-b border-white/5 flex justify-between items-center">
+                                    <div>
+                                        <h2 class="font-bold text-on-surface">Pengaturan Umum</h2>
+                                        <p class="text-sm text-on-surface-variant">Konfigurasi dasar aplikasi POS</p>
+                                    </div>
+                                    <span class="text-xs text-on-surface-variant" id="section-general-status"></span>
+                                </div>
+                                <div class="p-6 space-y-4">
+                                    <div class="flex items-center justify-between py-3 border-b border-white/5 last:border-0 setting-item" data-setting="store-name">
+                                        <div>
+                                            <p class="font-medium text-on-surface">Nama Toko</p>
+                                            <p class="text-sm text-on-surface-variant">Nama yang akan muncul di struk</p>
+                                        </div>
+                                        <input type="text" value="Little Story Roastery" class="bg-surface-container-high border border-white/10 rounded-lg px-4 py-2 text-on-surface text-sm w-64 focus:ring-2 focus:ring-primary/50 transition" data-original="Little Story Roastery" onchange="markChanged(this)">
+                                    </div>
+                                    <div class="flex items-center justify-between py-3 border-b border-white/5 last:border-0 setting-item" data-setting="store-address">
+                                        <div>
+                                            <p class="font-medium text-on-surface">Alamat Toko</p>
+                                            <p class="text-sm text-on-surface-variant">Alamat lengkap toko</p>
+                                        </div>
+                                        <input type="text" value="Jl. Kopi No. 123, Jakarta" class="bg-surface-container-high border border-white/10 rounded-lg px-4 py-2 text-on-surface text-sm w-64 focus:ring-2 focus:ring-primary/50 transition" data-original="Jl. Kopi No. 123, Jakarta" onchange="markChanged(this)">
+                                    </div>
+                                    <div class="flex items-center justify-between py-3 border-b border-white/5 last:border-0 setting-item" data-setting="store-phone">
+                                        <div>
+                                            <p class="font-medium text-on-surface">Nomor Telepon</p>
+                                            <p class="text-sm text-on-surface-variant">Kontak toko</p>
+                                        </div>
+                                        <input type="text" value="+62 812 3456 7890" class="bg-surface-container-high border border-white/10 rounded-lg px-4 py-2 text-on-surface text-sm w-64 focus:ring-2 focus:ring-primary/50 transition" data-original="+62 812 3456 7890" onchange="markChanged(this)">
+                                    </div>
+                                    <div class="flex items-center justify-between py-3 border-b border-white/5 last:border-0 setting-item" data-setting="currency">
+                                        <div>
+                                            <p class="font-medium text-on-surface">Mata Uang</p>
+                                            <p class="text-sm text-on-surface-variant">Format mata uang yang digunakan</p>
+                                        </div>
+                                        <select class="bg-surface-container-high border border-white/10 rounded-lg px-4 py-2 text-on-surface text-sm w-64 focus:ring-2 focus:ring-primary/50 transition" data-original="IDR" onchange="markChanged(this)">
+                                            <option value="IDR" selected>IDR - Rupiah (Rp)</option>
+                                            <option value="USD">USD - Dolar ($)</option>
+                                            <option value="SGD">SGD - Dolar Singapura (S$)</option>
+                                        </select>
+                                    </div>
+                                    <div class="flex items-center justify-between py-3 setting-item" data-setting="dark-mode">
+                                        <div>
+                                            <p class="font-medium text-on-surface">Mode Gelap</p>
+                                            <p class="text-sm text-on-surface-variant">Tampilan antarmuka gelap</p>
+                                        </div>
+                                        <div class="toggle-switch active" onclick="toggleSwitch(this)" data-original="active">
+                                            <div class="toggle-knob"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Payment Settings -->
+                        <div class="settings-section hidden" id="section-payment">
+                            <div class="bg-surface-container rounded-xl border border-white/5 overflow-hidden">
+                                <div class="px-6 py-4 border-b border-white/5 flex justify-between items-center">
+                                    <div>
+                                        <h2 class="font-bold text-on-surface">Pengaturan Pembayaran</h2>
+                                        <p class="text-sm text-on-surface-variant">Konfigurasi metode pembayaran</p>
+                                    </div>
+                                    <span class="text-xs text-on-surface-variant" id="section-payment-status"></span>
+                                </div>
+                                <div class="p-6 space-y-4">
+                                    <div class="flex items-center justify-between py-3 border-b border-white/5 last:border-0 setting-item" data-setting="payment-cash">
+                                        <div>
+                                            <p class="font-medium text-on-surface">Tunai (Cash)</p>
+                                            <p class="text-sm text-on-surface-variant">Pembayaran dengan uang tunai</p>
+                                        </div>
+                                        <div class="toggle-switch active" onclick="toggleSwitch(this)" data-original="active">
+                                            <div class="toggle-knob"></div>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center justify-between py-3 border-b border-white/5 last:border-0 setting-item" data-setting="payment-qris">
+                                        <div>
+                                            <p class="font-medium text-on-surface">QRIS</p>
+                                            <p class="text-sm text-on-surface-variant">Pembayaran dengan QR code</p>
+                                        </div>
+                                        <div class="toggle-switch active" onclick="toggleSwitch(this)" data-original="active">
+                                            <div class="toggle-knob"></div>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center justify-between py-3 border-b border-white/5 last:border-0 setting-item" data-setting="payment-card">
+                                        <div>
+                                            <p class="font-medium text-on-surface">Kartu Debit/Kredit</p>
+                                            <p class="text-sm text-on-surface-variant">Pembayaran dengan kartu</p>
+                                        </div>
+                                        <div class="toggle-switch" onclick="toggleSwitch(this)" data-original="inactive">
+                                            <div class="toggle-knob"></div>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center justify-between py-3 border-b border-white/5 last:border-0 setting-item" data-setting="payment-ewallet">
+                                        <div>
+                                            <p class="font-medium text-on-surface">E-Wallet (OVO, Gopay, dll)</p>
+                                            <p class="text-sm text-on-surface-variant">Pembayaran digital wallet</p>
+                                        </div>
+                                        <div class="toggle-switch" onclick="toggleSwitch(this)" data-original="inactive">
+                                            <div class="toggle-knob"></div>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center justify-between py-3 setting-item" data-setting="payment-transfer">
+                                        <div>
+                                            <p class="font-medium text-on-surface">Transfer Bank</p>
+                                            <p class="text-sm text-on-surface-variant">Pembayaran via transfer bank</p>
+                                        </div>
+                                        <div class="toggle-switch" onclick="toggleSwitch(this)" data-original="inactive">
+                                            <div class="toggle-knob"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Tax & Discount Settings -->
+                        <div class="settings-section hidden" id="section-tax">
+                            <div class="bg-surface-container rounded-xl border border-white/5 overflow-hidden">
+                                <div class="px-6 py-4 border-b border-white/5 flex justify-between items-center">
+                                    <div>
+                                        <h2 class="font-bold text-on-surface">Pajak &amp; Diskon</h2>
+                                        <p class="text-sm text-on-surface-variant">Konfigurasi pajak dan diskon</p>
+                                    </div>
+                                    <span class="text-xs text-on-surface-variant" id="section-tax-status"></span>
+                                </div>
+                                <div class="p-6 space-y-4">
+                                    <div class="flex items-center justify-between py-3 border-b border-white/5 last:border-0 setting-item" data-setting="tax-rate">
+                                        <div>
+                                            <p class="font-medium text-on-surface">Pajak Penjualan (PPN)</p>
+                                            <p class="text-sm text-on-surface-variant">Persentase pajak yang dikenakan</p>
+                                        </div>
+                                        <div class="flex items-center gap-3">
+                                            <input type="number" value="10" class="bg-surface-container-high border border-white/10 rounded-lg px-4 py-2 text-on-surface text-sm w-24 text-center focus:ring-2 focus:ring-primary/50 transition" data-original="10" onchange="markChanged(this)">
+                                            <span class="text-sm text-on-surface-variant">%</span>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center justify-between py-3 border-b border-white/5 last:border-0 setting-item" data-setting="tax-enabled">
+                                        <div>
+                                            <p class="font-medium text-on-surface">Aktifkan Pajak</p>
+                                            <p class="text-sm text-on-surface-variant">Terapkan pajak pada setiap transaksi</p>
+                                        </div>
+                                        <div class="toggle-switch active" onclick="toggleSwitch(this)" data-original="active">
+                                            <div class="toggle-knob"></div>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center justify-between py-3 border-b border-white/5 last:border-0 setting-item" data-setting="discount-rate">
+                                        <div>
+                                            <p class="font-medium text-on-surface">Diskon Member</p>
+                                            <p class="text-sm text-on-surface-variant">Diskon untuk member tetap</p>
+                                        </div>
+                                        <div class="flex items-center gap-3">
+                                            <input type="number" value="5" class="bg-surface-container-high border border-white/10 rounded-lg px-4 py-2 text-on-surface text-sm w-24 text-center focus:ring-2 focus:ring-primary/50 transition" data-original="5" onchange="markChanged(this)">
+                                            <span class="text-sm text-on-surface-variant">%</span>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center justify-between py-3 setting-item" data-setting="rounding">
+                                        <div>
+                                            <p class="font-medium text-on-surface">Pembulatan Tunai</p>
+                                            <p class="text-sm text-on-surface-variant">Pembulatan otomatis untuk transaksi tunai</p>
+                                        </div>
+                                        <div class="toggle-switch" onclick="toggleSwitch(this)" data-original="inactive">
+                                            <div class="toggle-knob"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Printer Settings -->
+                        <div class="settings-section hidden" id="section-printer">
+                            <div class="bg-surface-container rounded-xl border border-white/5 overflow-hidden">
+                                <div class="px-6 py-4 border-b border-white/5 flex justify-between items-center">
+                                    <div>
+                                        <h2 class="font-bold text-on-surface">Pengaturan Printer</h2>
+                                        <p class="text-sm text-on-surface-variant">Konfigurasi printer struk</p>
+                                    </div>
+                                    <span class="text-xs text-on-surface-variant" id="section-printer-status"></span>
+                                </div>
+                                <div class="p-6 space-y-4">
+                                    <div class="flex items-center justify-between py-3 border-b border-white/5 last:border-0 setting-item" data-setting="printer-enabled">
+                                        <div>
+                                            <p class="font-medium text-on-surface">Aktifkan Printer</p>
+                                            <p class="text-sm text-on-surface-variant">Cetak struk otomatis setelah transaksi</p>
+                                        </div>
+                                        <div class="toggle-switch active" onclick="toggleSwitch(this)" data-original="active">
+                                            <div class="toggle-knob"></div>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center justify-between py-3 border-b border-white/5 last:border-0 setting-item" data-setting="printer-type">
+                                        <div>
+                                            <p class="font-medium text-on-surface">Jenis Printer</p>
+                                            <p class="text-sm text-on-surface-variant">Pilih tipe printer yang digunakan</p>
+                                        </div>
+                                        <select class="bg-surface-container-high border border-white/10 rounded-lg px-4 py-2 text-on-surface text-sm w-64 focus:ring-2 focus:ring-primary/50 transition" data-original="thermal" onchange="markChanged(this)">
+                                            <option value="thermal" selected>Thermal (Epson, Star, dll)</option>
+                                            <option value="dotmatrix">Dot Matrix</option>
+                                            <option value="bluetooth">Bluetooth Thermal</option>
+                                        </select>
+                                    </div>
+                                    <div class="flex items-center justify-between py-3 border-b border-white/5 last:border-0 setting-item" data-setting="printer-size">
+                                        <div>
+                                            <p class="font-medium text-on-surface">Ukuran Struk</p>
+                                            <p class="text-sm text-on-surface-variant">Lebar kertas struk</p>
+                                        </div>
+                                        <select class="bg-surface-container-high border border-white/10 rounded-lg px-4 py-2 text-on-surface text-sm w-64 focus:ring-2 focus:ring-primary/50 transition" data-original="58" onchange="markChanged(this)">
+                                            <option value="58" selected>58 mm</option>
+                                            <option value="80">80 mm</option>
+                                        </select>
+                                    </div>
+                                    <div class="flex items-center justify-between py-3 setting-item" data-setting="printer-copies">
+                                        <div>
+                                            <p class="font-medium text-on-surface">Salinan Struk</p>
+                                            <p class="text-sm text-on-surface-variant">Jumlah salinan struk yang dicetak</p>
+                                        </div>
+                                        <input type="number" value="1" min="1" max="3" class="bg-surface-container-high border border-white/10 rounded-lg px-4 py-2 text-on-surface text-sm w-24 text-center focus:ring-2 focus:ring-primary/50 transition" data-original="1" onchange="markChanged(this)">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Cashier Settings -->
+                        <div class="settings-section hidden" id="section-cashier">
+                            <div class="bg-surface-container rounded-xl border border-white/5 overflow-hidden">
+                                <div class="px-6 py-4 border-b border-white/5 flex justify-between items-center">
+                                    <div>
+                                        <h2 class="font-bold text-on-surface">Pengaturan Kasir</h2>
+                                        <p class="text-sm text-on-surface-variant">Manajemen akun kasir</p>
+                                    </div>
+                                    <span class="text-xs text-on-surface-variant" id="section-cashier-status"></span>
+                                </div>
+                                <div class="p-6 space-y-4">
+                                    <div class="flex items-center justify-between py-3 border-b border-white/5 last:border-0 setting-item" data-setting="cashier-name">
+                                        <div>
+                                            <p class="font-medium text-on-surface">Nama Kasir</p>
+                                            <p class="text-sm text-on-surface-variant">Nama yang akan muncul di transaksi</p>
+                                        </div>
+                                        <input type="text" value="Sarah Wijaya" class="bg-surface-container-high border border-white/10 rounded-lg px-4 py-2 text-on-surface text-sm w-64 focus:ring-2 focus:ring-primary/50 transition" data-original="Sarah Wijaya" id="cashierNameInput" oninput="onCashierNameChange(this)">
+                                    </div>
+                                    <div class="flex items-center justify-between py-3 border-b border-white/5 last:border-0 setting-item" data-setting="cashier-role">
+                                        <div>
+                                            <p class="font-medium text-on-surface">Peran Kasir</p>
+                                            <p class="text-sm text-on-surface-variant">Level akses kasir</p>
+                                        </div>
+                                        <select class="bg-surface-container-high border border-white/10 rounded-lg px-4 py-2 text-on-surface text-sm w-64 focus:ring-2 focus:ring-primary/50 transition" data-original="cashier" onchange="markChanged(this)">
+                                            <option value="admin">Admin</option>
+                                            <option value="cashier" selected>Kasir</option>
+                                        </select>
+                                    </div>
+                                    <div class="flex items-center justify-between py-3 setting-item" data-setting="cashier-log">
+                                        <div>
+                                            <p class="font-medium text-on-surface">Log Aktivitas</p>
+                                            <p class="text-sm text-on-surface-variant">Catatan aktivitas kasir</p>
+                                        </div>
+                                        <button class="bg-white/10 hover:bg-white/20 text-on-surface px-4 py-2 rounded-lg text-sm font-bold transition" onclick="showNotification('📋 Log aktivitas akan ditampilkan', 'info')">
+                                            Lihat Log
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Backup & Data Settings -->
+                        <div class="settings-section hidden" id="section-backup">
+                            <div class="bg-surface-container rounded-xl border border-white/5 overflow-hidden">
+                                <div class="px-6 py-4 border-b border-white/5 flex justify-between items-center">
+                                    <div>
+                                        <h2 class="font-bold text-on-surface">Backup &amp; Data</h2>
+                                        <p class="text-sm text-on-surface-variant">Kelola backup dan data aplikasi</p>
+                                    </div>
+                                    <span class="text-xs text-on-surface-variant" id="section-backup-status"></span>
+                                </div>
+                                <div class="p-6 space-y-4">
+                                    <div class="flex items-center justify-between py-3 border-b border-white/5 last:border-0 setting-item" data-setting="backup-auto">
+                                        <div>
+                                            <p class="font-medium text-on-surface">Backup Otomatis</p>
+                                            <p class="text-sm text-on-surface-variant">Backup data secara otomatis setiap hari</p>
+                                        </div>
+                                        <div class="toggle-switch active" onclick="toggleSwitch(this)" data-original="active">
+                                            <div class="toggle-knob"></div>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center justify-between py-3 border-b border-white/5 last:border-0 setting-item" data-setting="backup-time">
+                                        <div>
+                                            <p class="font-medium text-on-surface">Waktu Backup</p>
+                                            <p class="text-sm text-on-surface-variant">Jadwal backup harian</p>
+                                        </div>
+                                        <input type="time" value="23:00" class="bg-surface-container-high border border-white/10 rounded-lg px-4 py-2 text-on-surface text-sm w-32 focus:ring-2 focus:ring-primary/50 transition" data-original="23:00" onchange="markChanged(this)">
+                                    </div>
+                                    <div class="flex items-center justify-between py-3 border-b border-white/5 last:border-0">
+                                        <div>
+                                            <p class="font-medium text-on-surface">Ukuran Data</p>
+                                            <p class="text-sm text-on-surface-variant">Total ukuran data tersimpan</p>
+                                        </div>
+                                        <span class="text-sm text-on-surface font-medium">2.4 MB</span>
+                                    </div>
+                                    <div class="flex items-center justify-between py-3 border-b border-white/5 last:border-0 setting-item" data-setting="backup-export">
+                                        <div>
+                                            <p class="font-medium text-on-surface">Ekspor Data</p>
+                                            <p class="text-sm text-on-surface-variant">Ekspor semua data ke file CSV</p>
+                                        </div>
+                                        <button class="bg-primary hover:bg-primary-fixed-dim text-on-primary px-4 py-2 rounded-lg text-sm font-bold transition" onclick="showNotification('📥 Data berhasil diekspor!', 'success')">
+                                            <span class="material-symbols-outlined text-sm mr-1">download</span>
+                                            Ekspor
+                                        </button>
+                                    </div>
+                                    <div class="flex items-center justify-between py-3 setting-item" data-setting="backup-delete">
+                                        <div>
+                                            <p class="font-medium text-on-surface">Hapus Semua Data</p>
+                                            <p class="text-sm text-error/80">Hapus semua data aplikasi (tidak dapat dikembalikan)</p>
+                                        </div>
+                                        <button class="bg-error hover:bg-opacity-80 text-white px-4 py-2 rounded-lg text-sm font-bold transition" onclick="confirmDelete()">
+                                            <span class="material-symbols-outlined text-sm mr-1">delete_forever</span>
+                                            Hapus Data
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Save Button -->
+                        <div class="flex justify-end gap-3 pt-4">
+                            <button class="px-6 py-2.5 bg-white/10 hover:bg-white/20 text-on-surface rounded-xl font-bold transition" onclick="resetSettings()">
+                                <span class="material-symbols-outlined text-sm mr-1">refresh</span>
+                                Reset
+                            </button>
+                            <button class="px-6 py-2.5 bg-primary hover:bg-primary-fixed-dim text-on-primary rounded-xl font-bold transition" onclick="saveSettings()">
+                                <span class="material-symbols-outlined text-sm mr-1">save</span>
+                                Simpan Pengaturan
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // ===================== GET CASHIER PROFILE =====================
+        function getCashierProfile() {
+            try {
+                // Coba ambil dari cashier_profile di localStorage
+                const saved = localStorage.getItem('cashier_profile');
+                if (saved) {
+                    const profile = JSON.parse(saved);
+                    if (profile && profile.name) {
+                        return profile;
+                    }
+                }
+                // Coba ambil dari pengaturan kasir
+                const settings = localStorage.getItem('pos_settings');
+                if (settings) {
+                    const data = JSON.parse(settings);
+                    if (data['cashier-name']) {
+                        return {
+                            name: data['cashier-name'],
+                            avatar: data['cashier-avatar'] || 'https://lh3.googleusercontent.com/aida-public/AB6AXuAYTZwsiM_474tkqVJwk7LI3d_fa4RfQ6jOu2AvL5GcMV-Bqg823Y7Vg_iqC4ol8PiPr1liLPCA0FsntKwylC0mE0eIw6ecFBSYwRztKsiSQkajYOlPVataAMp9qGmTAoYeeON0qiBJ9CruYwcwMEO8E7ayGcReE18EJjgAzUUEaWf3SjsSi1BH-Ybsha2ed21I9T4pkLM65TJSOikrYFLH56NluOJqYUMs91nJnVwlaHVkg72HO2FERzYIoTC4y75pSTy1QHyspX-Q'
+                        };
+                    }
+                }
+            } catch(e) {}
+            // Default profile
+            return {
+                name: 'Sarah Wijaya',
+                avatar: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAYTZwsiM_474tkqVJwk7LI3d_fa4RfQ6jOu2AvL5GcMV-Bqg823Y7Vg_iqC4ol8PiPr1liLPCA0FsntKwylC0mE0eIw6ecFBSYwRztKsiSQkajYOlPVataAMp9qGmTAoYeeON0qiBJ9CruYwcwMEO8E7ayGcReE18EJjgAzUUEaWf3SjsSi1BH-Ybsha2ed21I9T4pkLM65TJSOikrYFLH56NluOJqYUMs91nJnVwlaHVkg72HO2FERzYIoTC4y75pSTy1QHyspX-Q'
+            };
+        }
+
+        // ===================== UPDATE CASHIER DISPLAY =====================
+        function updateCashierDisplay() {
+            const profile = getCashierProfile();
+            const nameEl = document.getElementById('cashierNameDisplay');
+            const avatarEl = document.getElementById('cashierAvatarDisplay');
+            
+            // Update top bar
+            if (nameEl) nameEl.textContent = profile.name;
+            if (avatarEl) avatarEl.src = profile.avatar;
+        }
+
+        // ===================== SAVE CASHIER PROFILE =====================
+        function saveCashierProfile(name, avatar) {
+            try {
+                const profile = {
+                    name: name,
+                    avatar: avatar || 'https://lh3.googleusercontent.com/aida-public/AB6AXuAYTZwsiM_474tkqVJwk7LI3d_fa4RfQ6jOu2AvL5GcMV-Bqg823Y7Vg_iqC4ol8PiPr1liLPCA0FsntKwylC0mE0eIw6ecFBSYwRztKsiSQkajYOlPVataAMp9qGmTAoYeeON0qiBJ9CruYwcwMEO8E7ayGcReE18EJjgAzUUEaWf3SjsSi1BH-Ybsha2ed21I9T4pkLM65TJSOikrYFLH56NluOJqYUMs91nJnVwlaHVkg72HO2FERzYIoTC4y75pSTy1QHyspX-Q'
+                };
+                localStorage.setItem('cashier_profile', JSON.stringify(profile));
+                
+                // Also update pos_settings for backward compatibility
+                try {
+                    const settings = localStorage.getItem('pos_settings');
+                    let data = {};
+                    if (settings) {
+                        data = JSON.parse(settings);
+                    }
+                    data['cashier-name'] = name;
+                    data['cashier-avatar'] = profile.avatar;
+                    localStorage.setItem('pos_settings', JSON.stringify(data));
+                } catch(e) {}
+                
+                // Update display immediately
+                updateCashierDisplay();
+                
+                // Trigger storage event for other tabs
+                window.dispatchEvent(new StorageEvent('storage', {
+                    key: 'cashier_profile',
+                    newValue: JSON.stringify(profile)
+                }));
+            } catch(e) {}
+        }
+
+        // ===================== CASHIER NAME INPUT HANDLER =====================
+        let cashierNameChanged = false;
+
+        function onCashierNameChange(input) {
+            const original = input.dataset.original || '';
+            if (input.value !== original) {
+                cashierNameChanged = true;
+                markChanged(input);
+            } else {
+                cashierNameChanged = false;
+                unmarkChanged(input);
+            }
+        }
+
+        // ===================== SETTINGS STATE =====================
+        let changedSettings = {};
+        let isSaved = true;
+
+        // ===================== SETTINGS NAVIGATION =====================
+        document.querySelectorAll('.settings-nav').forEach(nav => {
+            nav.addEventListener('click', function() {
+                document.querySelectorAll('.settings-nav').forEach(n => {
+                    n.classList.remove('bg-white/10', 'text-on-surface');
+                    n.classList.add('text-on-surface-variant');
+                });
+                this.classList.add('bg-white/10', 'text-on-surface');
+                this.classList.remove('text-on-surface-variant');
+
+                const sectionId = this.dataset.section;
+                document.querySelectorAll('.settings-section').forEach(section => {
+                    section.classList.add('hidden');
+                });
+                document.getElementById('section-' + sectionId).classList.remove('hidden');
+            });
+        });
+
+        // ===================== TOGGLE SWITCH =====================
+        function toggleSwitch(element) {
+            const isCurrentlyActive = element.classList.contains('active');
+            element.classList.toggle('active');
+            const isActive = element.classList.contains('active');
+            
+            // Check if changed from original
+            const original = element.dataset.original || (isCurrentlyActive ? 'active' : 'inactive');
+            const current = isActive ? 'active' : 'inactive';
+            
+            if (original !== current) {
+                markChanged(element);
+            } else {
+                unmarkChanged(element);
+            }
+            
+            const parentDiv = element.closest('.setting-item');
+            if (parentDiv) {
+                const label = parentDiv.querySelector('p.font-medium')?.textContent || 'Pengaturan';
+                const status = isActive ? 'diaktifkan' : 'dinonaktifkan';
+                showNotification(`${label} ${status}`, 'info');
+            }
+        }
+
+        // ===================== MARK CHANGES =====================
+        function markChanged(element) {
+            const parent = element.closest('.setting-item') || element.parentElement?.closest('.setting-item');
+            if (parent) {
+                parent.classList.add('setting-changed');
+                const settingKey = parent.dataset.setting || 'unknown';
+                changedSettings[settingKey] = true;
+                updateStatusIndicators(true);
+            }
+            
+            // For toggle switches
+            if (element.classList.contains('toggle-switch')) {
+                const parentDiv = element.closest('.setting-item');
+                if (parentDiv) {
+                    parentDiv.classList.add('setting-changed');
+                    const settingKey = parentDiv.dataset.setting || 'unknown';
+                    changedSettings[settingKey] = true;
+                    updateStatusIndicators(true);
+                }
+            }
+        }
+
+        function unmarkChanged(element) {
+            const parent = element.closest('.setting-item') || element.parentElement?.closest('.setting-item');
+            if (parent) {
+                parent.classList.remove('setting-changed');
+                const settingKey = parent.dataset.setting || 'unknown';
+                delete changedSettings[settingKey];
+                updateStatusIndicators(Object.keys(changedSettings).length > 0);
+            }
+            
+            if (element.classList.contains('toggle-switch')) {
+                const parentDiv = element.closest('.setting-item');
+                if (parentDiv) {
+                    parentDiv.classList.remove('setting-changed');
+                    const settingKey = parentDiv.dataset.setting || 'unknown';
+                    delete changedSettings[settingKey];
+                    updateStatusIndicators(Object.keys(changedSettings).length > 0);
+                }
+            }
+        }
+
+        // ===================== UPDATE STATUS INDICATORS =====================
+        function updateStatusIndicators(hasChanges) {
+            const statusText = document.getElementById('last-saved-status');
+            const indicator = document.getElementById('save-indicator');
+            
+            if (hasChanges) {
+                statusText.textContent = 'Ada perubahan yang belum disimpan';
+                statusText.className = 'text-xs text-yellow-400';
+                indicator.className = 'w-2 h-2 rounded-full bg-yellow-400 animate-pulse';
+                isSaved = false;
+            } else {
+                statusText.textContent = 'Semua pengaturan tersimpan';
+                statusText.className = 'text-xs text-green-400';
+                indicator.className = 'w-2 h-2 rounded-full bg-green-400';
+                isSaved = true;
+            }
+            
+            // Update section status
+            document.querySelectorAll('.settings-section').forEach(section => {
+                const sectionId = section.id.replace('section-', '');
+                const statusEl = document.getElementById('section-' + sectionId + '-status');
+                const hasSectionChanges = section.querySelectorAll('.setting-changed').length > 0;
+                if (statusEl) {
+                    statusEl.textContent = hasSectionChanges ? '● Ada perubahan' : '';
+                    statusEl.className = hasSectionChanges ? 'text-xs text-yellow-400' : 'text-xs text-on-surface-variant';
+                }
+            });
+            
+            // Update nav status
+            document.querySelectorAll('.settings-nav').forEach(nav => {
+                const sectionId = nav.dataset.section;
+                const statusEl = document.getElementById('nav-' + sectionId + '-status');
+                const section = document.getElementById('section-' + sectionId);
+                if (section && statusEl) {
+                    const hasChanges = section.querySelectorAll('.setting-changed').length > 0;
+                    statusEl.textContent = hasChanges ? '●' : '';
+                    statusEl.className = hasChanges ? 'text-yellow-400' : 'text-on-surface-variant';
+                }
+            });
+        }
+
+        // ===================== SAVE SETTINGS =====================
+        function saveSettings() {
+            const changedItems = document.querySelectorAll('.setting-changed');
+            if (changedItems.length === 0) {
+                showNotification('ℹ️ Tidak ada perubahan yang perlu disimpan', 'info');
+                return;
+            }
+            
+            // Collect all changed values
+            let savedData = {};
+            changedItems.forEach(item => {
+                const settingKey = item.dataset.setting || 'unknown';
+                const input = item.querySelector('input, select');
+                const toggle = item.querySelector('.toggle-switch');
+                
+                if (input) {
+                    savedData[settingKey] = input.value;
+                } else if (toggle) {
+                    savedData[settingKey] = toggle.classList.contains('active') ? 'active' : 'inactive';
+                }
+            });
+            
+            // Save to localStorage
+            try {
+                // Get existing settings
+                let existingData = {};
+                const existing = localStorage.getItem('pos_settings');
+                if (existing) {
+                    existingData = JSON.parse(existing);
+                }
+                
+                // Merge with new data
+                const mergedData = { ...existingData, ...savedData };
+                localStorage.setItem('pos_settings', JSON.stringify(mergedData));
+                
+                // Also save each individual setting
+                Object.entries(savedData).forEach(([key, value]) => {
+                    localStorage.setItem('setting_' + key, JSON.stringify(value));
+                });
+                
+                // If cashier name changed, update profile
+                if (savedData['cashier-name']) {
+                    const currentProfile = getCashierProfile();
+                    saveCashierProfile(savedData['cashier-name'], currentProfile.avatar);
+                    showNotification('✅ Nama kasir berhasil diperbarui!', 'success');
+                }
+            } catch (e) {
+                showNotification('❌ Gagal menyimpan pengaturan', 'error');
+                return;
+            }
+            
+            // Remove change indicators
+            changedItems.forEach(item => {
+                item.classList.remove('setting-changed');
+                const input = item.querySelector('input, select');
+                const toggle = item.querySelector('.toggle-switch');
+                if (input) {
+                    input.dataset.original = input.value;
+                } else if (toggle) {
+                    toggle.dataset.original = toggle.classList.contains('active') ? 'active' : 'inactive';
+                }
+            });
+            
+            changedSettings = {};
+            cashierNameChanged = false;
+            updateStatusIndicators(false);
+            showNotification('✅ Semua pengaturan berhasil disimpan!', 'success');
+        }
+
+        // ===================== RESET SETTINGS =====================
+        function resetSettings() {
+            if (Object.keys(changedSettings).length === 0) {
+                showNotification('ℹ️ Tidak ada perubahan untuk direset', 'info');
+                return;
+            }
+            
+            if (confirm('Apakah Anda yakin ingin mereset semua perubahan ke pengaturan awal?')) {
+                document.querySelectorAll('.setting-changed').forEach(item => {
+                    item.classList.remove('setting-changed');
+                    const input = item.querySelector('input, select');
+                    const toggle = item.querySelector('.toggle-switch');
+                    
+                    if (input && input.dataset.original) {
+                        input.value = input.dataset.original;
+                    } else if (toggle && toggle.dataset.original) {
+                        const isActive = toggle.dataset.original === 'active';
+                        if (isActive && !toggle.classList.contains('active')) {
+                            toggle.classList.add('active');
+                        } else if (!isActive && toggle.classList.contains('active')) {
+                            toggle.classList.remove('active');
+                        }
+                    }
+                });
+                
+                changedSettings = {};
+                cashierNameChanged = false;
+                updateStatusIndicators(false);
+                showNotification('🔄 Pengaturan telah direset ke default', 'warning');
+            }
+        }
+
+        // ===================== NOTIFICATION =====================
+        function showNotification(message, type = 'success') {
+            const existing = document.querySelector('.notification-toast');
+            if (existing) existing.remove();
+            const colors = { 
+                success: 'bg-green-500', 
+                error: 'bg-red-500', 
+                warning: 'bg-yellow-500', 
+                info: 'bg-blue-500' 
+            };
+            const notification = document.createElement('div');
+            notification.className = `notification-toast fixed top-24 right-4 ${colors[type] || colors.success} text-white px-4 py-2 rounded-lg shadow-lg z-50`;
+            notification.innerHTML = `
+                <div class="flex items-center gap-2">
+                    <span class="material-symbols-outlined">${type === 'error' ? 'error' : 'check_circle'}</span>
+                    <span class="text-sm font-medium">${message}</span>
+                </div>
+            `;
+            document.body.appendChild(notification);
+            setTimeout(() => notification.remove(), 3000);
+        }
+
+        // ===================== CONFIRM DELETE =====================
+        function confirmDelete() {
+            if (confirm('⚠️ Apakah Anda yakin ingin menghapus semua data? Tindakan ini tidak dapat dibatalkan!')) {
+                if (confirm('Konfirmasi terakhir: Hapus semua data aplikasi?')) {
+                    try {
+                        localStorage.clear();
+                        showNotification('🗑️ Semua data telah dihapus', 'warning');
+                        setTimeout(() => window.location.reload(), 1000);
+                    } catch (e) {
+                        showNotification('❌ Gagal menghapus data', 'error');
+                    }
+                }
+            }
+        }
+
+        // ===================== SEARCH SETTINGS =====================
+        document.getElementById('search-settings').addEventListener('input', function() {
+            const term = this.value.toLowerCase().trim();
+            const sections = document.querySelectorAll('.settings-section');
+            
+            if (term === '') {
+                sections.forEach(section => {
+                    if (!section.classList.contains('hidden')) {
+                        // Keep current section visible
+                    }
+                });
+                return;
+            }
+
+            sections.forEach(section => section.classList.remove('hidden'));
+            
+            sections.forEach(section => {
+                const text = section.textContent.toLowerCase();
+                if (!text.includes(term)) {
+                    section.classList.add('hidden');
+                }
+            });
+
+            const visibleSections = document.querySelectorAll('.settings-section:not(.hidden)');
+            if (visibleSections.length === 0) {
+                const existingMsg = document.querySelector('.search-empty-state');
+                if (!existingMsg) {
+                    const msg = document.createElement('div');
+                    msg.className = 'search-empty-state col-span-9';
+                    msg.innerHTML = `
+                        <div class="bg-surface-container rounded-xl border border-white/5 p-12 text-center">
+                            <span class="material-symbols-outlined text-4xl block mx-auto mb-3 text-on-surface-variant">search_off</span>
+                            <p class="text-on-surface-variant">Tidak ada pengaturan yang ditemukan untuk "${term}"</p>
+                        </div>
+                    `;
+                    document.querySelector('.col-span-9').appendChild(msg);
+                }
+            } else {
+                const existingMsg = document.querySelector('.search-empty-state');
+                if (existingMsg) existingMsg.remove();
+            }
+        });
+
+        // ===================== AUTO SAVE ON CHANGE =====================
+        document.querySelectorAll('input, select').forEach(el => {
+            el.addEventListener('change', function() {
+                if (this.dataset.original && this.value !== this.dataset.original) {
+                    markChanged(this);
+                } else if (this.dataset.original && this.value === this.dataset.original) {
+                    unmarkChanged(this);
+                }
+            });
+        });
+
+        // ===================== LISTEN FOR STORAGE CHANGES =====================
+        window.addEventListener('storage', function(e) {
+            if (e.key === 'cashier_profile' || e.key === 'pos_settings') {
+                updateCashierDisplay();
+                // Only update input if user hasn't changed it
+                if (!cashierNameChanged) {
+                    const profile = getCashierProfile();
+                    const cashierInput = document.getElementById('cashierNameInput');
+                    if (cashierInput && cashierInput.value !== profile.name) {
+                        cashierInput.value = profile.name;
+                        cashierInput.dataset.original = profile.name;
+                    }
+                }
+            }
+        });
+
+        // ===================== MICRO-INTERACTIONS =====================
+        document.querySelectorAll('a, button').forEach(el => {
+            el.addEventListener('mousedown', () => {
+                el.classList.add('scale-95');
+            });
+            el.addEventListener('mouseup', () => {
+                el.classList.remove('scale-95');
+            });
+            el.addEventListener('mouseleave', () => {
+                el.classList.remove('scale-95');
+            });
+        });
+
+        // ===================== INIT =====================
+        // Update cashier display
+        updateCashierDisplay();
+        
+        // Load saved settings from localStorage
+        function loadSavedSettings() {
+            try {
+                const saved = localStorage.getItem('pos_settings');
+                if (saved) {
+                    const data = JSON.parse(saved);
+                    Object.entries(data).forEach(([key, value]) => {
+                        const item = document.querySelector(`.setting-item[data-setting="${key}"]`);
+                        if (item) {
+                            const input = item.querySelector('input, select');
+                            const toggle = item.querySelector('.toggle-switch');
+                            if (input && input.type !== 'time' && input.type !== 'number') {
+                                input.value = value;
+                                input.dataset.original = value;
+                            } else if (input && input.type === 'number') {
+                                input.value = value;
+                                input.dataset.original = value;
+                            } else if (toggle) {
+                                const isActive = value === 'active';
+                                if (isActive) {
+                                    toggle.classList.add('active');
+                                } else {
+                                    toggle.classList.remove('active');
+                                }
+                                toggle.dataset.original = value;
+                            }
+                        }
+                    });
+                    // Mark as saved
+                    updateStatusIndicators(false);
+                }
+            } catch (e) {}
+        }
+        
+        loadSavedSettings();
+
+        // Make sure general section is visible by default
+        document.querySelectorAll('.settings-section').forEach(s => s.classList.add('hidden'));
+        document.getElementById('section-general').classList.remove('hidden');
+
+        // Auto-sync cashier name in input field (only if not changed by user)
+        setInterval(() => {
+            if (!cashierNameChanged) {
+                const profile = getCashierProfile();
+                const cashierInput = document.getElementById('cashierNameInput');
+                if (cashierInput && cashierInput.value !== profile.name) {
+                    cashierInput.value = profile.name;
+                    cashierInput.dataset.original = profile.name;
+                }
+            }
+            updateCashierDisplay();
+        }, 3000);
+    </script>
+</body>
+</html>

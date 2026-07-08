@@ -1,0 +1,267 @@
+<!DOCTYPE html><html lang="id" style=""><head><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet" class="">
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Login - Little Story ERP System</title>
+<!-- Tailwind CSS CDN -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Google Fonts: Inter or similar sans-serif -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet">
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              primary: '#3D2B1F', // Dark brown used in buttons and branding
+              secondary: '#F5E6D3', // Light cream/beige
+              accent: '#8B5E3C'
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          },
+        }
+      }
+    }
+  </script>
+<style data-purpose="custom-layout">
+    body {
+      background-color: #F3F4F6;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+    }
+    
+    /* Main container styling to match image border-radius and shadow */
+    .app-container {
+      width: 100%;
+      max-width: 1200px;
+      height: 800px;
+      background: white;
+      border-radius: 1.5rem;
+      overflow: hidden;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
+      display: flex;
+    }
+
+    /* Left section background treatment */
+    .hero-section {
+      position: relative;
+      width: 45%;
+      background-image: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.6)), url('https://lh3.googleusercontent.com/aida-public/AB6AXuD04x_T_DrfTAVdOKbFtkpjIR95FyMWnwRWiwXYmoonfDbOp8SoCKA3RBM7ZuCChRSRmrHVcdlwODzqrUe2BKdv4LQOEZ87cQgfYdO_i4CPju3-888qNjezxUeFISWuYC6GmAVQquQbWKSpKmv4760GhcsTnh-RKjQSCBj3E2ZhChP_rVb5Q_VNroRmfLG_Ef3q3sOr1EAzEEEIEZG1C4itbFGM2iVsfH0uToYEs05NqabXu0RVPt3h9x0ZZ1YT3gw-wxPjsyDOvg');
+      background-size: cover;
+      background-position: left center;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 3rem;
+    }
+
+    /* Overlay for the bottom part of the left section */
+    .hero-overlay {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 45%;
+      background: linear-gradient(transparent, rgba(61, 43, 31, 0.9));
+      pointer-events: none;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 10;
+    }
+
+    /* Custom input focus states */
+    .form-input:focus {
+      border-color: #3D2B1F !important;
+      ring-color: #3D2B1F !important;
+    }
+  </style>
+</head>
+<body>
+<!-- BEGIN: MainContainer -->
+<div class="app-container" data-purpose="login-wrapper">
+<!-- BEGIN: LeftHeroSection -->
+
+<!-- END: LeftHeroSection -->
+<!-- BEGIN: RightLoginSection -->
+<section class="hero-section">
+  <div class="absolute inset-0 bg-cover bg-center" style="background-image: url(&quot;https://lh3.googleusercontent.com/aida-public/AB6AXuDcXeYv6BixbHWSj-cGipuXTFMup8sE7DUon0vAWidhdMjzI_TzazQNPbOyJVB0TzW0l9tN0BLi8bciIiDeTnYWymdKQs8bXIhdl0zgIIAi7g5nzq59NYuNRoriTzBgbJMgJGT-T6KTUJ2-KHTd_XFQleaN8iPaSBh6SM_6SG1d0YvH-DCjP7uxzEqwSPled36vJGqRz5VyvZgjx6mKbWHn-tMHCeviayAy-J5dEOYTj97UkhBEfBtPUyHKNVRbMaDlm9eolo-tcA&quot;);"></div>
+  <div class="hero-overlay"></div>
+  <div class="hero-content">
+    <h1 class="text-3xl font-bold mb-4">Solusi ERP Terpadu</h1>
+    <p class="mb-8 opacity-90">Kelola bisnis Anda dengan lebih mudah, cepat, dan akurat bersama Little Story.</p>
+    <div class="grid grid-cols-2 gap-4">
+      <div class="flex items-center space-x-2">
+        <div class="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+        </div>
+        <span class="text-sm font-medium">Terintegrasi</span>
+      </div>
+      <div class="flex items-center space-x-2">
+        <div class="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+        </div>
+        <span class="text-sm font-medium">Aman</span>
+      </div>
+      <div class="flex items-center space-x-2">
+        <div class="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+        </div>
+        <span class="text-sm font-medium">Efisien</span>
+      </div>
+      <div class="flex items-center space-x-2">
+        <div class="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+        </div>
+        <span class="text-sm font-medium">Akurat</span>
+      </div>
+    </div>
+  </div>
+</section><main class="w-[55%] flex flex-col p-12 overflow-y-auto" data-purpose="login-form-container">
+<!-- Brand Badge -->
+<div class="flex justify-center mb-8">
+<div class="bg-[#F5EFE6] px-6 py-4 rounded-xl flex items-center space-x-3" data-purpose="brand-logo">
+<div class="w-10 h-10 bg-brand-primary rounded-full flex items-center justify-center text-white">
+
+</div>
+<div>
+<div class="text-brand-primary font-bold text-lg leading-tight">Little Story</div>
+<div class="text-[10px] tracking-[0.2em] text-brand-primary font-medium opacity-70">ERP SYSTEM</div>
+</div>
+</div>
+</div>
+<!-- Welcome Text -->
+<div class="text-center mb-8">
+<h2 class="text-3xl font-bold text-gray-800 mb-2">Selamat Datang&nbsp;</h2>
+<p class="text-gray-500 text-sm">Silakan masuk untuk melanjutkan ke sistem ERP Little Story</p>
+</div>
+<!-- Login Form -->
+<form class="space-y-5" data-purpose="main-login-form">
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-1.5" for="username">Nama Pengguna</label>
+<div class="relative">
+<span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</span>
+<input class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-brand-primary focus:border-brand-primary text-sm" id="username" placeholder="Contoh: kasir_lstory" type="text">
+</div>
+</div>
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-1.5" for="password">Kata Sandi</label>
+<div class="relative">
+<span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</span>
+<input class="block w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg focus:ring-brand-primary focus:border-brand-primary text-sm" id="password" placeholder="Masukkan Sandi" type="password">
+<span class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 cursor-pointer">
+
+</span>
+</div>
+</div>
+
+<button class="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-semibold text-white bg-brand-primary hover:bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-primary" type="submit">
+<svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+          Masuk
+        </button>
+</form>
+<!-- Role Selection Section -->
+<div class="mt-8">
+<div class="relative mb-6">
+<div aria-hidden="true" class="absolute inset-0 flex items-center">
+<div class="w-full border-t border-gray-200"></div>
+</div>
+<div class="relative flex justify-center text-sm">
+<span class="px-2 bg-white text-gray-400">Perhatikan!</span>
+</div>
+</div>
+<h3 class="text-sm font-semibold text-gray-700 mb-4">yang dapat menggunakan Website ini</h3>
+<div class="grid grid-cols-4 gap-3">
+<!-- Role: Manajemen -->
+<button class="flex flex-col items-center p-3 border border-gray-100 rounded-xl bg-gray-50 hover:bg-white hover:shadow-md transition-all group" data-purpose="role-card" data-username="manajer_lstory" data-password="">
+<div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center mb-2 group-hover:bg-blue-200"><img src="https://icons.veryicon.com/png/o/system/dan_system/manager-2.png" class="w-6 h-6 object-contain" alt="Manajemen"></div>
+<span class="text-[10px] font-semibold text-gray-600">Manajemen</span>
+</button>
+<!-- Role: Gudang -->
+<button class="flex flex-col items-center p-3 border border-gray-100 rounded-xl bg-gray-50 hover:bg-white hover:shadow-md transition-all group" data-purpose="role-card" data-username="gudang_lstory" data-password="">
+<div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center mb-2 group-hover:bg-green-200"><span class="material-symbols-outlined text-green-600" style="font-size: 24px;">inventory_2</span></div>
+<span class="text-[10px] font-semibold text-gray-600">Gudang</span>
+</button>
+<!-- Role: Kasir -->
+<button class="flex flex-col items-center p-3 border border-gray-100 rounded-xl bg-gray-50 hover:bg-white hover:shadow-md transition-all group" data-purpose="role-card" data-username="kasir_lstory" data-password="">
+<div class="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center mb-2 group-hover:bg-orange-200">
+<span class="material-symbols-outlined text-orange-600" style="font-size: 24px;">point_of_sale</span>
+</div>
+<span class="text-[10px] font-semibold text-gray-600">Kasir</span>
+</button>
+<!-- Role: Pemilik -->
+<button class="flex flex-col items-center p-3 border border-gray-100 rounded-xl bg-gray-50 hover:bg-white hover:shadow-md transition-all group" data-purpose="role-card" data-username="pemilik_lstory" data-password="">
+<div class="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center mb-2 group-hover:bg-purple-200"><img src="https://cdn-icons-png.flaticon.com/512/1654/1654220.png" ></div>
+<span class="text-[10px] font-semibold text-gray-600">Pemilik</span>
+</button>
+</div>
+</div>
+<!-- Footer -->
+
+</main>
+<!-- END: RightLoginSection -->
+</div>
+<!-- END: MainContainer -->
+
+<script class="">
+  // Daftar akun untuk semua peran
+  const accounts = {
+    'manajer_lstory': { password: 'manajer123', role: 'manajer', redirect: 'manajer.html' },
+    'gudang_lstory': { password: 'gudang123', role: 'gudang', redirect: 'gudang.html' },
+    'kasir_lstory': { password: 'lstory123', role: 'kasir', redirect: 's.html' },
+    'pemilik_lstory': { password: 'pemilik123', role: 'pemilik', redirect: 'pemilik.html' }
+  };
+
+  // Fungsi login
+  function performLogin(username, password) {
+    if (accounts[username] && accounts[username].password === password) {
+      // Login berhasil
+      window.location.href = accounts[username].redirect;
+      return true;
+    } else {
+      alert('Username atau password salah. Silakan coba lagi.');
+      return false;
+    }
+  }
+
+  // Event listener untuk form login
+  document.querySelector('[data-purpose="main-login-form"]').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const user = document.getElementById('username').value;
+    const pass = document.getElementById('password').value;
+    performLogin(user, pass);
+  });
+
+  // Event listener untuk role cards
+  document.querySelectorAll('[data-purpose="role-card"]').forEach(button => {
+    button.addEventListener('click', function() {
+      const username = this.getAttribute('data-username');
+      const password = this.getAttribute('data-password');
+      
+      // Isi form dengan data role
+      document.getElementById('username').value = username;
+      document.getElementById('password').value = password;
+      
+      // Otomatis login
+      performLogin(username, password);
+    });
+  });
+
+  // Tampilkan info akun di console untuk referensi
+  console.log('=== Akun Little Story ERP ===');
+  console.log('Manajer: manajer_lstory / manajer123');
+  console.log('Gudang: gudang_lstory / gudang123');
+  console.log('Kasir: kasir_lstory / lstory123');
+  console.log('Pemilik: pemilik_lstory / pemilik123');
+  console.log('=============================');
+</script></body></html>

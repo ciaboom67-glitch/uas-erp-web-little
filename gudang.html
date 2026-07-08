@@ -1,0 +1,2312 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Little Story ERP - Warehouse Dashboard</title>
+<!-- Tailwind CSS v3 CDN -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Google Fonts: Inter -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          },
+          colors: {
+            earthy: {
+              DEFAULT: '#4d3310',
+              sidebar: '#4d3310',
+              surface: '#f8f9fa',
+              'surface-dim': '#d9dadb',
+              'surface-container': '#ffffff',
+            },
+            status: {
+              kritis: '#fee2e2',
+              'kritis-text': '#dc2626',
+              rendah: '#ffedd5',
+              'rendah-text': '#ea580c',
+              aktif: '#dbeafe',
+              'aktif-text': '#2563eb',
+              today: '#dcfce7',
+              'today-text': '#16a34a',
+            }
+          },
+          borderRadius: {
+            'custom': '8px',
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    * {
+      box-sizing: border-box;
+    }
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f1f1;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #ccc;
+      border-radius: 10px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #4d3310;
+    }
+    .dashboard-container {
+      max-width: 1440px;
+      margin: 0 auto;
+      width: 100%;
+    }
+    .content-area {
+      padding: 24px 32px 40px;
+    }
+    @media (max-width: 1024px) {
+      .content-area {
+        padding: 20px 24px 32px;
+      }
+    }
+    @media (max-width: 768px) {
+      .content-area {
+        padding: 16px;
+      }
+    }
+    .sidebar-fixed {
+      width: 240px;
+      flex-shrink: 0;
+    }
+    .main-content {
+      flex: 1;
+      min-width: 0;
+      width: 100%;
+    }
+    .table-wrap {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .stat-card {
+      min-width: 0;
+    }
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 16px;
+    }
+    @media (min-width: 1024px) {
+      .card-grid {
+        grid-template-columns: repeat(6, 1fr);
+      }
+    }
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 24px;
+    }
+    @media (max-width: 1024px) {
+      .main-grid {
+        grid-template-columns: 1fr;
+        gap: 24px;
+      }
+    }
+    .custom-shadow {
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+    }
+    .status-badge {
+      padding: 4px 12px;
+      border-radius: 9999px;
+      font-size: 10px;
+      font-weight: 600;
+      display: inline-block;
+      white-space: nowrap;
+    }
+    .status-pending { background: #FEF3C7; color: #D97706; }
+    .status-approved { background: #D1FAE5; color: #059669; }
+    .status-rejected { background: #FEE2E2; color: #DC2626; }
+    .status-draft { background: #E5E7EB; color: #6B7280; }
+    .status-waiting { background: #FEF3C7; color: #D97706; }
+    .status-received { background: #D1FAE5; color: #059669; }
+  </style>
+</head>
+<body class="bg-earthy-surface font-sans text-slate-800">
+<div class="flex min-h-screen">
+<!-- BEGIN: Sidebar -->
+<aside class="sidebar-fixed bg-earthy-sidebar text-white flex flex-col fixed h-full z-20" data-purpose="main-navigation">
+<!-- Logo Section -->
+<div class="p-5 flex items-center gap-3">
+<div class="w-8 h-8 bg-white rounded-md flex items-center justify-center flex-shrink-0">
+<div class="w-5 h-5 bg-earthy-sidebar rounded-sm"></div>
+</div>
+<div class="min-w-0">
+<h1 class="text-sm font-bold leading-none">Little Story</h1>
+<span class="text-[10px] opacity-70 tracking-wider">ENTERPRISE ERP</span>
+</div>
+</div>
+<!-- Nav Items -->
+<nav class="flex-1 px-3 space-y-1 mt-4 overflow-y-auto">
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-white/10 text-white font-medium" href="#">
+<svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+          Dashboard
+        </a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-white/60 hover:text-white hover:bg-white/5 transition-colors" href="st.html">
+<svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+          Stok
+        </a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-white/60 hover:text-white hover:bg-white/5 transition-colors" href="bm.html">
+<svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M7 16l-4-4m0 0l4-4m-4 4h18" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+          Barang Masuk
+        </a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-white/60 hover:text-white hover:bg-white/5 transition-colors" href="bk.html">
+<svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M17 8l4 4m0 0l-4 4m4-4H3" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+          Barang Keluar
+        </a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-white/60 hover:text-white hover:bg-white/5 transition-colors" href="pengajuan.html">
+<svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+          Pengajuan
+        </a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-white/60 hover:text-white hover:bg-white/5 transition-colors" href="pen.html">
+<svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+          Pengaturan
+        </a>
+</nav>
+</aside>
+<!-- END: Sidebar -->
+
+<!-- Main Content Wrapper -->
+<main class="main-content ml-[240px] flex flex-col min-h-screen">
+<!-- BEGIN: Header -->
+<header class="h-16 bg-white border-b border-gray-100 flex items-center justify-between px-6 lg:px-8 sticky top-0 z-10 flex-shrink-0">
+<div class="relative w-64 lg:w-96">
+<span class="absolute inset-y-0 left-0 flex items-center pl-3">
+<svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</span>
+<input class="w-full pl-10 pr-4 py-2 bg-slate-100 border-none rounded-lg text-xs focus:ring-1 focus:ring-earthy placeholder:text-slate-400" placeholder="Cari data stok atau transaksi..." type="text" id="search-dashboard"/>
+</div>
+<div class="flex items-center gap-4 lg:gap-6 flex-shrink-0">
+<div class="relative">
+<svg class="w-6 h-6 text-slate-500" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span class="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-white">3</span>
+</div>
+<div class="flex items-center gap-3">
+<div class="text-right hidden sm:block">
+<p class="text-sm font-semibold text-slate-800">Budi Santoso</p>
+<p class="text-xs text-slate-400 font-medium">KEPALA GUDANG</p>
+</div>
+<img alt="User Profile" class="w-10 h-10 rounded-full border-2 border-white custom-shadow object-cover flex-shrink-0" src="https://ui-avatars.com/api/?name=Budi+Santoso&background=4d3310&color=fff&size=128"/>
+<svg class="w-4 h-4 text-slate-400 hidden sm:block" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+</div>
+</header>
+<!-- END: Header -->
+
+<!-- BEGIN: Content Area -->
+<div class="content-area flex-1">
+<div class="dashboard-container">
+<!-- Dashboard Title -->
+<div class="flex flex-wrap justify-between items-start gap-4 mb-6">
+<div class="min-w-0">
+<h2 class="text-2xl font-bold text-slate-800">DASHBOARD GUDANG</h2>
+<p class="text-sm text-slate-500 mt-1" id="dashboard-date">Pantau ketersediaan stok dan alur logistik secara real-time.</p>
+</div>
+<div class="flex flex-wrap gap-3 flex-shrink-0">
+<button class="px-4 py-2 bg-white border border-slate-300 rounded-lg text-xs font-semibold flex items-center gap-2 hover:bg-slate-50 whitespace-nowrap shadow-sm" onclick="exportAllData()">
+<svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+              Export Data
+            </button>
+<button class="px-4 py-2 bg-black text-white rounded-lg text-xs font-semibold flex items-center gap-2 hover:opacity-90 whitespace-nowrap shadow-sm" onclick="window.location.href='st.html'">
+<svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M12 6v6m0 0v6m0-6h6m-6 0H6" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+              Kelola Stok
+            </button>
+</div>
+</div>
+
+<!-- Summary Cards Row (6 cards untuk semua modul) -->
+<div class="card-grid mb-8">
+<!-- Card 1: Total Produk -->
+<div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100 stat-card">
+<div class="flex justify-between items-start">
+<div class="p-2 bg-blue-50 text-blue-600 rounded-lg flex-shrink-0">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<span class="text-[9px] font-bold bg-status-aktif text-status-aktif-text px-2 py-0.5 rounded">Produk</span>
+</div>
+<div class="mt-3">
+<p class="text-[10px] text-slate-500 font-medium">Total Produk</p>
+<p class="text-2xl font-bold text-slate-800" id="total-products">0</p>
+<p class="text-[9px] text-slate-400 mt-0.5"><span id="total-categories">0</span> kategori</p>
+</div>
+</div>
+
+<!-- Card 2: Total Stok -->
+<div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100 stat-card">
+<div class="flex justify-between items-start">
+<div class="p-2 bg-green-50 text-green-600 rounded-lg flex-shrink-0">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<span class="text-[9px] font-bold bg-status-today text-status-today-text px-2 py-0.5 rounded">Stok</span>
+</div>
+<div class="mt-3">
+<p class="text-[10px] text-slate-500 font-medium">Total Stok</p>
+<p class="text-2xl font-bold text-slate-800" id="total-stock-qty">0</p>
+<p class="text-[9px] text-slate-400 mt-0.5"><span id="low-stock-count">0</span> stok menipis</p>
+</div>
+</div>
+
+<!-- Card 3: Barang Masuk Hari Ini -->
+<div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100 stat-card">
+<div class="flex justify-between items-start">
+<div class="p-2 bg-emerald-50 text-emerald-600 rounded-lg flex-shrink-0">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M7 16l-4-4m0 0l4-4m-4 4h18" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<span class="text-[9px] font-bold bg-status-today text-status-today-text px-2 py-0.5 rounded">Hari Ini</span>
+</div>
+<div class="mt-3">
+<p class="text-[10px] text-slate-500 font-medium">Barang Masuk</p>
+<p class="text-2xl font-bold text-slate-800"><span id="today-in">0</span></p>
+<p class="text-[9px] text-slate-400 mt-0.5"><span id="today-suppliers">0</span> supplier</p>
+</div>
+</div>
+
+<!-- Card 4: Barang Keluar Hari Ini -->
+<div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100 stat-card">
+<div class="flex justify-between items-start">
+<div class="p-2 bg-orange-50 text-orange-600 rounded-lg flex-shrink-0">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M17 8l4 4m0 0l-4 4m4-4H3" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<span class="text-[9px] font-bold bg-blue-50 text-blue-600 px-2 py-0.5 rounded">Keluar</span>
+</div>
+<div class="mt-3">
+<p class="text-[10px] text-slate-500 font-medium">Barang Keluar</p>
+<p class="text-2xl font-bold text-slate-800"><span id="today-out">0</span></p>
+<p class="text-[9px] text-slate-400 mt-0.5"><span id="today-outlets">0</span> tujuan</p>
+</div>
+</div>
+
+<!-- Card 5: Pengajuan Menunggu -->
+<div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100 stat-card">
+<div class="flex justify-between items-start">
+<div class="p-2 bg-amber-50 text-amber-600 rounded-lg flex-shrink-0">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<span class="text-[9px] font-bold bg-yellow-50 text-yellow-600 px-2 py-0.5 rounded">Menunggu</span>
+</div>
+<div class="mt-3">
+<p class="text-[10px] text-slate-500 font-medium">Pengajuan</p>
+<p class="text-2xl font-bold text-amber-600" id="pending-purchases">0</p>
+<p class="text-[9px] text-slate-400 mt-0.5">menunggu persetujuan</p>
+</div>
+</div>
+
+<!-- Card 6: Pengajuan Disetujui -->
+<div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100 stat-card">
+<div class="flex justify-between items-start">
+<div class="p-2 bg-purple-50 text-purple-600 rounded-lg flex-shrink-0">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<span class="text-[9px] font-bold bg-green-50 text-green-600 px-2 py-0.5 rounded">Disetujui</span>
+</div>
+<div class="mt-3">
+<p class="text-[10px] text-slate-500 font-medium">Disetujui</p>
+<p class="text-2xl font-bold text-green-600" id="approved-purchases">0</p>
+<p class="text-[9px] text-slate-400 mt-0.5">siap diterima</p>
+</div>
+</div>
+</div>
+
+<!-- Main Grid for Tables and Widgets -->
+<div class="main-grid">
+<!-- LEFT SIDE: Stok Minimum Table -->
+<div class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden min-w-0">
+<div class="p-4 border-b border-slate-50 flex flex-wrap justify-between items-center gap-2">
+<div class="min-w-0">
+<h3 class="font-bold text-slate-800 text-sm">⚠️ Stok Minimum</h3>
+<p class="text-xs text-slate-500">Item yang mendekati atau di bawah batas minimum.</p>
+</div>
+<a class="text-[10px] font-bold text-slate-400 hover:text-earthy transition-colors flex-shrink-0" href="st.html">Lihat Semua →</a>
+</div>
+<div class="table-wrap">
+<table class="w-full text-left min-w-[500px]">
+<thead>
+<tr class="bg-slate-50 text-[10px] text-slate-400 font-bold uppercase tracking-wider">
+<th class="px-4 py-2">Produk</th>
+<th class="px-4 py-2 text-center">Stok</th>
+<th class="px-4 py-2 text-center">Minimum</th>
+<th class="px-4 py-2">Satuan</th>
+<th class="px-4 py-2">Status</th>
+</tr>
+</thead>
+<tbody id="min-stock-body" class="text-xs divide-y divide-slate-100">
+</tbody>
+</table>
+</div>
+</div>
+
+<!-- RIGHT SIDE: Widgets -->
+<div class="space-y-6 min-w-0">
+<!-- BEGIN: Barang Masuk Terakhir -->
+<div class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
+<div class="p-3 border-b border-slate-50 flex justify-between items-center">
+<h3 class="text-xs font-bold text-slate-800">📦 Barang Masuk Terakhir</h3>
+<a class="text-[9px] font-bold text-slate-400 hover:text-earthy transition-colors flex-shrink-0" href="bm.html">Lihat Semua →</a>
+</div>
+<div class="table-wrap">
+<table class="w-full text-left min-w-[250px]">
+<thead class="bg-slate-50 text-[9px] text-slate-400 font-bold uppercase tracking-wider">
+<tr>
+<th class="px-3 py-1.5">Produk</th>
+<th class="px-3 py-1.5">Supplier</th>
+<th class="px-3 py-1.5 text-right">Qty</th>
+</tr>
+</thead>
+<tbody id="last-in-body" class="text-[10px] divide-y divide-slate-50">
+</tbody>
+</table>
+</div>
+</div>
+<!-- END: Barang Masuk Terakhir -->
+
+<!-- BEGIN: Notifikasi Gudang -->
+<div class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
+<div class="p-3 border-b border-slate-50">
+<h3 class="text-xs font-bold text-slate-800">🔔 Notifikasi</h3>
+</div>
+<div id="notifications-container" class="p-3 space-y-2">
+</div>
+</div>
+<!-- END: Notifikasi Gudang -->
+</div>
+</div>
+
+<!-- BEGIN: Barang Keluar & Pengajuan Terakhir (2 kolom) -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+<!-- Barang Keluar Terakhir -->
+<div class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
+<div class="p-4 border-b border-slate-50 flex flex-wrap justify-between items-center gap-2">
+<h3 class="font-bold text-slate-800 text-sm">📤 Barang Keluar Terakhir</h3>
+<a class="text-[10px] font-bold text-slate-400 hover:text-earthy transition-colors flex-shrink-0" href="bk.html">Lihat Semua →</a>
+</div>
+<div class="table-wrap">
+<table class="w-full text-left min-w-[400px]">
+<thead>
+<tr class="bg-slate-50 text-[10px] text-slate-400 font-bold uppercase tracking-wider">
+<th class="px-4 py-2">No.</th>
+<th class="px-4 py-2">Produk</th>
+<th class="px-4 py-2 text-center">Qty</th>
+<th class="px-4 py-2">Tujuan</th>
+</tr>
+</thead>
+<tbody id="last-out-body" class="text-xs divide-y divide-slate-100">
+</tbody>
+</table>
+</div>
+</div>
+
+<!-- Pengajuan Terakhir -->
+<div class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
+<div class="p-4 border-b border-slate-50 flex flex-wrap justify-between items-center gap-2">
+<h3 class="font-bold text-slate-800 text-sm">📋 Pengajuan Terakhir</h3>
+<a class="text-[10px] font-bold text-slate-400 hover:text-earthy transition-colors flex-shrink-0" href="pengajuan.html">Lihat Semua →</a>
+</div>
+<div class="table-wrap">
+<table class="w-full text-left min-w-[400px]">
+<thead>
+<tr class="bg-slate-50 text-[10px] text-slate-400 font-bold uppercase tracking-wider">
+<th class="px-4 py-2">No.</th>
+<th class="px-4 py-2">Item</th>
+<th class="px-4 py-2 text-center">Qty</th>
+<th class="px-4 py-2">Status</th>
+</tr>
+</thead>
+<tbody id="last-purchase-body" class="text-xs divide-y divide-slate-100">
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<!-- END: Barang Keluar & Pengajuan Terakhir -->
+</div>
+</div>
+<!-- END: Content Area -->
+</main>
+</div>
+
+<script>
+// ===================== DATA STORE =====================
+let stocks = [];
+let inTransactions = [];
+let outTransactions = [];
+let purchases = [];
+
+// ===================== LOAD DATA =====================
+function loadAllData() {
+    // Load Stok
+    try {
+        const saved = localStorage.getItem('pos_stocks');
+        stocks = saved ? JSON.parse(saved) : [];
+    } catch(e) { stocks = []; }
+    
+    // Load Barang Masuk
+    try {
+        const saved = localStorage.getItem('pos_in_transactions');
+        inTransactions = saved ? JSON.parse(saved) : [];
+    } catch(e) { inTransactions = []; }
+    
+    // Load Barang Keluar
+    try {
+        const saved = localStorage.getItem('pos_out_transactions');
+        outTransactions = saved ? JSON.parse(saved) : [];
+    } catch(e) { outTransactions = []; }
+    
+    // Load Pengajuan
+    try {
+        const saved = localStorage.getItem('pos_purchases');
+        purchases = saved ? JSON.parse(saved) : [];
+    } catch(e) { purchases = []; }
+}
+
+// ===================== HELPERS =====================
+function getStatus(stock) {
+    if (!stock || stock.qty <= 0) return 'kritis';
+    if (stock.qty < stock.min) return 'rendah';
+    return 'aman';
+}
+
+function getStatusBadge(status) {
+    const map = {
+        'kritis': '<span class="px-2 py-0.5 bg-status-kritis text-status-kritis-text text-[9px] font-bold rounded whitespace-nowrap">KRITIS</span>',
+        'rendah': '<span class="px-2 py-0.5 bg-status-rendah text-status-rendah-text text-[9px] font-bold rounded whitespace-nowrap">Rendah</span>',
+        'aman': '<span class="px-2 py-0.5 bg-status-today text-status-today-text text-[9px] font-bold rounded whitespace-nowrap">Aman</span>'
+    };
+    return map[status] || '<span class="px-2 py-0.5 bg-gray-100 text-gray-600 text-[9px] font-bold rounded">Unknown</span>';
+}
+
+function getPurchaseStatusBadge(status) {
+    const map = {
+        'draft': '<span class="status-badge status-draft">Draft</span>',
+        'pending': '<span class="status-badge status-pending">Menunggu</span>',
+        'approved': '<span class="status-badge status-approved">Disetujui</span>',
+        'rejected': '<span class="status-badge status-rejected">Ditolak</span>',
+        'received': '<span class="status-badge status-received">Diterima</span>'
+    };
+    return map[status] || '<span class="status-badge status-draft">' + status + '</span>';
+}
+
+function isToday(dateStr) {
+    if (!dateStr) return false;
+    const today = new Date();
+    const date = new Date(dateStr);
+    return date.getFullYear() === today.getFullYear() &&
+           date.getMonth() === today.getMonth() &&
+           date.getDate() === today.getDate();
+}
+
+function formatDate(dateStr) {
+    if (!dateStr) return '-';
+    const d = new Date(dateStr);
+    return d.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
+}
+
+function formatDateShort(dateStr) {
+    if (!dateStr) return '-';
+    const d = new Date(dateStr);
+    return d.toLocaleDateString('id-ID', { day: '2-digit', month: 'short' });
+}
+
+// ===================== UPDATE DASHBOARD =====================
+function updateDashboard() {
+    // Update date
+    const now = new Date();
+    const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+    const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+    document.getElementById('dashboard-date').textContent = 
+        `Pantau ketersediaan stok dan alur logistik secara real-time - ${days[now.getDay()]}, ${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
+
+    // --- Summary Cards ---
+    // Total Produk
+    document.getElementById('total-products').textContent = stocks.length;
+    const categories = new Set(stocks.map(p => p.category).filter(Boolean));
+    document.getElementById('total-categories').textContent = categories.size;
+    
+    // Total Stok
+    const totalQty = stocks.reduce((sum, p) => sum + (p.qty || 0), 0);
+    document.getElementById('total-stock-qty').textContent = totalQty;
+    const lowStock = stocks.filter(p => getStatus(p) === 'kritis' || getStatus(p) === 'rendah');
+    document.getElementById('low-stock-count').textContent = lowStock.length;
+    
+    // Barang Masuk Hari Ini
+    const todayIns = inTransactions.filter(t => isToday(t.date));
+    document.getElementById('today-in').textContent = todayIns.length;
+    const suppliers = new Set(todayIns.map(t => t.supplier).filter(Boolean));
+    document.getElementById('today-suppliers').textContent = suppliers.size;
+    
+    // Barang Keluar Hari Ini
+    const todayOuts = outTransactions.filter(t => isToday(t.date));
+    document.getElementById('today-out').textContent = todayOuts.length;
+    const outlets = new Set(todayOuts.map(t => t.destination).filter(Boolean));
+    document.getElementById('today-outlets').textContent = outlets.size;
+    
+    // Pengajuan Menunggu
+    const pendingPurchases = purchases.filter(p => p.status === 'pending');
+    document.getElementById('pending-purchases').textContent = pendingPurchases.length;
+    
+    // Pengajuan Disetujui
+    const approvedPurchases = purchases.filter(p => p.status === 'approved');
+    document.getElementById('approved-purchases').textContent = approvedPurchases.length;
+
+    // --- Stok Minimum Table ---
+    const tbody = document.getElementById('min-stock-body');
+    const lowStockItems = stocks.filter(p => getStatus(p) === 'kritis' || getStatus(p) === 'rendah');
+    if (lowStockItems.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="text-center py-6 text-gray-400 text-sm">✅ Semua stok dalam kondisi aman</td></tr>`;
+    } else {
+        tbody.innerHTML = lowStockItems.slice(0, 5).map(p => {
+            const status = getStatus(p);
+            return `
+            <tr class="hover:bg-slate-50/50">
+                <td class="px-4 py-3">
+                    <div class="flex items-center gap-2">
+                        <span class="font-semibold text-slate-700 truncate">${p.name}</span>
+                    </div>
+                </td>
+                <td class="px-4 py-3 text-center font-bold ${status === 'kritis' ? 'text-red-600' : 'text-amber-600'}">${p.qty}</td>
+                <td class="px-4 py-3 text-center text-slate-500">${p.min}</td>
+                <td class="px-4 py-3 text-slate-500">${p.unit}</td>
+                <td class="px-4 py-3">${getStatusBadge(status)}</td>
+            </tr>
+        `}).join('');
+    }
+
+    // --- Barang Masuk Terakhir ---
+    const lastInBody = document.getElementById('last-in-body');
+    const lastIn = inTransactions.sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 5);
+    if (lastIn.length === 0) {
+        lastInBody.innerHTML = `<tr><td colspan="3" class="text-center py-3 text-gray-400 text-xs">Belum ada barang masuk</td></tr>`;
+    } else {
+        lastInBody.innerHTML = lastIn.map(t => `
+            <tr>
+                <td class="px-3 py-2 font-semibold text-slate-700 truncate text-xs">${t.productName}</td>
+                <td class="px-3 py-2 text-slate-400 truncate text-xs">${t.supplier || '-'}</td>
+                <td class="px-3 py-2 text-right font-medium whitespace-nowrap text-xs">${t.qty} ${t.unit || 'kg'}</td>
+            </tr>
+        `).join('');
+    }
+
+    // --- Notifikasi ---
+    const notificationsContainer = document.getElementById('notifications-container');
+    let notifications = [];
+    
+    // Notifikasi dari stok kritis
+    stocks.filter(p => getStatus(p) === 'kritis').forEach(p => {
+        notifications.push({
+            type: 'critical',
+            title: `⚠️ Stok ${p.name} kritis!`,
+            desc: `Sisa stok ${p.qty} ${p.unit}. Batas minimum ${p.min} ${p.unit}.`,
+            time: 'Perlu tindakan segera!'
+        });
+    });
+    
+    // Notifikasi dari stok rendah
+    stocks.filter(p => getStatus(p) === 'rendah').forEach(p => {
+        notifications.push({
+            type: 'warning',
+            title: `📉 Stok ${p.name} menipis`,
+            desc: `Sisa stok ${p.qty} ${p.unit}. Batas minimum ${p.min} ${p.unit}.`,
+            time: 'Segera lakukan pengajuan pembelian'
+        });
+    });
+    
+    // Notifikasi dari pengajuan menunggu
+    const pending = purchases.filter(p => p.status === 'pending');
+    if (pending.length > 0) {
+        notifications.push({
+            type: 'info',
+            title: `📋 ${pending.length} pengajuan menunggu persetujuan`,
+            desc: pending.slice(0, 3).map(p => `${p.itemName} (${p.qty} unit)`).join(', '),
+            time: 'Menunggu atasan'
+        });
+    }
+    
+    // Notifikasi dari barang masuk menunggu
+    const waitingIn = inTransactions.filter(t => t.status === 'waiting');
+    if (waitingIn.length > 0) {
+        notifications.push({
+            type: 'info',
+            title: `📦 ${waitingIn.length} barang masuk menunggu diterima`,
+            desc: waitingIn.slice(0, 3).map(t => `${t.productName} (${t.qty} ${t.unit || 'kg'})`).join(', '),
+            time: 'Segera konfirmasi penerimaan'
+        });
+    }
+    
+    if (notifications.length === 0) {
+        notificationsContainer.innerHTML = `
+            <div class="flex gap-2 p-2 bg-green-50/50 border-l-4 border-green-500 rounded">
+                <div class="flex-shrink-0">
+                    <svg class="w-4 h-4 text-green-600" fill="currentColor" viewbox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+                </div>
+                <div>
+                    <p class="text-[10px] font-bold text-slate-800 leading-tight">Semua dalam kondisi baik</p>
+                    <p class="text-[9px] text-slate-500">Tidak ada notifikasi penting</p>
+                </div>
+            </div>
+        `;
+    } else {
+        notificationsContainer.innerHTML = notifications.slice(0, 4).map(n => {
+            const isCritical = n.type === 'critical';
+            const bgClass = isCritical ? 'bg-red-50/50 border-red-500' : 
+                           n.type === 'warning' ? 'bg-orange-50/50 border-orange-500' : 'bg-blue-50/50 border-blue-500';
+            const iconColor = isCritical ? 'text-red-600' : 
+                            n.type === 'warning' ? 'text-orange-600' : 'text-blue-600';
+            return `
+            <div class="flex gap-2 p-2 ${bgClass} border-l-4 rounded">
+                <div class="flex-shrink-0">
+                    <svg class="w-4 h-4 ${iconColor}" fill="currentColor" viewbox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>
+                </div>
+                <div class="min-w-0">
+                    <p class="text-[10px] font-bold text-slate-800 leading-tight">${n.title}</p>
+                    <p class="text-[9px] text-slate-500 truncate">${n.desc}</p>
+                    <p class="text-[8px] text-slate-400 mt-0.5">${n.time}</p>
+                </div>
+            </div>
+        `}).join('');
+    }
+
+    // --- Barang Keluar Terakhir ---
+    const lastOutBody = document.getElementById('last-out-body');
+    const lastOut = outTransactions.sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 5);
+    if (lastOut.length === 0) {
+        lastOutBody.innerHTML = `<tr><td colspan="4" class="text-center py-4 text-gray-400 text-sm">Belum ada barang keluar</td></tr>`;
+    } else {
+        lastOutBody.innerHTML = lastOut.map((t, index) => `
+            <tr class="hover:bg-slate-50/50">
+                <td class="px-4 py-2 text-slate-400 text-center">${index + 1}</td>
+                <td class="px-4 py-2 font-semibold text-slate-700 truncate text-xs">${t.productName}</td>
+                <td class="px-4 py-2 text-center font-medium whitespace-nowrap text-xs">${t.qty} ${t.unit}</td>
+                <td class="px-4 py-2 text-slate-500 truncate text-xs">${t.destination || '-'}</td>
+            </tr>
+        `).join('');
+    }
+
+    // --- Pengajuan Terakhir ---
+    const lastPurchaseBody = document.getElementById('last-purchase-body');
+    const lastPurchases = purchases.sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 5);
+    if (lastPurchases.length === 0) {
+        lastPurchaseBody.innerHTML = `<tr><td colspan="4" class="text-center py-4 text-gray-400 text-sm">Belum ada pengajuan</td></tr>`;
+    } else {
+        lastPurchaseBody.innerHTML = lastPurchases.map((p, index) => `
+            <tr class="hover:bg-slate-50/50">
+                <td class="px-4 py-2 text-slate-400 text-center">${index + 1}</td>
+                <td class="px-4 py-2 font-semibold text-slate-700 truncate text-xs">${p.itemName}</td>
+                <td class="px-4 py-2 text-center font-medium whitespace-nowrap text-xs">${p.qty}</td>
+                <td class="px-4 py-2">${getPurchaseStatusBadge(p.status)}</td>
+            </tr>
+        `).join('');
+    }
+}
+
+// ===================== EXPORT ALL DATA =====================
+function exportAllData() {
+    let csv = '=== LAPORAN DASHBOARD GUDANG ===\n\n';
+    csv += `Tanggal: ${new Date().toLocaleDateString('id-ID')}\n\n`;
+    
+    csv += '--- DATA STOK ---\n';
+    csv += 'No,Kode,Nama Produk,Kategori,Stok,Satuan,Minimum,Status\n';
+    stocks.forEach((p, i) => {
+        const status = getStatus(p);
+        const statusText = status === 'kritis' ? 'Kritis' : status === 'rendah' ? 'Rendah' : 'Aman';
+        csv += `${i+1},${p.code || '-'},${p.name},${p.category || '-'},${p.qty},${p.unit},${p.min},${statusText}\n`;
+    });
+    
+    csv += '\n--- BARANG MASUK ---\n';
+    csv += 'No,Produk,Jumlah,Satuan,Supplier,Status,Tanggal\n';
+    inTransactions.forEach((t, i) => {
+        const statusText = t.status === 'received' ? 'Diterima' : 'Menunggu';
+        csv += `${i+1},${t.productName},${t.qty},${t.unit || 'kg'},${t.supplier || '-'},${statusText},${formatDate(t.date)}\n`;
+    });
+    
+    csv += '\n--- BARANG KELUAR ---\n';
+    csv += 'No,Produk,Jumlah,Satuan,Tujuan,Tanggal\n';
+    outTransactions.forEach((t, i) => {
+        csv += `${i+1},${t.productName},${t.qty},${t.unit},${t.destination || '-'},${formatDate(t.date)}\n`;
+    });
+    
+    csv += '\n--- PENGAJUAN ---\n';
+    csv += 'No,Item,Jumlah,Supplier,Status,Tanggal\n';
+    purchases.forEach((p, i) => {
+        csv += `${i+1},${p.itemName},${p.qty},${p.supplier},${p.status},${formatDate(p.date)}\n`;
+    });
+    
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    const now = new Date();
+    const dateStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
+    a.download = `dashboard_gudang_${dateStr}.csv`;
+    a.click();
+    window.URL.revokeObjectURL(url);
+}
+
+// ===================== STORAGE LISTENER =====================
+window.addEventListener('storage', function(e) {
+    if (['pos_stocks', 'pos_in_transactions', 'pos_out_transactions', 'pos_purchases'].includes(e.key)) {
+        loadAllData();
+        updateDashboard();
+    }
+});
+
+// ===================== INIT =====================
+document.addEventListener('DOMContentLoaded', function() {
+    loadAllData();
+    updateDashboard();
+    
+    // Refresh every 10 seconds
+    setInterval(() => {
+        loadAllData();
+        updateDashboard();
+    }, 10000);
+});
+</script>
+</body>
+</html><!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Little Story ERP - Warehouse Dashboard</title>
+<!-- Tailwind CSS v3 CDN -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Google Fonts: Inter -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          },
+          colors: {
+            earthy: {
+              DEFAULT: '#4d3310',
+              sidebar: '#4d3310',
+              surface: '#f8f9fa',
+              'surface-dim': '#d9dadb',
+              'surface-container': '#ffffff',
+            },
+            status: {
+              kritis: '#fee2e2',
+              'kritis-text': '#dc2626',
+              rendah: '#ffedd5',
+              'rendah-text': '#ea580c',
+              aktif: '#dbeafe',
+              'aktif-text': '#2563eb',
+              today: '#dcfce7',
+              'today-text': '#16a34a',
+            }
+          },
+          borderRadius: {
+            'custom': '8px',
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    * {
+      box-sizing: border-box;
+    }
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f1f1;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #ccc;
+      border-radius: 10px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #4d3310;
+    }
+    .dashboard-container {
+      max-width: 1440px;
+      margin: 0 auto;
+      width: 100%;
+    }
+    .content-area {
+      padding: 24px 32px 40px;
+    }
+    @media (max-width: 1024px) {
+      .content-area {
+        padding: 20px 24px 32px;
+      }
+    }
+    @media (max-width: 768px) {
+      .content-area {
+        padding: 16px;
+      }
+    }
+    .sidebar-fixed {
+      width: 240px;
+      flex-shrink: 0;
+    }
+    .main-content {
+      flex: 1;
+      min-width: 0;
+      width: 100%;
+    }
+    .table-wrap {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .stat-card {
+      min-width: 0;
+    }
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 16px;
+    }
+    @media (min-width: 1024px) {
+      .card-grid {
+        grid-template-columns: repeat(6, 1fr);
+      }
+    }
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 24px;
+    }
+    @media (max-width: 1024px) {
+      .main-grid {
+        grid-template-columns: 1fr;
+        gap: 24px;
+      }
+    }
+    .custom-shadow {
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+    }
+    .status-badge {
+      padding: 4px 12px;
+      border-radius: 9999px;
+      font-size: 10px;
+      font-weight: 600;
+      display: inline-block;
+      white-space: nowrap;
+    }
+    .status-pending { background: #FEF3C7; color: #D97706; }
+    .status-approved { background: #D1FAE5; color: #059669; }
+    .status-rejected { background: #FEE2E2; color: #DC2626; }
+    .status-draft { background: #E5E7EB; color: #6B7280; }
+    .status-waiting { background: #FEF3C7; color: #D97706; }
+    .status-received { background: #D1FAE5; color: #059669; }
+  </style>
+</head>
+<body class="bg-earthy-surface font-sans text-slate-800">
+<div class="flex min-h-screen">
+<!-- BEGIN: Sidebar -->
+<aside class="sidebar-fixed bg-earthy-sidebar text-white flex flex-col fixed h-full z-20" data-purpose="main-navigation">
+<!-- Logo Section -->
+<div class="p-5 flex items-center gap-3">
+<div class="w-8 h-8 bg-white rounded-md flex items-center justify-center flex-shrink-0">
+<div class="w-5 h-5 bg-earthy-sidebar rounded-sm"></div>
+</div>
+<div class="min-w-0">
+<h1 class="text-sm font-bold leading-none">Little Story</h1>
+<span class="text-[10px] opacity-70 tracking-wider">ENTERPRISE ERP</span>
+</div>
+</div>
+<!-- Nav Items -->
+<nav class="flex-1 px-3 space-y-1 mt-4 overflow-y-auto">
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-white/10 text-white font-medium" href="#">
+<svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+          Dashboard
+        </a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-white/60 hover:text-white hover:bg-white/5 transition-colors" href="st.html">
+<svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+          Stok
+        </a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-white/60 hover:text-white hover:bg-white/5 transition-colors" href="bm.html">
+<svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M7 16l-4-4m0 0l4-4m-4 4h18" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+          Barang Masuk
+        </a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-white/60 hover:text-white hover:bg-white/5 transition-colors" href="bk.html">
+<svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M17 8l4 4m0 0l-4 4m4-4H3" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+          Barang Keluar
+        </a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-white/60 hover:text-white hover:bg-white/5 transition-colors" href="pengajuan.html">
+<svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+          Pengajuan
+        </a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-white/60 hover:text-white hover:bg-white/5 transition-colors" href="pen.html">
+<svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+          Pengaturan
+        </a>
+</nav>
+</aside>
+<!-- END: Sidebar -->
+
+<!-- Main Content Wrapper -->
+<main class="main-content ml-[240px] flex flex-col min-h-screen">
+<!-- BEGIN: Header -->
+<header class="h-16 bg-white border-b border-gray-100 flex items-center justify-between px-6 lg:px-8 sticky top-0 z-10 flex-shrink-0">
+<div class="relative w-64 lg:w-96">
+<span class="absolute inset-y-0 left-0 flex items-center pl-3">
+<svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</span>
+<input class="w-full pl-10 pr-4 py-2 bg-slate-100 border-none rounded-lg text-xs focus:ring-1 focus:ring-earthy placeholder:text-slate-400" placeholder="Cari data stok atau transaksi..." type="text" id="search-dashboard"/>
+</div>
+<div class="flex items-center gap-4 lg:gap-6 flex-shrink-0">
+<div class="relative">
+<svg class="w-6 h-6 text-slate-500" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span class="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-white">3</span>
+</div>
+<div class="flex items-center gap-3">
+<div class="text-right hidden sm:block">
+<p class="text-sm font-semibold text-slate-800">Budi Santoso</p>
+<p class="text-xs text-slate-400 font-medium">KEPALA GUDANG</p>
+</div>
+<img alt="User Profile" class="w-10 h-10 rounded-full border-2 border-white custom-shadow object-cover flex-shrink-0" src="https://ui-avatars.com/api/?name=Budi+Santoso&background=4d3310&color=fff&size=128"/>
+<svg class="w-4 h-4 text-slate-400 hidden sm:block" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+</div>
+</header>
+<!-- END: Header -->
+
+<!-- BEGIN: Content Area -->
+<div class="content-area flex-1">
+<div class="dashboard-container">
+<!-- Dashboard Title -->
+<div class="flex flex-wrap justify-between items-start gap-4 mb-6">
+<div class="min-w-0">
+<h2 class="text-2xl font-bold text-slate-800">DASHBOARD GUDANG</h2>
+<p class="text-sm text-slate-500 mt-1" id="dashboard-date">Pantau ketersediaan stok dan alur logistik secara real-time.</p>
+</div>
+<div class="flex flex-wrap gap-3 flex-shrink-0">
+<button class="px-4 py-2 bg-white border border-slate-300 rounded-lg text-xs font-semibold flex items-center gap-2 hover:bg-slate-50 whitespace-nowrap shadow-sm" onclick="exportAllData()">
+<svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+              Export Data
+            </button>
+</div>
+</div>
+
+<!-- Summary Cards Row (6 cards untuk semua modul) -->
+<div class="card-grid mb-8">
+<!-- Card 1: Total Produk -->
+<div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100 stat-card">
+<div class="flex justify-between items-start">
+<div class="p-2 bg-blue-50 text-blue-600 rounded-lg flex-shrink-0">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<span class="text-[9px] font-bold bg-status-aktif text-status-aktif-text px-2 py-0.5 rounded">Produk</span>
+</div>
+<div class="mt-3">
+<p class="text-[10px] text-slate-500 font-medium">Total Produk</p>
+<p class="text-2xl font-bold text-slate-800" id="total-products">0</p>
+<p class="text-[9px] text-slate-400 mt-0.5"><span id="total-categories">0</span> kategori</p>
+</div>
+</div>
+
+<!-- Card 2: Total Stok -->
+<div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100 stat-card">
+<div class="flex justify-between items-start">
+<div class="p-2 bg-green-50 text-green-600 rounded-lg flex-shrink-0">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<span class="text-[9px] font-bold bg-status-today text-status-today-text px-2 py-0.5 rounded">Stok</span>
+</div>
+<div class="mt-3">
+<p class="text-[10px] text-slate-500 font-medium">Total Stok</p>
+<p class="text-2xl font-bold text-slate-800" id="total-stock-qty">0</p>
+<p class="text-[9px] text-slate-400 mt-0.5"><span id="low-stock-count">0</span> stok menipis</p>
+</div>
+</div>
+
+<!-- Card 3: Barang Masuk Hari Ini -->
+<div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100 stat-card">
+<div class="flex justify-between items-start">
+<div class="p-2 bg-emerald-50 text-emerald-600 rounded-lg flex-shrink-0">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M7 16l-4-4m0 0l4-4m-4 4h18" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<span class="text-[9px] font-bold bg-status-today text-status-today-text px-2 py-0.5 rounded">Hari Ini</span>
+</div>
+<div class="mt-3">
+<p class="text-[10px] text-slate-500 font-medium">Barang Masuk</p>
+<p class="text-2xl font-bold text-slate-800"><span id="today-in">0</span></p>
+<p class="text-[9px] text-slate-400 mt-0.5"><span id="today-suppliers">0</span> supplier</p>
+</div>
+</div>
+
+<!-- Card 4: Barang Keluar Hari Ini -->
+<div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100 stat-card">
+<div class="flex justify-between items-start">
+<div class="p-2 bg-orange-50 text-orange-600 rounded-lg flex-shrink-0">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M17 8l4 4m0 0l-4 4m4-4H3" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<span class="text-[9px] font-bold bg-blue-50 text-blue-600 px-2 py-0.5 rounded">Keluar</span>
+</div>
+<div class="mt-3">
+<p class="text-[10px] text-slate-500 font-medium">Barang Keluar</p>
+<p class="text-2xl font-bold text-slate-800"><span id="today-out">0</span></p>
+<p class="text-[9px] text-slate-400 mt-0.5"><span id="today-outlets">0</span> tujuan</p>
+</div>
+</div>
+
+<!-- Card 5: Pengajuan Menunggu -->
+<div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100 stat-card">
+<div class="flex justify-between items-start">
+<div class="p-2 bg-amber-50 text-amber-600 rounded-lg flex-shrink-0">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<span class="text-[9px] font-bold bg-yellow-50 text-yellow-600 px-2 py-0.5 rounded">Menunggu</span>
+</div>
+<div class="mt-3">
+<p class="text-[10px] text-slate-500 font-medium">Pengajuan</p>
+<p class="text-2xl font-bold text-amber-600" id="pending-purchases">0</p>
+<p class="text-[9px] text-slate-400 mt-0.5">menunggu persetujuan</p>
+</div>
+</div>
+
+<!-- Card 6: Pengajuan Disetujui -->
+<div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100 stat-card">
+<div class="flex justify-between items-start">
+<div class="p-2 bg-purple-50 text-purple-600 rounded-lg flex-shrink-0">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<span class="text-[9px] font-bold bg-green-50 text-green-600 px-2 py-0.5 rounded">Disetujui</span>
+</div>
+<div class="mt-3">
+<p class="text-[10px] text-slate-500 font-medium">Disetujui</p>
+<p class="text-2xl font-bold text-green-600" id="approved-purchases">0</p>
+<p class="text-[9px] text-slate-400 mt-0.5">siap diterima</p>
+</div>
+</div>
+</div>
+
+<!-- Main Grid for Tables and Widgets -->
+<div class="main-grid">
+<!-- LEFT SIDE: Stok Minimum Table -->
+<div class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden min-w-0">
+<div class="p-4 border-b border-slate-50 flex flex-wrap justify-between items-center gap-2">
+<div class="min-w-0">
+<h3 class="font-bold text-slate-800 text-sm">⚠️ Stok Minimum</h3>
+<p class="text-xs text-slate-500">Item yang mendekati atau di bawah batas minimum.</p>
+</div>
+<a class="text-[10px] font-bold text-slate-400 hover:text-earthy transition-colors flex-shrink-0" href="st.html">Lihat Semua →</a>
+</div>
+<div class="table-wrap">
+<table class="w-full text-left min-w-[500px]">
+<thead>
+<tr class="bg-slate-50 text-[10px] text-slate-400 font-bold uppercase tracking-wider">
+<th class="px-4 py-2">Produk</th>
+<th class="px-4 py-2 text-center">Stok</th>
+<th class="px-4 py-2 text-center">Minimum</th>
+<th class="px-4 py-2">Satuan</th>
+<th class="px-4 py-2">Status</th>
+</tr>
+</thead>
+<tbody id="min-stock-body" class="text-xs divide-y divide-slate-100">
+</tbody>
+</table>
+</div>
+</div>
+
+<!-- RIGHT SIDE: Widgets -->
+<div class="space-y-6 min-w-0">
+<!-- BEGIN: Barang Masuk Terakhir -->
+<div class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
+<div class="p-3 border-b border-slate-50 flex justify-between items-center">
+<h3 class="text-xs font-bold text-slate-800">📦 Barang Masuk Terakhir</h3>
+<a class="text-[9px] font-bold text-slate-400 hover:text-earthy transition-colors flex-shrink-0" href="bm.html">Lihat Semua →</a>
+</div>
+<div class="table-wrap">
+<table class="w-full text-left min-w-[250px]">
+<thead class="bg-slate-50 text-[9px] text-slate-400 font-bold uppercase tracking-wider">
+<tr>
+<th class="px-3 py-1.5">Produk</th>
+<th class="px-3 py-1.5">Supplier</th>
+<th class="px-3 py-1.5 text-right">Qty</th>
+</tr>
+</thead>
+<tbody id="last-in-body" class="text-[10px] divide-y divide-slate-50">
+</tbody>
+</table>
+</div>
+</div>
+<!-- END: Barang Masuk Terakhir -->
+
+<!-- BEGIN: Notifikasi Gudang -->
+<div class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
+<div class="p-3 border-b border-slate-50">
+<h3 class="text-xs font-bold text-slate-800">🔔 Notifikasi</h3>
+</div>
+<div id="notifications-container" class="p-3 space-y-2">
+</div>
+</div>
+<!-- END: Notifikasi Gudang -->
+</div>
+</div>
+
+<!-- BEGIN: Barang Keluar & Pengajuan Terakhir (2 kolom) -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+<!-- Barang Keluar Terakhir -->
+<div class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
+<div class="p-4 border-b border-slate-50 flex flex-wrap justify-between items-center gap-2">
+<h3 class="font-bold text-slate-800 text-sm">📤 Barang Keluar Terakhir</h3>
+<a class="text-[10px] font-bold text-slate-400 hover:text-earthy transition-colors flex-shrink-0" href="bk.html">Lihat Semua →</a>
+</div>
+<div class="table-wrap">
+<table class="w-full text-left min-w-[400px]">
+<thead>
+<tr class="bg-slate-50 text-[10px] text-slate-400 font-bold uppercase tracking-wider">
+<th class="px-4 py-2">No.</th>
+<th class="px-4 py-2">Produk</th>
+<th class="px-4 py-2 text-center">Qty</th>
+<th class="px-4 py-2">Tujuan</th>
+</tr>
+</thead>
+<tbody id="last-out-body" class="text-xs divide-y divide-slate-100">
+</tbody>
+</table>
+</div>
+</div>
+
+<!-- Pengajuan Terakhir -->
+<div class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
+<div class="p-4 border-b border-slate-50 flex flex-wrap justify-between items-center gap-2">
+<h3 class="font-bold text-slate-800 text-sm">📋 Pengajuan Terakhir</h3>
+<a class="text-[10px] font-bold text-slate-400 hover:text-earthy transition-colors flex-shrink-0" href="pengajuan.html">Lihat Semua →</a>
+</div>
+<div class="table-wrap">
+<table class="w-full text-left min-w-[400px]">
+<thead>
+<tr class="bg-slate-50 text-[10px] text-slate-400 font-bold uppercase tracking-wider">
+<th class="px-4 py-2">No.</th>
+<th class="px-4 py-2">Item</th>
+<th class="px-4 py-2 text-center">Qty</th>
+<th class="px-4 py-2">Status</th>
+</tr>
+</thead>
+<tbody id="last-purchase-body" class="text-xs divide-y divide-slate-100">
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<!-- END: Barang Keluar & Pengajuan Terakhir -->
+</div>
+</div>
+<!-- END: Content Area -->
+</main>
+</div>
+
+<script>
+// ===================== DATA STORE =====================
+let stocks = [];
+let inTransactions = [];
+let outTransactions = [];
+let purchases = [];
+
+// ===================== LOAD DATA =====================
+function loadAllData() {
+    // Load Stok
+    try {
+        const saved = localStorage.getItem('pos_stocks');
+        stocks = saved ? JSON.parse(saved) : [];
+    } catch(e) { stocks = []; }
+    
+    // Load Barang Masuk
+    try {
+        const saved = localStorage.getItem('pos_in_transactions');
+        inTransactions = saved ? JSON.parse(saved) : [];
+    } catch(e) { inTransactions = []; }
+    
+    // Load Barang Keluar
+    try {
+        const saved = localStorage.getItem('pos_out_transactions');
+        outTransactions = saved ? JSON.parse(saved) : [];
+    } catch(e) { outTransactions = []; }
+    
+    // Load Pengajuan
+    try {
+        const saved = localStorage.getItem('pos_purchases');
+        purchases = saved ? JSON.parse(saved) : [];
+    } catch(e) { purchases = []; }
+}
+
+// ===================== HELPERS =====================
+function getStatus(stock) {
+    if (!stock || stock.qty <= 0) return 'kritis';
+    if (stock.qty < stock.min) return 'rendah';
+    return 'aman';
+}
+
+function getStatusBadge(status) {
+    const map = {
+        'kritis': '<span class="px-2 py-0.5 bg-status-kritis text-status-kritis-text text-[9px] font-bold rounded whitespace-nowrap">KRITIS</span>',
+        'rendah': '<span class="px-2 py-0.5 bg-status-rendah text-status-rendah-text text-[9px] font-bold rounded whitespace-nowrap">Rendah</span>',
+        'aman': '<span class="px-2 py-0.5 bg-status-today text-status-today-text text-[9px] font-bold rounded whitespace-nowrap">Aman</span>'
+    };
+    return map[status] || '<span class="px-2 py-0.5 bg-gray-100 text-gray-600 text-[9px] font-bold rounded">Unknown</span>';
+}
+
+function getPurchaseStatusBadge(status) {
+    const map = {
+        'draft': '<span class="status-badge status-draft">Draft</span>',
+        'pending': '<span class="status-badge status-pending">Menunggu</span>',
+        'approved': '<span class="status-badge status-approved">Disetujui</span>',
+        'rejected': '<span class="status-badge status-rejected">Ditolak</span>',
+        'received': '<span class="status-badge status-received">Diterima</span>'
+    };
+    return map[status] || '<span class="status-badge status-draft">' + status + '</span>';
+}
+
+function isToday(dateStr) {
+    if (!dateStr) return false;
+    const today = new Date();
+    const date = new Date(dateStr);
+    return date.getFullYear() === today.getFullYear() &&
+           date.getMonth() === today.getMonth() &&
+           date.getDate() === today.getDate();
+}
+
+function formatDate(dateStr) {
+    if (!dateStr) return '-';
+    const d = new Date(dateStr);
+    return d.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
+}
+
+function formatDateShort(dateStr) {
+    if (!dateStr) return '-';
+    const d = new Date(dateStr);
+    return d.toLocaleDateString('id-ID', { day: '2-digit', month: 'short' });
+}
+
+// ===================== UPDATE DASHBOARD =====================
+function updateDashboard() {
+    // Update date
+    const now = new Date();
+    const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+    const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+    document.getElementById('dashboard-date').textContent = 
+        `Pantau ketersediaan stok dan alur logistik secara real-time - ${days[now.getDay()]}, ${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
+
+    // --- Summary Cards ---
+    // Total Produk
+    document.getElementById('total-products').textContent = stocks.length;
+    const categories = new Set(stocks.map(p => p.category).filter(Boolean));
+    document.getElementById('total-categories').textContent = categories.size;
+    
+    // Total Stok
+    const totalQty = stocks.reduce((sum, p) => sum + (p.qty || 0), 0);
+    document.getElementById('total-stock-qty').textContent = totalQty;
+    const lowStock = stocks.filter(p => getStatus(p) === 'kritis' || getStatus(p) === 'rendah');
+    document.getElementById('low-stock-count').textContent = lowStock.length;
+    
+    // Barang Masuk Hari Ini
+    const todayIns = inTransactions.filter(t => isToday(t.date));
+    document.getElementById('today-in').textContent = todayIns.length;
+    const suppliers = new Set(todayIns.map(t => t.supplier).filter(Boolean));
+    document.getElementById('today-suppliers').textContent = suppliers.size;
+    
+    // Barang Keluar Hari Ini
+    const todayOuts = outTransactions.filter(t => isToday(t.date));
+    document.getElementById('today-out').textContent = todayOuts.length;
+    const outlets = new Set(todayOuts.map(t => t.destination).filter(Boolean));
+    document.getElementById('today-outlets').textContent = outlets.size;
+    
+    // Pengajuan Menunggu
+    const pendingPurchases = purchases.filter(p => p.status === 'pending');
+    document.getElementById('pending-purchases').textContent = pendingPurchases.length;
+    
+    // Pengajuan Disetujui
+    const approvedPurchases = purchases.filter(p => p.status === 'approved');
+    document.getElementById('approved-purchases').textContent = approvedPurchases.length;
+
+    // --- Stok Minimum Table ---
+    const tbody = document.getElementById('min-stock-body');
+    const lowStockItems = stocks.filter(p => getStatus(p) === 'kritis' || getStatus(p) === 'rendah');
+    if (lowStockItems.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="text-center py-6 text-gray-400 text-sm">✅ Semua stok dalam kondisi aman</td></tr>`;
+    } else {
+        tbody.innerHTML = lowStockItems.slice(0, 5).map(p => {
+            const status = getStatus(p);
+            return `
+            <tr class="hover:bg-slate-50/50">
+                <td class="px-4 py-3">
+                    <div class="flex items-center gap-2">
+                        <span class="font-semibold text-slate-700 truncate">${p.name}</span>
+                    </div>
+                </td>
+                <td class="px-4 py-3 text-center font-bold ${status === 'kritis' ? 'text-red-600' : 'text-amber-600'}">${p.qty}</td>
+                <td class="px-4 py-3 text-center text-slate-500">${p.min}</td>
+                <td class="px-4 py-3 text-slate-500">${p.unit}</td>
+                <td class="px-4 py-3">${getStatusBadge(status)}</td>
+            </tr>
+        `}).join('');
+    }
+
+    // --- Barang Masuk Terakhir ---
+    const lastInBody = document.getElementById('last-in-body');
+    const lastIn = inTransactions.sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 5);
+    if (lastIn.length === 0) {
+        lastInBody.innerHTML = `<tr><td colspan="3" class="text-center py-3 text-gray-400 text-xs">Belum ada barang masuk</td></tr>`;
+    } else {
+        lastInBody.innerHTML = lastIn.map(t => `
+            <tr>
+                <td class="px-3 py-2 font-semibold text-slate-700 truncate text-xs">${t.productName}</td>
+                <td class="px-3 py-2 text-slate-400 truncate text-xs">${t.supplier || '-'}</td>
+                <td class="px-3 py-2 text-right font-medium whitespace-nowrap text-xs">${t.qty} ${t.unit || 'kg'}</td>
+            </tr>
+        `).join('');
+    }
+
+    // --- Notifikasi ---
+    const notificationsContainer = document.getElementById('notifications-container');
+    let notifications = [];
+    
+    // Notifikasi dari stok kritis
+    stocks.filter(p => getStatus(p) === 'kritis').forEach(p => {
+        notifications.push({
+            type: 'critical',
+            title: `⚠️ Stok ${p.name} kritis!`,
+            desc: `Sisa stok ${p.qty} ${p.unit}. Batas minimum ${p.min} ${p.unit}.`,
+            time: 'Perlu tindakan segera!'
+        });
+    });
+    
+    // Notifikasi dari stok rendah
+    stocks.filter(p => getStatus(p) === 'rendah').forEach(p => {
+        notifications.push({
+            type: 'warning',
+            title: `📉 Stok ${p.name} menipis`,
+            desc: `Sisa stok ${p.qty} ${p.unit}. Batas minimum ${p.min} ${p.unit}.`,
+            time: 'Segera lakukan pengajuan pembelian'
+        });
+    });
+    
+    // Notifikasi dari pengajuan menunggu
+    const pending = purchases.filter(p => p.status === 'pending');
+    if (pending.length > 0) {
+        notifications.push({
+            type: 'info',
+            title: `📋 ${pending.length} pengajuan menunggu persetujuan`,
+            desc: pending.slice(0, 3).map(p => `${p.itemName} (${p.qty} unit)`).join(', '),
+            time: 'Menunggu atasan'
+        });
+    }
+    
+    // Notifikasi dari barang masuk menunggu
+    const waitingIn = inTransactions.filter(t => t.status === 'waiting');
+    if (waitingIn.length > 0) {
+        notifications.push({
+            type: 'info',
+            title: `📦 ${waitingIn.length} barang masuk menunggu diterima`,
+            desc: waitingIn.slice(0, 3).map(t => `${t.productName} (${t.qty} ${t.unit || 'kg'})`).join(', '),
+            time: 'Segera konfirmasi penerimaan'
+        });
+    }
+    
+    if (notifications.length === 0) {
+        notificationsContainer.innerHTML = `
+            <div class="flex gap-2 p-2 bg-green-50/50 border-l-4 border-green-500 rounded">
+                <div class="flex-shrink-0">
+                    <svg class="w-4 h-4 text-green-600" fill="currentColor" viewbox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+                </div>
+                <div>
+                    <p class="text-[10px] font-bold text-slate-800 leading-tight">Semua dalam kondisi baik</p>
+                    <p class="text-[9px] text-slate-500">Tidak ada notifikasi penting</p>
+                </div>
+            </div>
+        `;
+    } else {
+        notificationsContainer.innerHTML = notifications.slice(0, 4).map(n => {
+            const isCritical = n.type === 'critical';
+            const bgClass = isCritical ? 'bg-red-50/50 border-red-500' : 
+                           n.type === 'warning' ? 'bg-orange-50/50 border-orange-500' : 'bg-blue-50/50 border-blue-500';
+            const iconColor = isCritical ? 'text-red-600' : 
+                            n.type === 'warning' ? 'text-orange-600' : 'text-blue-600';
+            return `
+            <div class="flex gap-2 p-2 ${bgClass} border-l-4 rounded">
+                <div class="flex-shrink-0">
+                    <svg class="w-4 h-4 ${iconColor}" fill="currentColor" viewbox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>
+                </div>
+                <div class="min-w-0">
+                    <p class="text-[10px] font-bold text-slate-800 leading-tight">${n.title}</p>
+                    <p class="text-[9px] text-slate-500 truncate">${n.desc}</p>
+                    <p class="text-[8px] text-slate-400 mt-0.5">${n.time}</p>
+                </div>
+            </div>
+        `}).join('');
+    }
+
+    // --- Barang Keluar Terakhir ---
+    const lastOutBody = document.getElementById('last-out-body');
+    const lastOut = outTransactions.sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 5);
+    if (lastOut.length === 0) {
+        lastOutBody.innerHTML = `<tr><td colspan="4" class="text-center py-4 text-gray-400 text-sm">Belum ada barang keluar</td></tr>`;
+    } else {
+        lastOutBody.innerHTML = lastOut.map((t, index) => `
+            <tr class="hover:bg-slate-50/50">
+                <td class="px-4 py-2 text-slate-400 text-center">${index + 1}</td>
+                <td class="px-4 py-2 font-semibold text-slate-700 truncate text-xs">${t.productName}</td>
+                <td class="px-4 py-2 text-center font-medium whitespace-nowrap text-xs">${t.qty} ${t.unit}</td>
+                <td class="px-4 py-2 text-slate-500 truncate text-xs">${t.destination || '-'}</td>
+            </tr>
+        `).join('');
+    }
+
+    // --- Pengajuan Terakhir ---
+    const lastPurchaseBody = document.getElementById('last-purchase-body');
+    const lastPurchases = purchases.sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 5);
+    if (lastPurchases.length === 0) {
+        lastPurchaseBody.innerHTML = `<tr><td colspan="4" class="text-center py-4 text-gray-400 text-sm">Belum ada pengajuan</td></tr>`;
+    } else {
+        lastPurchaseBody.innerHTML = lastPurchases.map((p, index) => `
+            <tr class="hover:bg-slate-50/50">
+                <td class="px-4 py-2 text-slate-400 text-center">${index + 1}</td>
+                <td class="px-4 py-2 font-semibold text-slate-700 truncate text-xs">${p.itemName}</td>
+                <td class="px-4 py-2 text-center font-medium whitespace-nowrap text-xs">${p.qty}</td>
+                <td class="px-4 py-2">${getPurchaseStatusBadge(p.status)}</td>
+            </tr>
+        `).join('');
+    }
+}
+
+// ===================== EXPORT ALL DATA =====================
+function exportAllData() {
+    let csv = '=== LAPORAN DASHBOARD GUDANG ===\n\n';
+    csv += `Tanggal: ${new Date().toLocaleDateString('id-ID')}\n\n`;
+    
+    csv += '--- DATA STOK ---\n';
+    csv += 'No,Kode,Nama Produk,Kategori,Stok,Satuan,Minimum,Status\n';
+    stocks.forEach((p, i) => {
+        const status = getStatus(p);
+        const statusText = status === 'kritis' ? 'Kritis' : status === 'rendah' ? 'Rendah' : 'Aman';
+        csv += `${i+1},${p.code || '-'},${p.name},${p.category || '-'},${p.qty},${p.unit},${p.min},${statusText}\n`;
+    });
+    
+    csv += '\n--- BARANG MASUK ---\n';
+    csv += 'No,Produk,Jumlah,Satuan,Supplier,Status,Tanggal\n';
+    inTransactions.forEach((t, i) => {
+        const statusText = t.status === 'received' ? 'Diterima' : 'Menunggu';
+        csv += `${i+1},${t.productName},${t.qty},${t.unit || 'kg'},${t.supplier || '-'},${statusText},${formatDate(t.date)}\n`;
+    });
+    
+    csv += '\n--- BARANG KELUAR ---\n';
+    csv += 'No,Produk,Jumlah,Satuan,Tujuan,Tanggal\n';
+    outTransactions.forEach((t, i) => {
+        csv += `${i+1},${t.productName},${t.qty},${t.unit},${t.destination || '-'},${formatDate(t.date)}\n`;
+    });
+    
+    csv += '\n--- PENGAJUAN ---\n';
+    csv += 'No,Item,Jumlah,Supplier,Status,Tanggal\n';
+    purchases.forEach((p, i) => {
+        csv += `${i+1},${p.itemName},${p.qty},${p.supplier},${p.status},${formatDate(p.date)}\n`;
+    });
+    
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    const now = new Date();
+    const dateStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
+    a.download = `dashboard_gudang_${dateStr}.csv`;<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Little Story ERP - Warehouse Dashboard</title>
+<!-- Tailwind CSS v3 CDN -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Google Fonts: Inter -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          },
+          colors: {
+            earthy: {
+              DEFAULT: '#4d3310',
+              sidebar: '#4d3310',
+              surface: '#f8f9fa',
+              'surface-dim': '#d9dadb',
+              'surface-container': '#ffffff',
+            },
+            status: {
+              kritis: '#fee2e2',
+              'kritis-text': '#dc2626',
+              rendah: '#ffedd5',
+              'rendah-text': '#ea580c',
+              aktif: '#dbeafe',
+              'aktif-text': '#2563eb',
+              today: '#dcfce7',
+              'today-text': '#16a34a',
+            }
+          },
+          borderRadius: {
+            'custom': '8px',
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    * {
+      box-sizing: border-box;
+    }
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f1f1;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #ccc;
+      border-radius: 10px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #4d3310;
+    }
+    .dashboard-container {
+      max-width: 1440px;
+      margin: 0 auto;
+      width: 100%;
+    }
+    .content-area {
+      padding: 24px 32px 40px;
+    }
+    @media (max-width: 1024px) {
+      .content-area {
+        padding: 20px 24px 32px;
+      }
+    }
+    @media (max-width: 768px) {
+      .content-area {
+        padding: 16px;
+      }
+    }
+    .sidebar-fixed {
+      width: 240px;
+      flex-shrink: 0;
+    }
+    .main-content {
+      flex: 1;
+      min-width: 0;
+      width: 100%;
+    }
+    .table-wrap {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .stat-card {
+      min-width: 0;
+    }
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 16px;
+    }
+    @media (min-width: 1024px) {
+      .card-grid {
+        grid-template-columns: repeat(6, 1fr);
+      }
+    }
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 24px;
+    }
+    @media (max-width: 1024px) {
+      .main-grid {
+        grid-template-columns: 1fr;
+        gap: 24px;
+      }
+    }
+    .custom-shadow {
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+    }
+    .status-badge {
+      padding: 4px 12px;
+      border-radius: 9999px;
+      font-size: 10px;
+      font-weight: 600;
+      display: inline-block;
+      white-space: nowrap;
+    }
+    .status-pending { background: #FEF3C7; color: #D97706; }
+    .status-approved { background: #D1FAE5; color: #059669; }
+    .status-rejected { background: #FEE2E2; color: #DC2626; }
+    .status-draft { background: #E5E7EB; color: #6B7280; }
+    .status-waiting { background: #FEF3C7; color: #D97706; }
+    .status-received { background: #D1FAE5; color: #059669; }
+  </style>
+</head>
+<body class="bg-earthy-surface font-sans text-slate-800">
+<div class="flex min-h-screen">
+<!-- BEGIN: Sidebar -->
+<aside class="sidebar-fixed bg-earthy-sidebar text-white flex flex-col fixed h-full z-20" data-purpose="main-navigation">
+<!-- Logo Section -->
+<div class="p-5 flex items-center gap-3">
+<div class="w-8 h-8 bg-white rounded-md flex items-center justify-center flex-shrink-0">
+<div class="w-5 h-5 bg-earthy-sidebar rounded-sm"></div>
+</div>
+<div class="min-w-0">
+<h1 class="text-sm font-bold leading-none">Little Story</h1>
+<span class="text-[10px] opacity-70 tracking-wider">ENTERPRISE ERP</span>
+</div>
+</div>
+<!-- Nav Items -->
+<nav class="flex-1 px-3 space-y-1 mt-4 overflow-y-auto">
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-white/10 text-white font-medium" href="#">
+<svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+          Dashboard
+        </a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-white/60 hover:text-white hover:bg-white/5 transition-colors" href="st.html">
+<svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+          Stok
+        </a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-white/60 hover:text-white hover:bg-white/5 transition-colors" href="bm.html">
+<svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M7 16l-4-4m0 0l4-4m-4 4h18" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+          Barang Masuk
+        </a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-white/60 hover:text-white hover:bg-white/5 transition-colors" href="bk.html">
+<svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M17 8l4 4m0 0l-4 4m4-4H3" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+          Barang Keluar
+        </a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-white/60 hover:text-white hover:bg-white/5 transition-colors" href="pengajuan.html">
+<svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+          Pengajuan
+        </a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-white/60 hover:text-white hover:bg-white/5 transition-colors" href="pen.html">
+<svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+          Pengaturan
+        </a>
+</nav>
+</aside>
+<!-- END: Sidebar -->
+
+<!-- Main Content Wrapper -->
+<main class="main-content ml-[240px] flex flex-col min-h-screen">
+<!-- BEGIN: Header -->
+<header class="h-16 bg-white border-b border-gray-100 flex items-center justify-between px-6 lg:px-8 sticky top-0 z-10 flex-shrink-0">
+<div class="relative w-64 lg:w-96">
+<span class="absolute inset-y-0 left-0 flex items-center pl-3">
+<svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</span>
+<input class="w-full pl-10 pr-4 py-2 bg-slate-100 border-none rounded-lg text-xs focus:ring-1 focus:ring-earthy placeholder:text-slate-400" placeholder="Cari data stok atau transaksi..." type="text" id="search-dashboard"/>
+</div>
+<div class="flex items-center gap-4 lg:gap-6 flex-shrink-0">
+<div class="relative">
+<svg class="w-6 h-6 text-slate-500" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span class="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-white">3</span>
+</div>
+<div class="flex items-center gap-3">
+<div class="text-right hidden sm:block">
+<p class="text-sm font-semibold text-slate-800">Budi Santoso</p>
+<p class="text-xs text-slate-400 font-medium">KEPALA GUDANG</p>
+</div>
+<img alt="User Profile" class="w-10 h-10 rounded-full border-2 border-white custom-shadow object-cover flex-shrink-0" src="https://ui-avatars.com/api/?name=Budi+Santoso&background=4d3310&color=fff&size=128"/>
+<svg class="w-4 h-4 text-slate-400 hidden sm:block" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+</div>
+</header>
+<!-- END: Header -->
+
+<!-- BEGIN: Content Area -->
+<div class="content-area flex-1">
+<div class="dashboard-container">
+<!-- Dashboard Title -->
+<div class="flex flex-wrap justify-between items-start gap-4 mb-6">
+<div class="min-w-0">
+<h2 class="text-2xl font-bold text-slate-800">DASHBOARD GUDANG</h2>
+<p class="text-sm text-slate-500 mt-1" id="dashboard-date">Pantau ketersediaan stok dan alur logistik secara real-time.</p>
+</div>
+<div class="flex flex-wrap gap-3 flex-shrink-0">
+<button class="px-4 py-2 bg-white border border-slate-300 rounded-lg text-xs font-semibold flex items-center gap-2 hover:bg-slate-50 whitespace-nowrap shadow-sm" onclick="exportAllData()">
+<svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+              Export Data
+            </button>
+</div>
+</div>
+
+<!-- Summary Cards Row (6 cards untuk semua modul) -->
+<div class="card-grid mb-8">
+<!-- Card 1: Total Produk -->
+<div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100 stat-card">
+<div class="flex justify-between items-start">
+<div class="p-2 bg-blue-50 text-blue-600 rounded-lg flex-shrink-0">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<span class="text-[9px] font-bold bg-status-aktif text-status-aktif-text px-2 py-0.5 rounded">Produk</span>
+</div>
+<div class="mt-3">
+<p class="text-[10px] text-slate-500 font-medium">Total Produk</p>
+<p class="text-2xl font-bold text-slate-800" id="total-products">0</p>
+<p class="text-[9px] text-slate-400 mt-0.5"><span id="total-categories">0</span> kategori</p>
+</div>
+</div>
+
+<!-- Card 2: Total Stok -->
+<div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100 stat-card">
+<div class="flex justify-between items-start">
+<div class="p-2 bg-green-50 text-green-600 rounded-lg flex-shrink-0">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<span class="text-[9px] font-bold bg-status-today text-status-today-text px-2 py-0.5 rounded">Stok</span>
+</div>
+<div class="mt-3">
+<p class="text-[10px] text-slate-500 font-medium">Total Stok</p>
+<p class="text-2xl font-bold text-slate-800" id="total-stock-qty">0</p>
+<p class="text-[9px] text-slate-400 mt-0.5"><span id="low-stock-count">0</span> stok menipis</p>
+</div>
+</div>
+
+<!-- Card 3: Barang Masuk Hari Ini -->
+<div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100 stat-card">
+<div class="flex justify-between items-start">
+<div class="p-2 bg-emerald-50 text-emerald-600 rounded-lg flex-shrink-0">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M7 16l-4-4m0 0l4-4m-4 4h18" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<span class="text-[9px] font-bold bg-status-today text-status-today-text px-2 py-0.5 rounded">Hari Ini</span>
+</div>
+<div class="mt-3">
+<p class="text-[10px] text-slate-500 font-medium">Barang Masuk</p>
+<p class="text-2xl font-bold text-slate-800"><span id="today-in">0</span></p>
+<p class="text-[9px] text-slate-400 mt-0.5"><span id="today-suppliers">0</span> supplier</p>
+</div>
+</div>
+
+<!-- Card 4: Barang Keluar Hari Ini -->
+<div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100 stat-card">
+<div class="flex justify-between items-start">
+<div class="p-2 bg-orange-50 text-orange-600 rounded-lg flex-shrink-0">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M17 8l4 4m0 0l-4 4m4-4H3" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<span class="text-[9px] font-bold bg-blue-50 text-blue-600 px-2 py-0.5 rounded">Keluar</span>
+</div>
+<div class="mt-3">
+<p class="text-[10px] text-slate-500 font-medium">Barang Keluar</p>
+<p class="text-2xl font-bold text-slate-800"><span id="today-out">0</span></p>
+<p class="text-[9px] text-slate-400 mt-0.5"><span id="today-outlets">0</span> tujuan</p>
+</div>
+</div>
+
+<!-- Card 5: Pengajuan Menunggu -->
+<div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100 stat-card">
+<div class="flex justify-between items-start">
+<div class="p-2 bg-amber-50 text-amber-600 rounded-lg flex-shrink-0">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<span class="text-[9px] font-bold bg-yellow-50 text-yellow-600 px-2 py-0.5 rounded">Menunggu</span>
+</div>
+<div class="mt-3">
+<p class="text-[10px] text-slate-500 font-medium">Pengajuan</p>
+<p class="text-2xl font-bold text-amber-600" id="pending-purchases">0</p>
+<p class="text-[9px] text-slate-400 mt-0.5">menunggu persetujuan</p>
+</div>
+</div>
+
+<!-- Card 6: Pengajuan Disetujui -->
+<div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100 stat-card">
+<div class="flex justify-between items-start">
+<div class="p-2 bg-purple-50 text-purple-600 rounded-lg flex-shrink-0">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<span class="text-[9px] font-bold bg-green-50 text-green-600 px-2 py-0.5 rounded">Disetujui</span>
+</div>
+<div class="mt-3">
+<p class="text-[10px] text-slate-500 font-medium">Disetujui</p>
+<p class="text-2xl font-bold text-green-600" id="approved-purchases">0</p>
+<p class="text-[9px] text-slate-400 mt-0.5">siap diterima</p>
+</div>
+</div>
+</div>
+
+<!-- Main Grid for Tables and Widgets -->
+<div class="main-grid">
+<!-- LEFT SIDE: Stok Minimum Table -->
+<div class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden min-w-0">
+<div class="p-4 border-b border-slate-50 flex flex-wrap justify-between items-center gap-2">
+<div class="min-w-0">
+<h3 class="font-bold text-slate-800 text-sm">⚠️ Stok Minimum</h3>
+<p class="text-xs text-slate-500">Item yang mendekati atau di bawah batas minimum.</p>
+</div>
+<a class="text-[10px] font-bold text-slate-400 hover:text-earthy transition-colors flex-shrink-0" href="st.html">Lihat Semua →</a>
+</div>
+<div class="table-wrap">
+<table class="w-full text-left min-w-[500px]">
+<thead>
+<tr class="bg-slate-50 text-[10px] text-slate-400 font-bold uppercase tracking-wider">
+<th class="px-4 py-2">Produk</th>
+<th class="px-4 py-2 text-center">Stok</th>
+<th class="px-4 py-2 text-center">Minimum</th>
+<th class="px-4 py-2">Satuan</th>
+<th class="px-4 py-2">Status</th>
+</tr>
+</thead>
+<tbody id="min-stock-body" class="text-xs divide-y divide-slate-100">
+</tbody>
+</table>
+</div>
+</div>
+
+<!-- RIGHT SIDE: Widgets -->
+<div class="space-y-6 min-w-0">
+<!-- BEGIN: Barang Masuk Terakhir -->
+<div class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
+<div class="p-3 border-b border-slate-50 flex justify-between items-center">
+<h3 class="text-xs font-bold text-slate-800">📦 Barang Masuk Terakhir</h3>
+<a class="text-[9px] font-bold text-slate-400 hover:text-earthy transition-colors flex-shrink-0" href="bm.html">Lihat Semua →</a>
+</div>
+<div class="table-wrap">
+<table class="w-full text-left min-w-[250px]">
+<thead class="bg-slate-50 text-[9px] text-slate-400 font-bold uppercase tracking-wider">
+<tr>
+<th class="px-3 py-1.5">Produk</th>
+<th class="px-3 py-1.5">Supplier</th>
+<th class="px-3 py-1.5 text-right">Qty</th>
+</tr>
+</thead>
+<tbody id="last-in-body" class="text-[10px] divide-y divide-slate-50">
+</tbody>
+</table>
+</div>
+</div>
+<!-- END: Barang Masuk Terakhir -->
+
+<!-- BEGIN: Notifikasi Gudang -->
+<div class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
+<div class="p-3 border-b border-slate-50">
+<h3 class="text-xs font-bold text-slate-800">🔔 Notifikasi</h3>
+</div>
+<div id="notifications-container" class="p-3 space-y-2">
+</div>
+</div>
+<!-- END: Notifikasi Gudang -->
+</div>
+</div>
+
+<!-- BEGIN: Barang Keluar & Pengajuan Terakhir (2 kolom) -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+<!-- Barang Keluar Terakhir -->
+<div class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
+<div class="p-4 border-b border-slate-50 flex flex-wrap justify-between items-center gap-2">
+<h3 class="font-bold text-slate-800 text-sm">📤 Barang Keluar Terakhir</h3>
+<a class="text-[10px] font-bold text-slate-400 hover:text-earthy transition-colors flex-shrink-0" href="bk.html">Lihat Semua →</a>
+</div>
+<div class="table-wrap">
+<table class="w-full text-left min-w-[400px]">
+<thead>
+<tr class="bg-slate-50 text-[10px] text-slate-400 font-bold uppercase tracking-wider">
+<th class="px-4 py-2">No.</th>
+<th class="px-4 py-2">Produk</th>
+<th class="px-4 py-2 text-center">Qty</th>
+<th class="px-4 py-2">Tujuan</th>
+</tr>
+</thead>
+<tbody id="last-out-body" class="text-xs divide-y divide-slate-100">
+</tbody>
+</table>
+</div>
+</div>
+
+<!-- Pengajuan Terakhir -->
+<div class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
+<div class="p-4 border-b border-slate-50 flex flex-wrap justify-between items-center gap-2">
+<h3 class="font-bold text-slate-800 text-sm">📋 Pengajuan Terakhir</h3>
+<a class="text-[10px] font-bold text-slate-400 hover:text-earthy transition-colors flex-shrink-0" href="pengajuan.html">Lihat Semua →</a>
+</div>
+<div class="table-wrap">
+<table class="w-full text-left min-w-[400px]">
+<thead>
+<tr class="bg-slate-50 text-[10px] text-slate-400 font-bold uppercase tracking-wider">
+<th class="px-4 py-2">No.</th>
+<th class="px-4 py-2">Item</th>
+<th class="px-4 py-2 text-center">Qty</th>
+<th class="px-4 py-2">Status</th>
+</tr>
+</thead>
+<tbody id="last-purchase-body" class="text-xs divide-y divide-slate-100">
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<!-- END: Barang Keluar & Pengajuan Terakhir -->
+</div>
+</div>
+<!-- END: Content Area -->
+</main>
+</div>
+
+<script>
+// ===================== DATA STORE =====================
+let stocks = [];
+let inTransactions = [];
+let outTransactions = [];
+let purchases = [];
+
+// ===================== LOAD DATA =====================
+function loadAllData() {
+    // Load Stok
+    try {
+        const saved = localStorage.getItem('pos_stocks');
+        stocks = saved ? JSON.parse(saved) : [];
+    } catch(e) { stocks = []; }
+    
+    // Load Barang Masuk
+    try {
+        const saved = localStorage.getItem('pos_in_transactions');
+        inTransactions = saved ? JSON.parse(saved) : [];
+    } catch(e) { inTransactions = []; }
+    
+    // Load Barang Keluar
+    try {
+        const saved = localStorage.getItem('pos_out_transactions');
+        outTransactions = saved ? JSON.parse(saved) : [];
+    } catch(e) { outTransactions = []; }
+    
+    // Load Pengajuan
+    try {
+        const saved = localStorage.getItem('pos_purchases');
+        purchases = saved ? JSON.parse(saved) : [];
+    } catch(e) { purchases = []; }
+}
+
+// ===================== HELPERS =====================
+function getStatus(stock) {
+    if (!stock || stock.qty <= 0) return 'kritis';
+    if (stock.qty < stock.min) return 'rendah';
+    return 'aman';
+}
+
+function getStatusBadge(status) {
+    const map = {
+        'kritis': '<span class="px-2 py-0.5 bg-status-kritis text-status-kritis-text text-[9px] font-bold rounded whitespace-nowrap">KRITIS</span>',
+        'rendah': '<span class="px-2 py-0.5 bg-status-rendah text-status-rendah-text text-[9px] font-bold rounded whitespace-nowrap">Rendah</span>',
+        'aman': '<span class="px-2 py-0.5 bg-status-today text-status-today-text text-[9px] font-bold rounded whitespace-nowrap">Aman</span>'
+    };
+    return map[status] || '<span class="px-2 py-0.5 bg-gray-100 text-gray-600 text-[9px] font-bold rounded">Unknown</span>';
+}
+
+function getPurchaseStatusBadge(status) {
+    const map = {
+        'draft': '<span class="status-badge status-draft">Draft</span>',
+        'pending': '<span class="status-badge status-pending">Menunggu</span>',
+        'approved': '<span class="status-badge status-approved">Disetujui</span>',
+        'rejected': '<span class="status-badge status-rejected">Ditolak</span>',
+        'received': '<span class="status-badge status-received">Diterima</span>'
+    };
+    return map[status] || '<span class="status-badge status-draft">' + status + '</span>';
+}
+
+function isToday(dateStr) {
+    if (!dateStr) return false;
+    const today = new Date();
+    const date = new Date(dateStr);
+    return date.getFullYear() === today.getFullYear() &&
+           date.getMonth() === today.getMonth() &&
+           date.getDate() === today.getDate();
+}
+
+function formatDate(dateStr) {
+    if (!dateStr) return '-';
+    const d = new Date(dateStr);
+    return d.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
+}
+
+function formatDateShort(dateStr) {
+    if (!dateStr) return '-';
+    const d = new Date(dateStr);
+    return d.toLocaleDateString('id-ID', { day: '2-digit', month: 'short' });
+}
+
+// ===================== UPDATE DASHBOARD =====================
+function updateDashboard() {
+    // Update date
+    const now = new Date();
+    const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+    const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+    document.getElementById('dashboard-date').textContent = 
+        `Pantau ketersediaan stok dan alur logistik secara real-time - ${days[now.getDay()]}, ${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
+
+    // --- Summary Cards ---
+    // Total Produk
+    document.getElementById('total-products').textContent = stocks.length;
+    const categories = new Set(stocks.map(p => p.category).filter(Boolean));
+    document.getElementById('total-categories').textContent = categories.size;
+    
+    // Total Stok
+    const totalQty = stocks.reduce((sum, p) => sum + (p.qty || 0), 0);
+    document.getElementById('total-stock-qty').textContent = totalQty;
+    const lowStock = stocks.filter(p => getStatus(p) === 'kritis' || getStatus(p) === 'rendah');
+    document.getElementById('low-stock-count').textContent = lowStock.length;
+    
+    // Barang Masuk Hari Ini
+    const todayIns = inTransactions.filter(t => isToday(t.date));
+    document.getElementById('today-in').textContent = todayIns.length;
+    const suppliers = new Set(todayIns.map(t => t.supplier).filter(Boolean));
+    document.getElementById('today-suppliers').textContent = suppliers.size;
+    
+    // Barang Keluar Hari Ini
+    const todayOuts = outTransactions.filter(t => isToday(t.date));
+    document.getElementById('today-out').textContent = todayOuts.length;
+    const outlets = new Set(todayOuts.map(t => t.destination).filter(Boolean));
+    document.getElementById('today-outlets').textContent = outlets.size;
+    
+    // Pengajuan Menunggu
+    const pendingPurchases = purchases.filter(p => p.status === 'pending');
+    document.getElementById('pending-purchases').textContent = pendingPurchases.length;
+    
+    // Pengajuan Disetujui
+    const approvedPurchases = purchases.filter(p => p.status === 'approved');
+    document.getElementById('approved-purchases').textContent = approvedPurchases.length;
+
+    // --- Stok Minimum Table ---
+    const tbody = document.getElementById('min-stock-body');
+    const lowStockItems = stocks.filter(p => getStatus(p) === 'kritis' || getStatus(p) === 'rendah');
+    if (lowStockItems.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="text-center py-6 text-gray-400 text-sm">✅ Semua stok dalam kondisi aman</td></tr>`;
+    } else {
+        tbody.innerHTML = lowStockItems.slice(0, 5).map(p => {
+            const status = getStatus(p);
+            return `
+            <tr class="hover:bg-slate-50/50">
+                <td class="px-4 py-3">
+                    <div class="flex items-center gap-2">
+                        <span class="font-semibold text-slate-700 truncate">${p.name}</span>
+                    </div>
+                </td>
+                <td class="px-4 py-3 text-center font-bold ${status === 'kritis' ? 'text-red-600' : 'text-amber-600'}">${p.qty}</td>
+                <td class="px-4 py-3 text-center text-slate-500">${p.min}</td>
+                <td class="px-4 py-3 text-slate-500">${p.unit}</td>
+                <td class="px-4 py-3">${getStatusBadge(status)}</td>
+            </tr>
+        `}).join('');
+    }
+
+    // --- Barang Masuk Terakhir ---
+    const lastInBody = document.getElementById('last-in-body');
+    const lastIn = inTransactions.sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 5);
+    if (lastIn.length === 0) {
+        lastInBody.innerHTML = `<tr><td colspan="3" class="text-center py-3 text-gray-400 text-xs">Belum ada barang masuk</td></tr>`;
+    } else {
+        lastInBody.innerHTML = lastIn.map(t => `
+            <tr>
+                <td class="px-3 py-2 font-semibold text-slate-700 truncate text-xs">${t.productName}</td>
+                <td class="px-3 py-2 text-slate-400 truncate text-xs">${t.supplier || '-'}</td>
+                <td class="px-3 py-2 text-right font-medium whitespace-nowrap text-xs">${t.qty} ${t.unit || 'kg'}</td>
+            </tr>
+        `).join('');
+    }
+
+    // --- Notifikasi ---
+    const notificationsContainer = document.getElementById('notifications-container');
+    let notifications = [];
+    
+    // Notifikasi dari stok kritis
+    stocks.filter(p => getStatus(p) === 'kritis').forEach(p => {
+        notifications.push({
+            type: 'critical',
+            title: `⚠️ Stok ${p.name} kritis!`,
+            desc: `Sisa stok ${p.qty} ${p.unit}. Batas minimum ${p.min} ${p.unit}.`,
+            time: 'Perlu tindakan segera!'
+        });
+    });
+    
+    // Notifikasi dari stok rendah
+    stocks.filter(p => getStatus(p) === 'rendah').forEach(p => {
+        notifications.push({
+            type: 'warning',
+            title: `📉 Stok ${p.name} menipis`,
+            desc: `Sisa stok ${p.qty} ${p.unit}. Batas minimum ${p.min} ${p.unit}.`,
+            time: 'Segera lakukan pengajuan pembelian'
+        });
+    });
+    
+    // Notifikasi dari pengajuan menunggu
+    const pending = purchases.filter(p => p.status === 'pending');
+    if (pending.length > 0) {
+        notifications.push({
+            type: 'info',
+            title: `📋 ${pending.length} pengajuan menunggu persetujuan`,
+            desc: pending.slice(0, 3).map(p => `${p.itemName} (${p.qty} unit)`).join(', '),
+            time: 'Menunggu atasan'
+        });
+    }
+    
+    // Notifikasi dari barang masuk menunggu
+    const waitingIn = inTransactions.filter(t => t.status === 'waiting');
+    if (waitingIn.length > 0) {
+        notifications.push({
+            type: 'info',
+            title: `📦 ${waitingIn.length} barang masuk menunggu diterima`,
+            desc: waitingIn.slice(0, 3).map(t => `${t.productName} (${t.qty} ${t.unit || 'kg'})`).join(', '),
+            time: 'Segera konfirmasi penerimaan'
+        });
+    }
+    
+    if (notifications.length === 0) {
+        notificationsContainer.innerHTML = `
+            <div class="flex gap-2 p-2 bg-green-50/50 border-l-4 border-green-500 rounded">
+                <div class="flex-shrink-0">
+                    <svg class="w-4 h-4 text-green-600" fill="currentColor" viewbox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+                </div>
+                <div>
+                    <p class="text-[10px] font-bold text-slate-800 leading-tight">Semua dalam kondisi baik</p>
+                    <p class="text-[9px] text-slate-500">Tidak ada notifikasi penting</p>
+                </div>
+            </div>
+        `;
+    } else {
+        notificationsContainer.innerHTML = notifications.slice(0, 4).map(n => {
+            const isCritical = n.type === 'critical';
+            const bgClass = isCritical ? 'bg-red-50/50 border-red-500' : 
+                           n.type === 'warning' ? 'bg-orange-50/50 border-orange-500' : 'bg-blue-50/50 border-blue-500';
+            const iconColor = isCritical ? 'text-red-600' : 
+                            n.type === 'warning' ? 'text-orange-600' : 'text-blue-600';
+            return `
+            <div class="flex gap-2 p-2 ${bgClass} border-l-4 rounded">
+                <div class="flex-shrink-0">
+                    <svg class="w-4 h-4 ${iconColor}" fill="currentColor" viewbox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>
+                </div>
+                <div class="min-w-0">
+                    <p class="text-[10px] font-bold text-slate-800 leading-tight">${n.title}</p>
+                    <p class="text-[9px] text-slate-500 truncate">${n.desc}</p>
+                    <p class="text-[8px] text-slate-400 mt-0.5">${n.time}</p>
+                </div>
+            </div>
+        `}).join('');
+    }
+
+    // --- Barang Keluar Terakhir ---
+    const lastOutBody = document.getElementById('last-out-body');
+    const lastOut = outTransactions.sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 5);
+    if (lastOut.length === 0) {
+        lastOutBody.innerHTML = `<tr><td colspan="4" class="text-center py-4 text-gray-400 text-sm">Belum ada barang keluar</td></tr>`;
+    } else {
+        lastOutBody.innerHTML = lastOut.map((t, index) => `
+            <tr class="hover:bg-slate-50/50">
+                <td class="px-4 py-2 text-slate-400 text-center">${index + 1}</td>
+                <td class="px-4 py-2 font-semibold text-slate-700 truncate text-xs">${t.productName}</td>
+                <td class="px-4 py-2 text-center font-medium whitespace-nowrap text-xs">${t.qty} ${t.unit}</td>
+                <td class="px-4 py-2 text-slate-500 truncate text-xs">${t.destination || '-'}</td>
+            </tr>
+        `).join('');
+    }
+
+    // --- Pengajuan Terakhir ---
+    const lastPurchaseBody = document.getElementById('last-purchase-body');
+    const lastPurchases = purchases.sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 5);
+    if (lastPurchases.length === 0) {
+        lastPurchaseBody.innerHTML = `<tr><td colspan="4" class="text-center py-4 text-gray-400 text-sm">Belum ada pengajuan</td></tr>`;
+    } else {
+        lastPurchaseBody.innerHTML = lastPurchases.map((p, index) => `
+            <tr class="hover:bg-slate-50/50">
+                <td class="px-4 py-2 text-slate-400 text-center">${index + 1}</td>
+                <td class="px-4 py-2 font-semibold text-slate-700 truncate text-xs">${p.itemName}</td>
+                <td class="px-4 py-2 text-center font-medium whitespace-nowrap text-xs">${p.qty}</td>
+                <td class="px-4 py-2">${getPurchaseStatusBadge(p.status)}</td>
+            </tr>
+        `).join('');
+    }
+}
+
+// ===================== EXPORT ALL DATA =====================
+function exportAllData() {
+    let csv = '=== LAPORAN DASHBOARD GUDANG ===\n\n';
+    csv += `Tanggal: ${new Date().toLocaleDateString('id-ID')}\n\n`;
+    
+    csv += '--- DATA STOK ---\n';
+    csv += 'No,Kode,Nama Produk,Kategori,Stok,Satuan,Minimum,Status\n';
+    stocks.forEach((p, i) => {
+        const status = getStatus(p);
+        const statusText = status === 'kritis' ? 'Kritis' : status === 'rendah' ? 'Rendah' : 'Aman';
+        csv += `${i+1},${p.code || '-'},${p.name},${p.category || '-'},${p.qty},${p.unit},${p.min},${statusText}\n`;
+    });
+    
+    csv += '\n--- BARANG MASUK ---\n';
+    csv += 'No,Produk,Jumlah,Satuan,Supplier,Status,Tanggal\n';
+    inTransactions.forEach((t, i) => {
+        const statusText = t.status === 'received' ? 'Diterima' : 'Menunggu';
+        csv += `${i+1},${t.productName},${t.qty},${t.unit || 'kg'},${t.supplier || '-'},${statusText},${formatDate(t.date)}\n`;
+    });
+    
+    csv += '\n--- BARANG KELUAR ---\n';
+    csv += 'No,Produk,Jumlah,Satuan,Tujuan,Tanggal\n';
+    outTransactions.forEach((t, i) => {
+        csv += `${i+1},${t.productName},${t.qty},${t.unit},${t.destination || '-'},${formatDate(t.date)}\n`;
+    });
+    
+    csv += '\n--- PENGAJUAN ---\n';
+    csv += 'No,Item,Jumlah,Supplier,Status,Tanggal\n';
+    purchases.forEach((p, i) => {
+        csv += `${i+1},${p.itemName},${p.qty},${p.supplier},${p.status},${formatDate(p.date)}\n`;
+    });
+    
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    const now = new Date();
+    const dateStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
+    a.download = `dashboard_gudang_${dateStr}.csv`;
+    a.click();
+    window.URL.revokeObjectURL(url);
+}
+
+// ===================== STORAGE LISTENER =====================
+window.addEventListener('storage', function(e) {
+    if (['pos_stocks', 'pos_in_transactions', 'pos_out_transactions', 'pos_purchases'].includes(e.key)) {
+        loadAllData();
+        updateDashboard();
+    }
+});
+
+// ===================== INIT =====================
+document.addEventListener('DOMContentLoaded', function() {
+    loadAllData();
+    updateDashboard();
+    
+    // Refresh every 10 seconds
+    setInterval(() => {
+        loadAllData();
+        updateDashboard();
+    }, 10000);
+});
+</script>
+</body>
+</html>
+    a.click();
+    window.URL.revokeObjectURL(url);
+}
+
+// ===================== STORAGE LISTENER =====================
+window.addEventListener('storage', function(e) {
+    if (['pos_stocks', 'pos_in_transactions', 'pos_out_transactions', 'pos_purchases'].includes(e.key)) {
+        loadAllData();
+        updateDashboard();
+    }
+});
+
+// ===================== INIT =====================
+document.addEventListener('DOMContentLoaded', function() {
+    loadAllData();
+    updateDashboard();
+    
+    // Refresh every 10 seconds
+    setInterval(() => {
+        loadAllData();
+        updateDashboard();
+    }, 10000);
+});
+</script>
+</body>
+</html>

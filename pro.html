@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Little Story - Manajemen Produk</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'sidebar-bg': '#432C0B',
+                        'sidebar-active': '#5D4017',
+                        'brand-purple': '#6359E9',
+                        'brand-light-purple': '#F5F4FF',
+                        'dashboard-bg': '#F8F9FA',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #F8F9FA;
+            font-family: 'Inter', sans-serif;
+        }
+        .custom-shadow {
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+        }
+        aside::-webkit-scrollbar {
+            width: 4px;
+        }
+        aside::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+        }
+        .dashboard-content {
+            padding: 24px 32px;
+        }
+        .product-card {
+            transition: all 0.2s ease;
+        }
+        .product-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.08);
+        }
+        .status-badge {
+            font-size: 9px;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 3px 10px;
+            border-radius: 9999px;
+            letter-spacing: 0.05em;
+        }
+        .status-in-stock {
+            background-color: #DCFCE7;
+            color: #166534;
+        }
+        .status-low-stock {
+            background-color: #FEF9C3;
+            color: #854D0E;
+        }
+        .status-out-of-stock {
+            background-color: #FEE2E2;
+            color: #991B1B;
+        }
+        @media (max-width: 768px) {
+            .dashboard-content {
+                padding: 16px;
+            }
+        }
+        /* Modal styles */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(4px);
+        }
+        .modal-overlay.active {
+            display: flex;
+        }
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 32px;
+            animation: modalIn 0.3s ease;
+        }
+        @keyframes modalIn {
+            from { opacity: 0; transform: scale(0.95) translateY(20px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .image-preview {
+            width: 120px;
+            height: 120px;
+            border-radius: 12px;
+            object-fit: cover;
+            border: 2px dashed #E5E7EB;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .image-preview:hover {
+            border-color: #6359E9;
+        }
+        .image-preview.has-image {
+            border: 2px solid #6359E9;
+        }
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+        }
+        .file-input-wrapper input[type=file] {
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body class="flex min-h-screen text-slate-800">
+    <!-- BEGIN: Sidebar -->
+    <aside class="w-64 bg-sidebar-bg text-white flex-shrink-0 flex flex-col hidden lg:flex h-screen sticky top-0">
+        <div class="p-6 flex items-center space-x-3">
+            <div class="w-8 h-8 bg-white/20 rounded flex items-center justify-center">
+                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+                    <path d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+                </svg>
+            </div>
+            <span class="font-bold text-lg tracking-tight">Little Story</span>
+        </div>
+        <nav class="flex-1 px-4 py-2 space-y-1 overflow-y-auto">
+            <a class="flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium text-white/70 hover:bg-white/5 hover:text-white transition-colors" href="manajer.html">
+                <svg class="w-5 h-5" fill="currentColor" viewbox="0 0 20 20"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path></svg>
+                <span>Dashboard</span>
+            </a>
+            <a class="flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium text-white/70 hover:bg-white/5 hover:text-white transition-colors" href="penjualan.html">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+                <span>Penjualan</span>
+            </a>
+            <a class="flex items-center space-x-3 bg-sidebar-active px-4 py-3 rounded-lg text-sm font-medium" href="#">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+                <span>Produk</span>
+            </a>
+            
+            <a class="flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium text-white/70 hover:bg-white/5 hover:text-white transition-colors" href="pembelian.html">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+                <span>Pembelian</span>
+            </a>
+            <a class="flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium text-white/70 hover:bg-white/5 hover:text-white transition-colors" href="karyawan.html">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+                <span>Karyawan</span>
+            </a>
+            <a class="flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium text-white/70 hover:bg-white/5 hover:text-white transition-colors" href="laporan.html">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span>Laporan</span>
+</a>
+            <a class="flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium text-white/70 hover:bg-white/5 hover:text-white transition-colors" href="persetujuan.html">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+                <span>Persetujuan</span>
+            </a>
+            <a class="flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium text-white/70 hover:bg-white/5 hover:text-white transition-colors" href="peng.html">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+                <span>Pengaturan</span>
+            </a>
+        </nav>
+    </aside>
+    <!-- END: Sidebar -->
+
+    <!-- BEGIN: Main Content Area -->
+    <main class="flex-1 flex flex-col min-w-0 bg-dashboard-bg h-screen overflow-hidden">
+        <!-- BEGIN: Top Header -->
+        <header class="h-16 bg-white border-b border-gray-100 flex items-center justify-between px-8 flex-shrink-0">
+            <div class="relative w-96">
+                <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400">
+                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+                </span>
+                <input class="block w-full pl-10 pr-3 py-2 border-none bg-gray-100 rounded-lg text-sm focus:ring-brand-purple focus:ring-1" placeholder="Cari produk, SKU, atau kategori..." type="text" id="search-products"/>
+            </div>
+            <div class="flex items-center space-x-4">
+                <div class="text-right">
+                    <p class="text-sm font-semibold text-gray-800" id="">Manajer</p>
+                    <p class="text-xs text-gray-400">Siti Rahayu</p>
+                </div>
+                <img alt="Admin Profile" class="w-10 h-10 rounded-full border-2 border-white custom-shadow" id="admin-avatar" src="https://ui-avatars.com/api/?name=Admin+Utama&background=6359E9&color=fff&size=128"/>
+            </div>
+        </header>
+        <!-- END: Top Header -->
+
+        <!-- BEGIN: Dashboard Body -->
+        <div class="flex-1 overflow-y-auto dashboard-content">
+            <div class="max-w-7xl mx-auto space-y-6">
+                <!-- Page Title Row -->
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-2">
+                    <div>
+                        <h1 class="text-2xl font-bold text-gray-900">Manajemen Produk</h1>
+                        <p class="text-sm text-gray-500 mt-1" id="current-date">Kelola inventaris kafe dan merchandise Anda di sini.</p>
+                    </div>
+                    <button class="px-4 py-2 bg-brand-purple text-white rounded-lg text-sm font-semibold hover:bg-brand-purple/90 transition-colors shadow-lg shadow-brand-purple/20 flex items-center gap-2" id="add-product-btn">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M12 4v16m8-8H4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+                        Tambah Produk
+                    </button>
+                </div>
+
+                <!-- BEGIN: Summary Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                    <div class="bg-white rounded-2xl custom-shadow border border-gray-50 p-5">
+                        <div class="flex items-center justify-between">
+                            <div class="p-2.5 bg-brand-light-purple rounded-lg">
+                                <svg class="w-5 h-5 text-brand-purple" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+                            </div>
+                            <span class="text-xs text-gray-400">Total</span>
+                        </div>
+                        <p class="text-2xl font-bold text-gray-900 mt-2" id="total-products">0</p>
+                        <p class="text-[10px] text-gray-300 mt-1">Semua produk</p>
+                    </div>
+
+                    <div class="bg-white rounded-2xl custom-shadow border border-gray-50 p-5">
+                        <div class="flex items-center justify-between">
+                            <div class="p-2.5 bg-green-50 rounded-lg">
+                                <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+                            </div>
+                            <span class="text-xs text-gray-400">Tersedia</span>
+                        </div>
+                        <p class="text-2xl font-bold text-gray-900 mt-2" id="in-stock-products">0</p>
+                        <p class="text-[10px] text-gray-300 mt-1">Stok aman</p>
+                    </div>
+
+                    <div class="bg-white rounded-2xl custom-shadow border border-gray-50 p-5">
+                        <div class="flex items-center justify-between">
+                            <div class="p-2.5 bg-amber-50 rounded-lg">
+                                <svg class="w-5 h-5 text-amber-500" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+                            </div>
+                            <span class="text-xs text-gray-400">Hampir Habis</span>
+                        </div>
+                        <p class="text-2xl font-bold text-gray-900 mt-2" id="low-stock-products">0</p>
+                        <p class="text-[10px] text-gray-300 mt-1">Perlu restock</p>
+                    </div>
+                </div>
+                <!-- END: Summary Cards -->
+
+                <!-- BEGIN: Filters -->
+                <div class="flex flex-wrap items-center justify-between gap-3 bg-white rounded-2xl custom-shadow border border-gray-50 p-4">
+                    <div class="flex flex-wrap gap-2">
+                        <button class="px-4 py-1.5 bg-brand-light-purple text-brand-purple text-sm font-bold rounded-full active-filter" data-category="all">Semua</button>
+                        
+                        <button class="px-4 py-1.5 bg-gray-100 text-gray-600 text-sm font-medium rounded-full hover:bg-gray-200 transition-colors" data-category="makanan">Makanan</button>
+                        <button class="px-4 py-1.5 bg-gray-100 text-gray-600 text-sm font-medium rounded-full hover:bg-gray-200 transition-colors" data-category="pastry">Minuman</button>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <select class="bg-gray-100 border-none rounded-lg px-4 py-2 text-sm font-medium text-gray-700 focus:ring-2 focus:ring-brand-purple" id="stock-filter">
+                            <option value="all">Semua Stok</option>
+                            <option value="in-stock">Tersedia</option>
+                            <option value="low-stock">Hampir Habis</option>
+                            <option value="out-of-stock">Habis</option>
+                        </select>
+                        <button class="p-2 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors" id="refresh-products">
+                            <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M4 4v5h5M20 20v-5h-5M4 4l6 6m10-6l-6 6" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+                        </button>
+                    </div>
+                </div>
+                <!-- END: Filters -->
+
+                <!-- BEGIN: Product Grid -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5" id="product-grid">
+                    <!-- Product cards akan dirender oleh JavaScript -->
+                </div>
+                <!-- END: Product Grid -->
+            </div>
+        </div>
+        <!-- END: Dashboard Body -->
+    </main>
+    <!-- END: Main Content Area -->
+
+    <!-- ===================== MODAL TAMBAH PRODUK ===================== -->
+    <div class="modal-overlay" id="product-modal">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-bold text-gray-900" id="modal-title">Tambah Produk Baru</h2>
+                <button class="text-gray-400 hover:text-gray-600 transition-colors" id="close-modal">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+                </button>
+            </div>
+            <form id="product-form" class="space-y-4">
+                <input type="hidden" id="edit-product-id" value=""/>
+                
+                <!-- Upload Gambar -->
+                <div class="flex flex-col items-center">
+                    <div class="file-input-wrapper">
+                        <img id="image-preview" class="image-preview" src="https://placehold.co/400x300/EEE/999?text=Klik+untuk+upload" alt="Preview gambar"/>
+                        <input type="file" id="product-image" accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer"/>
+                    </div>
+                    <p class="text-xs text-gray-400 mt-2">Klik gambar untuk upload foto produk</p>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Nama Produk</label>
+                    <input type="text" id="product-name" class="w-full border border-gray-200 rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-brand-purple focus:border-transparent" placeholder="Masukkan nama produk" required/>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">SKU</label>
+                    <input type="text" id="product-sku" class="w-full border border-gray-200 rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-brand-purple focus:border-transparent" placeholder="Contoh: LS-COF-001"/>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Harga (Rp)</label>
+                        <input type="number" id="product-price" class="w-full border border-gray-200 rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-brand-purple focus:border-transparent" placeholder="28000" required/>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Stok</label>
+                        <input type="number" id="product-stock" class="w-full border border-gray-200 rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-brand-purple focus:border-transparent" placeholder="124" required/>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Kategori</label>
+                    <select id="product-category" class="w-full border border-gray-200 rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-brand-purple focus:border-transparent">
+                        <option value="Makanan">Makanan</option>
+                        <option value="Pastry">Minuman</option>
+                    </select>
+                </div>
+
+                <div class="flex gap-3 pt-4">
+                    <button type="submit" class="flex-1 px-4 py-2 bg-brand-purple text-white rounded-lg text-sm font-semibold hover:bg-brand-purple/90 transition-colors" id="submit-product">
+                        Simpan Produk
+                    </button>
+                    <button type="button" class="flex-1 px-4 py-2 bg-gray-100 text-gray-600 rounded-lg text-sm font-semibold hover:bg-gray-200 transition-colors" id="cancel-modal">
+                        Batal
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // ===================== ADMIN PROFILE =====================
+        const ADMIN_PROFILE = {
+            name: 'Admin Utama',
+            avatar: 'https://ui-avatars.com/api/?name=Admin+Utama&background=6359E9&color=fff&size=128'
+        };
+
+        // ===================== PRODUCT DATA =====================
+        const SAMPLE_PRODUCTS = [
+            { id: 1, name: 'Signature Latte', sku: 'LS-COF-001', price: 28000, stock: 124, category: 'Kopi', image: 'https://images.unsplash.com/photo-1541167760496-1628856ab772?w=400&h=300&fit=crop&auto=format', status: 'in-stock' },
+            { id: 2, name: 'Almond Croissant', sku: 'LS-PAS-022', price: 32000, stock: 5, category: 'Pastry', image: 'https://images.unsplash.com/photo-1555507036-ab1f4038808a?w=400&h=300&fit=crop&auto=format', status: 'low-stock' },
+            { id: 3, name: 'Double Choco Mocha', sku: 'LS-COF-008', price: 42000, stock: 88, category: 'Kopi', image: 'https://images.unsplash.com/photo-1578319439584-1d6a7aff4f6e?w=400&h=300&fit=crop&auto=format', status: 'in-stock' },
+            { id: 4, name: 'Green Tea Latte', sku: 'LS-TEA-003', price: 35000, stock: 42, category: 'Teh', image: 'https://images.unsplash.com/photo-1558857563-c0c3a62d9f48?w=400&h=300&fit=crop&auto=format', status: 'in-stock' },
+            { id: 5, name: 'Chocolate Chip Cookie', sku: 'LS-PAS-015', price: 18000, stock: 0, category: 'Pastry', image: 'https://images.unsplash.com/photo-1499636136210-6f4ee6e27bf3?w=400&h=300&fit=crop&auto=format', status: 'out-of-stock' },
+            { id: 6, name: 'Cold Brew', sku: 'LS-COF-012', price: 38000, stock: 56, category: 'Kopi', image: 'https://images.unsplash.com/photo-1517701550927-30cf4ba1dba5?w=400&h=300&fit=crop&auto=format', status: 'in-stock' },
+            { id: 7, name: 'Matcha Cheesecake', sku: 'LS-FOO-005', price: 45000, stock: 8, category: 'Makanan', image: 'https://images.unsplash.com/photo-1524351199672-9e2b6e1a4d7f?w=400&h=300&fit=crop&auto=format', status: 'low-stock' },
+            { id: 8, name: 'Espresso', sku: 'LS-COF-002', price: 22000, stock: 150, category: 'Kopi', image: 'https://images.unsplash.com/photo-1510591509098-f4fdc6d0ff04?w=400&h=300&fit=crop&auto=format', status: 'in-stock' },
+        ];
+
+        let products = [];
+        let filteredProducts = [];
+        let nextId = 9;
+        let selectedImageData = null;
+        let isEditing = false;
+        let editingId = null;
+
+        // ===================== UPDATE ADMIN DISPLAY =====================
+        function updateAdminDisplay() {
+            const nameEl = document.getElementById('admin-name');
+            const avatarEl = document.getElementById('admin-avatar');
+            if (nameEl) nameEl.textContent = ADMIN_PROFILE.name;
+            if (avatarEl) avatarEl.src = ADMIN_PROFILE.avatar;
+        }
+
+        // ===================== FORMAT PRICE =====================
+        function formatPrice(num) {
+            return 'Rp ' + (num || 0).toLocaleString('id-ID');
+        }
+
+        // ===================== GET STATUS BADGE =====================
+        function getStatusBadge(status) {
+            const classes = {
+                'in-stock': 'status-in-stock',
+                'low-stock': 'status-low-stock',
+                'out-of-stock': 'status-out-of-stock'
+            };
+            const labels = {
+                'in-stock': 'Tersedia',
+                'low-stock': 'Hampir Habis',
+                'out-of-stock': 'Habis'
+            };
+            const className = classes[status] || 'status-in-stock';
+            const label = labels[status] || 'Tersedia';
+            return `<span class="status-badge ${className}">${label}</span>`;
+        }
+
+        // ===================== GET CATEGORY COLOR =====================
+        function getCategoryColor(category) {
+            const colors = {
+                'Kopi': 'bg-purple-600',
+                'Teh': 'bg-green-600',
+                'Makanan': 'bg-blue-600',
+                'Pastry': 'bg-orange-600'
+            };
+            return colors[category] || 'bg-gray-600';
+        }
+
+        // ===================== LOAD PRODUCTS =====================
+        function loadProducts() {
+            try {
+                const saved = localStorage.getItem('pos_products');
+                if (saved) {
+                    const parsed = JSON.parse(saved);
+                    if (parsed && parsed.length > 0) {
+                        products = parsed;
+                        const maxId = products.reduce((max, p) => Math.max(max, p.id || 0), 0);
+                        nextId = maxId + 1;
+                        filteredProducts = [...products];
+                        updateSummary();
+                        renderProducts();
+                        return;
+                    }
+                }
+            } catch(e) {
+                console.error('Error loading products:', e);
+            }
+            products = JSON.parse(JSON.stringify(SAMPLE_PRODUCTS));
+            nextId = products.reduce((max, p) => Math.max(max, p.id || 0), 0) + 1;
+            filteredProducts = [...products];
+            updateSummary();
+            renderProducts();
+        }
+
+        // ===================== SAVE PRODUCTS =====================
+        function saveProducts() {
+            try {
+                localStorage.setItem('pos_products', JSON.stringify(products));
+                window.dispatchEvent(new StorageEvent('storage', {
+                    key: 'pos_products',
+                    newValue: JSON.stringify(products)
+                }));
+            } catch(e) {
+                console.error('Error saving products:', e);
+            }
+        }
+
+        // ===================== UPDATE SUMMARY =====================
+        function updateSummary() {
+            const total = products.length;
+            const inStock = products.filter(p => p.status === 'in-stock').length;
+            const lowStock = products.filter(p => p.status === 'low-stock' || p.status === 'out-of-stock').length;
+
+            document.getElementById('total-products').textContent = total;
+            document.getElementById('in-stock-products').textContent = inStock;
+            document.getElementById('low-stock-products').textContent = lowStock;
+        }
+
+        // ===================== RENDER PRODUCTS =====================
+        function renderProducts() {
+            const grid = document.getElementById('product-grid');
+            
+            if (filteredProducts.length === 0) {
+                grid.innerHTML = `
+                    <div class="col-span-full text-center py-12 text-gray-400">
+                        <svg class="w-16 h-16 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+                        <p class="text-sm">Tidak ada produk yang ditemukan</p>
+                        <button class="mt-4 px-4 py-2 bg-brand-purple text-white rounded-lg text-sm font-semibold hover:bg-brand-purple/90 transition-colors" onclick="openAddModal()">Tambah Produk</button>
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = filteredProducts.map(product => {
+                const statusBadge = getStatusBadge(product.status);
+                const categoryColor = getCategoryColor(product.category);
+
+                return `
+                    <div class="bg-white rounded-2xl custom-shadow border border-gray-50 overflow-hidden product-card">
+                        <div class="relative h-48 overflow-hidden bg-gray-100">
+                            <img alt="${product.name}" class="w-full h-full object-cover" src="${product.image || 'https://placehold.co/400x300/EEE/999?text=' + encodeURIComponent(product.name)}" onerror="this.src='https://placehold.co/400x300/EEE/999?text=${encodeURIComponent(product.name)}'"/>
+                            <span class="absolute top-3 right-3 ${categoryColor} text-white text-[10px] font-bold px-2 py-1 rounded uppercase tracking-tighter">${product.category}</span>
+                            ${product.status === 'low-stock' ? `<span class="absolute bottom-3 left-3 bg-orange-400 text-white text-[10px] font-bold px-2 py-1 rounded uppercase tracking-tighter">Low Stock</span>` : ''}
+                            ${product.status === 'out-of-stock' ? `<span class="absolute bottom-3 left-3 bg-red-500 text-white text-[10px] font-bold px-2 py-1 rounded uppercase tracking-tighter">Habis</span>` : ''}
+                        </div>
+                        <div class="p-5">
+                            <div class="flex justify-between items-start mb-1">
+                                <h3 class="font-bold text-gray-800 text-base leading-tight">${product.name}</h3>
+                                <p class="font-bold text-gray-900">${formatPrice(product.price)}</p>
+                            </div>
+                            <p class="text-xs text-gray-400 mb-4">SKU: ${product.sku}</p>
+                            <div class="flex items-center gap-2 mb-3">
+                                ${statusBadge}
+                            </div>
+                            <div class="pt-4 border-t border-gray-100 flex justify-between items-center">
+                                <div>
+                                    <p class="text-[10px] text-gray-400 uppercase font-bold">Stok</p>
+                                    <p class="text-sm font-medium text-gray-700">${product.stock} pcs</p>
+                                </div>
+                                <div class="flex gap-2">
+                                    <button class="p-2 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors edit-btn" data-id="${product.id}">
+                                        <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+                                    </button>
+                                    <button class="p-2 border border-gray-200 rounded-lg hover:bg-red-50 hover:border-red-200 transition-colors delete-btn" data-id="${product.id}">
+                                        <svg class="w-4 h-4 text-red-400" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            document.querySelectorAll('.edit-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const id = parseInt(this.dataset.id);
+                    const product = products.find(p => p.id === id);
+                    if (product) {
+                        openEditModal(product);
+                    }
+                });
+            });
+
+            document.querySelectorAll('.delete-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const id = parseInt(this.dataset.id);
+                    const product = products.find(p => p.id === id);
+                    if (product && confirm(`Hapus produk "${product.name}"?`)) {
+                        products = products.filter(p => p.id !== id);
+                        filteredProducts = filteredProducts.filter(p => p.id !== id);
+                        saveProducts();
+                        updateSummary();
+                        renderProducts();
+                    }
+                });
+            });
+        }
+
+        // ===================== MODAL FUNCTIONS =====================
+        function openModal(title, isEdit = false, product = null) {
+            const modal = document.getElementById('product-modal');
+            const modalTitle = document.getElementById('modal-title');
+            const submitBtn = document.getElementById('submit-product');
+            
+            modalTitle.textContent = title;
+            submitBtn.textContent = isEdit ? 'Update Produk' : 'Simpan Produk';
+            isEditing = isEdit;
+            
+            if (isEdit && product) {
+                editingId = product.id;
+                document.getElementById('edit-product-id').value = product.id;
+                document.getElementById('product-name').value = product.name;
+                document.getElementById('product-sku').value = product.sku;
+                document.getElementById('product-price').value = product.price;
+                document.getElementById('product-stock').value = product.stock;
+                document.getElementById('product-category').value = product.category;
+                
+                const preview = document.getElementById('image-preview');
+                if (product.image) {
+                    preview.src = product.image;
+                    preview.classList.add('has-image');
+                } else {
+                    preview.src = 'https://placehold.co/400x300/EEE/999?text=Klik+untuk+upload';
+                    preview.classList.remove('has-image');
+                }
+                selectedImageData = product.image || null;
+            } else {
+                editingId = null;
+                document.getElementById('edit-product-id').value = '';
+                document.getElementById('product-form').reset();
+                document.getElementById('product-name').value = '';
+                document.getElementById('product-sku').value = '';
+                document.getElementById('product-price').value = '';
+                document.getElementById('product-stock').value = '';
+                document.getElementById('product-category').value = 'Kopi';
+                
+                const preview = document.getElementById('image-preview');
+                preview.src = 'https://placehold.co/400x300/EEE/999?text=Klik+untuk+upload';
+                preview.classList.remove('has-image');
+                selectedImageData = null;
+            }
+            
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            document.getElementById('product-modal').classList.remove('active');
+            document.body.style.overflow = '';
+            document.getElementById('product-form').reset();
+            selectedImageData = null;
+            isEditing = false;
+            editingId = null;
+        }
+
+        function openAddModal() {
+            openModal('Tambah Produk Baru', false);
+        }
+
+        function openEditModal(product) {
+            openModal('Edit Produk', true, product);
+        }
+
+        // ===================== IMAGE UPLOAD =====================
+        document.getElementById('product-image').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const preview = document.getElementById('image-preview');
+                    preview.src = event.target.result;
+                    preview.classList.add('has-image');
+                    selectedImageData = event.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Click on preview to trigger file input
+        document.getElementById('image-preview').addEventListener('click', function() {
+            document.getElementById('product-image').click();
+        });
+
+        // ===================== FORM SUBMIT =====================
+        document.getElementById('product-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('product-name').value.trim();
+            const sku = document.getElementById('product-sku').value.trim() || `LS-${document.getElementById('product-category').value.substring(0,3).toUpperCase()}-${String(nextId).padStart(3, '0')}`;
+            const price = parseInt(document.getElementById('product-price').value);
+            const stock = parseInt(document.getElementById('product-stock').value);
+            const category = document.getElementById('product-category').value;
+            const image = selectedImageData || 'https://placehold.co/400x300/EEE/999?text=' + encodeURIComponent(name);
+
+            if (!name) {
+                alert('Nama produk wajib diisi!');
+                return;
+            }
+            if (isNaN(price) || price <= 0) {
+                alert('Harga produk wajib diisi dengan angka valid!');
+                return;
+            }
+            if (isNaN(stock) || stock < 0) {
+                alert('Stok produk wajib diisi dengan angka valid!');
+                return;
+            }
+
+            const status = stock > 10 ? 'in-stock' : stock > 0 ? 'low-stock' : 'out-of-stock';
+
+            if (isEditing && editingId) {
+                // Edit existing product
+                const index = products.findIndex(p => p.id === editingId);
+                if (index !== -1) {
+                    products[index] = {
+                        ...products[index],
+                        name,
+                        sku,
+                        price,
+                        stock,
+                        category,
+                        image,
+                        status
+                    };
+                }
+            } else {
+                // Add new product
+                const newProduct = {
+                    id: nextId++,
+                    name,
+                    sku,
+                    price,
+                    stock,
+                    category,
+                    image,
+                    status
+                };
+                products.push(newProduct);
+            }
+
+            filteredProducts = [...products];
+            saveProducts();
+            updateSummary();
+            renderProducts();
+            closeModal();
+        });
+
+        // ===================== MODAL EVENT LISTENERS =====================
+        document.getElementById('add-product-btn').addEventListener('click', openAddModal);
+        document.getElementById('close-modal').addEventListener('click', closeModal);
+        document.getElementById('cancel-modal').addEventListener('click', closeModal);
+
+        // Close modal on overlay click
+        document.getElementById('product-modal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+
+        // ===================== FILTER PRODUCTS =====================
+        function filterProducts() {
+            const searchTerm = document.getElementById('search-products').value.toLowerCase().trim();
+            const categoryFilter = document.querySelector('[data-category].active-filter')?.dataset.category || 'all';
+            const stockFilter = document.getElementById('stock-filter').value;
+
+            filteredProducts = products.filter(product => {
+                const matchesSearch = !searchTerm || 
+                    product.name.toLowerCase().includes(searchTerm) ||
+                    product.sku.toLowerCase().includes(searchTerm) ||
+                    product.category.toLowerCase().includes(searchTerm);
+
+                const matchesCategory = categoryFilter === 'all' || 
+                    product.category.toLowerCase() === categoryFilter;
+
+                let matchesStock = true;
+                if (stockFilter === 'in-stock') matchesStock = product.status === 'in-stock';
+                else if (stockFilter === 'low-stock') matchesStock = product.status === 'low-stock';
+                else if (stockFilter === 'out-of-stock') matchesStock = product.status === 'out-of-stock';
+
+                return matchesSearch && matchesCategory && matchesStock;
+            });
+
+            renderProducts();
+        }
+
+        // ===================== EVENT LISTENERS =====================
+        document.getElementById('search-products').addEventListener('input', filterProducts);
+
+        document.querySelectorAll('[data-category]').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('[data-category]').forEach(b => {
+                    b.classList.remove('active-filter', 'bg-brand-light-purple', 'text-brand-purple');
+                    b.classList.add('bg-gray-100', 'text-gray-600');
+                });
+                this.classList.add('active-filter', 'bg-brand-light-purple', 'text-brand-purple');
+                this.classList.remove('bg-gray-100', 'text-gray-600');
+                filterProducts();
+            });
+        });
+
+        document.getElementById('stock-filter').addEventListener('change', filterProducts);
+
+        document.getElementById('refresh-products').addEventListener('click', function() {
+            loadProducts();
+            const icon = this.querySelector('svg');
+            icon.style.animation = 'spin 0.5s ease';
+            setTimeout(() => icon.style.animation = '', 500);
+        });
+
+        // ===================== SPIN ANIMATION =====================
+        const styleSheet = document.createElement("style");
+        styleSheet.textContent = `@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`;
+        document.head.appendChild(styleSheet);
+
+        // ===================== STORAGE LISTENER =====================
+        window.addEventListener('storage', function(e) {
+            if (e.key === 'pos_products') {
+                try {
+                    const saved = JSON.parse(e.newValue);
+                    if (saved && saved.length > 0) {
+                        products = saved;
+                        filteredProducts = [...products];
+                        updateSummary();
+                        renderProducts();
+                    }
+                } catch(e) {}
+            }
+        });
+
+        // ===================== INIT =====================
+        document.addEventListener('DOMContentLoaded', function() {
+            updateAdminDisplay();
+            loadProducts();
+
+            document.querySelector('[data-category="all"]')?.classList.add('active-filter', 'bg-brand-light-purple', 'text-brand-purple');
+
+            const now = new Date();
+            const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+            const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+            document.getElementById('current-date').textContent = `Kelola inventaris kafe dan merchandise Anda di sini. • ${days[now.getDay()]}, ${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
+
+            setInterval(loadProducts, 30000);
+        });
+    </script>
+</body>
+</html>

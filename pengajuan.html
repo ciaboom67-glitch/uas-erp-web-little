@@ -1,0 +1,1140 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Little Story - Pengajuan Pembelian</title>
+<!-- Tailwind CSS v3 CDN -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Google Fonts: Inter -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            earthy: {
+              DEFAULT: '#4d3310',
+              sidebar: '#4d3310',
+              surface: '#f8f9fa',
+              'surface-dim': '#d9dadb',
+              'surface-container': '#ffffff',
+            },
+            status: {
+              kritis: '#fee2e2',
+              'kritis-text': '#dc2626',
+              rendah: '#ffedd5',
+              'rendah-text': '#ea580c',
+              aktif: '#dbeafe',
+              'aktif-text': '#2563eb',
+              today: '#dcfce7',
+              'today-text': '#16a34a',
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          },
+        }
+      }
+    }
+  </script>
+<style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      background-color: #F8F9FA;
+    }
+    .custom-shadow {
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+    }
+    aside::-webkit-scrollbar {
+      width: 4px;
+    }
+    aside::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 2px;
+    }
+    .dashboard-content {
+      padding: 24px 32px;
+    }
+    .status-badge {
+      padding: 4px 12px;
+      border-radius: 9999px;
+      font-size: 11px;
+      font-weight: 600;
+      display: inline-block;
+      white-space: nowrap;
+    }
+    .status-pending {
+      background: #FEF3C7;
+      color: #D97706;
+    }
+    .status-approved {
+      background: #D1FAE5;
+      color: #059669;
+    }
+    .status-rejected {
+      background: #FEE2E2;
+      color: #DC2626;
+    }
+    .status-draft {
+      background: #E5E7EB;
+      color: #6B7280;
+    }
+    .status-received {
+      background: #D1FAE5;
+      color: #059669;
+    }
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-overlay.active {
+      display: flex;
+    }
+    .modal-content {
+      background: white;
+      border-radius: 16px;
+      max-width: 640px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 32px;
+      margin: 16px;
+    }
+    .table-container {
+      padding: 4px 0;
+    }
+    .table-container table {
+      border-collapse: separate;
+      border-spacing: 0;
+      width: 100%;
+    }
+    .table-container th,
+    .table-container td {
+      padding: 12px 14px;
+      vertical-align: middle;
+    }
+    .table-container thead th {
+      padding: 12px 14px;
+      font-weight: 600;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #6B7280;
+      background: #F9FAFB;
+      border-bottom: 2px solid #E5E7EB;
+    }
+    .table-container tbody tr {
+      border-bottom: 1px solid #F3F4F6;
+      transition: background-color 0.15s ease;
+    }
+    .table-container tbody tr:last-child {
+      border-bottom: none;
+    }
+    .table-container tbody tr:hover {
+      background-color: #FAFBFC;
+    }
+    .table-container tbody td {
+      padding: 12px 14px;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+    .action-buttons {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      flex-wrap: nowrap;
+    }
+    .action-buttons .btn {
+      padding: 5px 10px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      transition: all 0.15s ease;
+      cursor: pointer;
+      border: none;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      white-space: nowrap;
+      line-height: 1.4;
+    }
+    .action-buttons .btn svg {
+      width: 14px;
+      height: 14px;
+      flex-shrink: 0;
+    }
+    .action-buttons .btn-detail {
+      color: #4d3310;
+      background: #f0ebe6;
+    }
+    .action-buttons .btn-detail:hover {
+      background: #e0d6cc;
+    }
+    .action-buttons .btn-submit {
+      color: white;
+      background: #2563EB;
+    }
+    .action-buttons .btn-submit:hover {
+      background: #1D4ED8;
+    }
+    .action-buttons .btn-edit {
+      color: white;
+      background: #D97706;
+    }
+    .action-buttons .btn-edit:hover {
+      background: #B45309;
+    }
+    .action-buttons .btn-delete {
+      color: white;
+      background: #DC2626;
+    }
+    .action-buttons .btn-delete:hover {
+      background: #B91C1C;
+    }
+    .status-filter-tab {
+      transition: all 0.2s ease;
+    }
+    .status-filter-tab.active {
+      background: #4d3310;
+      color: white;
+    }
+    .table-container td:first-child,
+    .table-container th:first-child {
+      width: 40px;
+      text-align: center;
+    }
+    .table-container td:nth-child(2),
+    .table-container th:nth-child(2) {
+      min-width: 120px;
+    }
+    .table-container td:nth-child(3),
+    .table-container th:nth-child(3) {
+      min-width: 150px;
+    }
+    .table-container td:nth-child(4),
+    .table-container th:nth-child(4) {
+      min-width: 150px;
+    }
+    .table-container td:nth-child(5),
+    .table-container th:nth-child(5) {
+      min-width: 80px;
+      text-align: center;
+    }
+    .table-container td:nth-child(6),
+    .table-container th:nth-child(6) {
+      min-width: 130px;
+    }
+    .table-container td:nth-child(7),
+    .table-container th:nth-child(7) {
+      min-width: 100px;
+      text-align: center;
+    }
+    .table-container td:nth-child(8),
+    .table-container th:nth-child(8) {
+      text-align: center;
+      min-width: 200px;
+    }
+    .btn-primary {
+      background: #4d3310;
+      color: white;
+    }
+    .btn-primary:hover {
+      background: #3d280d;
+    }
+    .btn-primary-outline {
+      background: white;
+      color: #4d3310;
+      border: 1px solid #4d3310;
+    }
+    .btn-primary-outline:hover {
+      background: #f5f0eb;
+    }
+    @media (max-width: 768px) {
+      .dashboard-content {
+        padding: 16px;
+      }
+      .modal-content {
+        padding: 20px;
+      }
+      .table-container th,
+      .table-container td {
+        padding: 8px 10px;
+      }
+      .table-container tbody td {
+        font-size: 12px;
+      }
+      .table-container td:last-child {
+        min-width: 160px;
+      }
+      .action-buttons {
+        flex-wrap: wrap;
+        gap: 3px;
+      }
+      .action-buttons .btn {
+        font-size: 10px;
+        padding: 3px 7px;
+      }
+      .action-buttons .btn svg {
+        width: 12px;
+        height: 12px;
+      }
+    }
+  </style>
+</head>
+<body class="flex min-h-screen text-slate-800 bg-earthy-surface">
+<!-- BEGIN: Sidebar -->
+<aside class="w-64 bg-earthy-sidebar text-white flex-shrink-0 flex flex-col hidden lg:flex h-screen sticky top-0">
+<div class="p-5 flex items-center gap-3">
+<div class="w-8 h-8 bg-white rounded-md flex items-center justify-center flex-shrink-0">
+<div class="w-5 h-5 bg-earthy-sidebar rounded-sm"></div>
+</div>
+<div class="min-w-0">
+<h1 class="text-sm font-bold leading-none">Little Story</h1>
+<span class="text-[10px] opacity-70 tracking-wider">ENTERPRISE ERP</span>
+</div>
+</div>
+<nav class="flex-1 px-3 space-y-1 mt-4 overflow-y-auto">
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-white/60 hover:text-white hover:bg-white/5 transition-colors" href="gudang.html">
+<svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+          Dashboard
+        </a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-white/60 hover:text-white hover:bg-white/5 transition-colors" href="st.html">
+<svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+          Stok
+        </a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-white/60 hover:text-white hover:bg-white/5 transition-colors" href="bm.html">
+<svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M7 16l-4-4m0 0l4-4m-4 4h18" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+          Barang Masuk
+        </a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-white/60 hover:text-white hover:bg-white/5 transition-colors" href="bk.html">
+<svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M17 8l4 4m0 0l-4 4m4-4H3" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+          Barang Keluar
+        </a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-white/10 text-white font-medium" href="#">
+<svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+          Pengajuan
+        </a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-white/60 hover:text-white hover:bg-white/5 transition-colors" href="pen.html">
+<svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+          Pengaturan
+        </a>
+</nav>
+</aside>
+<!-- END: Sidebar -->
+
+<!-- BEGIN: Main Content -->
+<main class="flex-1 flex flex-col min-w-0 bg-earthy-surface h-screen overflow-hidden">
+<!-- BEGIN: Top Header -->
+<header class="h-16 bg-white border-b border-earthy-surface-dim flex items-center justify-between px-6 lg:px-8 flex-shrink-0">
+<div class="relative w-64 lg:w-96">
+<span class="absolute inset-y-0 left-0 flex items-center pl-3">
+<svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</span>
+<input class="w-full pl-10 pr-4 py-2 bg-slate-100 border-none rounded-lg text-xs focus:ring-1 focus:ring-earthy placeholder:text-slate-400" placeholder="Cari pengajuan..." type="text" id="search-input"/>
+</div>
+<div class="flex items-center gap-4 lg:gap-6 flex-shrink-0">
+<div class="relative">
+<svg class="w-6 h-6 text-slate-500" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span class="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-white">3</span>
+</div>
+<div class="flex items-center gap-3">
+<div class="text-right hidden sm:block">
+<p class="text-sm font-semibold text-slate-800" id="admin-name">Budi Sentoso</p>
+<p class="text-xs text-slate-400 font-medium">KEPALA GUDANG</p>
+</div>
+<img alt="Admin Profile" class="w-10 h-10 rounded-full border-2 border-white custom-shadow object-cover flex-shrink-0" id="admin-avatar" src="https://ui-avatars.com/api/?name=Budi+Sentoso&background=4d3310&color=fff&size=128"/>
+<svg class="w-4 h-4 text-slate-400 hidden sm:block" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+</div>
+</header>
+<!-- END: Top Header -->
+
+<!-- BEGIN: Dashboard Body -->
+<div class="flex-1 overflow-y-auto dashboard-content">
+<div class="dashboard-container max-w-7xl mx-auto space-y-6">
+<!-- Page Title Row -->
+<div class="flex flex-wrap justify-between items-start gap-4 mb-2">
+<div class="min-w-0">
+<h2 class="text-2xl font-bold text-slate-800">Pengajuan Pembelian</h2>
+<p class="text-sm text-slate-500 mt-1" id="current-date">Buat dan kelola pengajuan pembelian barang untuk manajer</p>
+</div>
+<div class="flex flex-wrap gap-3 flex-shrink-0">
+<button id="new-purchase-btn" class="bg-earthy text-white px-5 py-2.5 rounded-lg text-sm font-semibold flex items-center gap-2 hover:bg-earthy/90 transition shadow-sm">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M12 4v16m8-8H4" stroke-linecap="round" stroke-width="2"/></svg>
+<span>Buat Pengajuan</span>
+</button>
+</div>
+</div>
+
+<!-- Status Filter Tabs -->
+<div class="flex flex-wrap gap-2 border-b border-gray-200 pb-3">
+<button class="status-filter-tab px-4 py-1.5 rounded-lg text-sm font-medium bg-earthy text-white" data-status="all">Semua</button>
+<button class="status-filter-tab px-4 py-1.5 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100" data-status="draft">Draft</button>
+<button class="status-filter-tab px-4 py-1.5 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100" data-status="pending">Menunggu</button>
+<button class="status-filter-tab px-4 py-1.5 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100" data-status="approved">Disetujui</button>
+<button class="status-filter-tab px-4 py-1.5 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100" data-status="rejected">Ditolak</button>
+</div>
+
+<!-- Summary Cards -->
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+<div class="bg-white rounded-xl custom-shadow border border-slate-100 p-4">
+<p class="text-xs text-slate-400 font-medium">Total Pengajuan</p>
+<p class="text-2xl font-bold text-slate-800" id="total-purchases">0</p>
+</div>
+<div class="bg-white rounded-xl custom-shadow border border-slate-100 p-4">
+<p class="text-xs text-slate-400 font-medium">Menunggu</p>
+<p class="text-2xl font-bold text-amber-600" id="pending-count">0</p>
+</div>
+<div class="bg-white rounded-xl custom-shadow border border-slate-100 p-4">
+<p class="text-xs text-slate-400 font-medium">Disetujui</p>
+<p class="text-2xl font-bold text-green-600" id="approved-count">0</p>
+</div>
+<div class="bg-white rounded-xl custom-shadow border border-slate-100 p-4">
+<p class="text-xs text-slate-400 font-medium">Ditolak</p>
+<p class="text-2xl font-bold text-red-600" id="rejected-count">0</p>
+</div>
+</div>
+
+<!-- Purchase List -->
+<div class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden table-container">
+<div class="overflow-x-auto">
+<table>
+<thead>
+<tr>
+<th class="text-center">No.</th>
+<th>Tanggal</th>
+<th>Supplier</th>
+<th>Item</th>
+<th class="text-center">Jumlah</th>
+<th>Total</th>
+<th class="text-center">Status</th>
+<th class="text-center">Aksi</th>
+</tr>
+</thead>
+<tbody id="purchase-table-body">
+<tr>
+<td colspan="8" class="text-center py-8 text-gray-400">Belum ada pengajuan pembelian</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+<!-- END: Dashboard Body -->
+</main>
+<!-- END: Main Content -->
+
+<!-- BEGIN: Modal Buat/Edit Pengajuan -->
+<div class="modal-overlay" id="purchase-modal">
+<div class="modal-content">
+<div class="flex justify-between items-center mb-5">
+<h2 class="text-xl font-bold text-gray-900" id="modal-title">Buat Pengajuan Baru</h2>
+<button class="text-gray-400 hover:text-gray-600 close-modal-btn">
+<svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12" stroke-width="2"/></svg>
+</button>
+</div>
+<form id="purchase-form">
+<input type="hidden" id="edit-id" value=""/>
+<div class="space-y-4">
+<div>
+<label class="text-sm font-semibold text-gray-700 block mb-1">Supplier</label>
+<select id="p-supplier" class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-earthy focus:border-transparent" required>
+<option value="">Pilih Supplier</option>
+<option value="PT Sumber Makmur">PT Sumber Makmur</option>
+<option value="CV Berkah Abadi">CV Berkah Abadi</option>
+<option value="UD Jaya Sentosa">UD Jaya Sentosa</option>
+<option value="Toko Maju Jaya">Toko Maju Jaya</option>
+<option value="PT Indo Food">PT Indo Food</option>
+</select>
+</div>
+<div>
+<label class="text-sm font-semibold text-gray-700 block mb-1">Nama Barang</label>
+<input type="text" id="p-item-name" class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-earthy focus:border-transparent" placeholder="Contoh: Tepung Terigu 25kg" required/>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div>
+<label class="text-sm font-semibold text-gray-700 block mb-1">Jumlah</label>
+<input type="number" id="p-qty" class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-earthy focus:border-transparent" placeholder="0" min="1" required/>
+</div>
+<div>
+<label class="text-sm font-semibold text-gray-700 block mb-1">Harga Satuan</label>
+<input type="number" id="p-price" class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-earthy focus:border-transparent" placeholder="0" min="0" required/>
+</div>
+</div>
+<div>
+<label class="text-sm font-semibold text-gray-700 block mb-1">Catatan</label>
+<textarea id="p-notes" rows="2" class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-earthy focus:border-transparent" placeholder="Tambahkan catatan untuk atasan..."></textarea>
+</div>
+<div class="flex gap-3 pt-3 border-t border-gray-100">
+<button type="submit" class="flex-1 bg-earthy text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-earthy/90 transition">Simpan Draft</button>
+<button type="button" id="submit-purchase-btn" class="flex-1 bg-green-600 text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-green-700 transition">Ajukan ke Manajer</button>
+</div>
+</div>
+</form>
+</div>
+</div>
+<!-- END: Modal -->
+
+<!-- BEGIN: Modal Detail Pengajuan -->
+<div class="modal-overlay" id="detail-modal">
+<div class="modal-content">
+<div class="flex justify-between items-center mb-5">
+<h2 class="text-xl font-bold text-gray-900" id="detail-title">Detail Pengajuan</h2>
+<button class="text-gray-400 hover:text-gray-600 close-modal-btn">
+<svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12" stroke-width="2"/></svg>
+</button>
+</div>
+<div id="detail-content" class="space-y-3">
+<div class="grid grid-cols-2 gap-3">
+<div><span class="text-gray-500 text-sm">Supplier</span><p class="font-semibold" id="d-supplier">-</p></div>
+<div><span class="text-gray-500 text-sm">Tanggal</span><p class="font-semibold" id="d-date">-</p></div>
+</div>
+<div class="grid grid-cols-2 gap-3">
+<div><span class="text-gray-500 text-sm">Item</span><p class="font-semibold" id="d-item">-</p></div>
+<div><span class="text-gray-500 text-sm">Jumlah</span><p class="font-semibold" id="d-qty">-</p></div>
+</div>
+<div><span class="text-gray-500 text-sm">Total Harga</span><p class="font-semibold text-xl text-earthy" id="d-total">-</p></div>
+<div><span class="text-gray-500 text-sm">Status</span><p id="d-status">-</p></div>
+<div><span class="text-gray-500 text-sm">Catatan</span><p class="text-gray-700" id="d-notes">-</p></div>
+<div><span class="text-gray-500 text-sm">Diajukan Oleh</span><p class="font-semibold" id="d-submitted-by">-</p></div>
+<div id="d-approval-info" style="display:none;" class="bg-gray-50 p-3 rounded-lg">
+<span class="text-gray-500 text-sm block">Info Persetujuan</span>
+<p class="text-sm" id="d-approved-by">-</p>
+<p class="text-xs text-gray-400" id="d-approved-at">-</p>
+</div>
+<div id="d-received-info" style="display:none;" class="bg-green-50 p-3 rounded-lg">
+<span class="text-gray-500 text-sm block">Info Penerimaan</span>
+<p class="text-sm text-green-700" id="d-received-status">✅ Barang sudah diterima</p>
+</div>
+</div>
+<div id="detail-actions" class="flex gap-3 mt-5 pt-4 border-t border-gray-100"></div>
+</div>
+</div>
+<!-- END: Modal Detail -->
+
+<script>
+// ===================== ADMIN PROFILE =====================
+const ADMIN_PROFILE = {
+    name: 'Budi Sentoso',
+    avatar: 'https://ui-avatars.com/api/?name=Budi+Sentoso&background=4d3310&color=fff&size=128'
+};
+
+// ===================== DATA STORE =====================
+let purchases = [];
+let currentFilter = 'all';
+let editId = null;
+
+// ===================== LOAD DATA =====================
+function loadPurchases() {
+    try {
+        const saved = localStorage.getItem('pos_purchases');
+        if (saved) {
+            purchases = JSON.parse(saved);
+        } else {
+            // Sample data
+            purchases = [
+                {
+                    id: 1,
+                    date: new Date(Date.now() - 86400000 * 2).toISOString(),
+                    supplier: 'PT Sumber Makmur',
+                    itemName: 'Tepung Terigu 25kg',
+                    qty: 50,
+                    price: 12000,
+                    total: 600000,
+                    status: 'approved',
+                    notes: 'Untuk produksi roti bulan ini',
+                    submittedBy: 'Budi Sentoso',
+                    approvedBy: 'Manager',
+                    approvedAt: new Date(Date.now() - 86400000).toISOString()
+                },
+                {
+                    id: 2,
+                    date: new Date(Date.now() - 86400000 * 3).toISOString(),
+                    supplier: 'CV Berkah Abadi',
+                    itemName: 'Gula Pasir 50kg',
+                    qty: 30,
+                    price: 15000,
+                    total: 450000,
+                    status: 'pending',
+                    notes: 'Stok gula menipis, perlu segera diisi',
+                    submittedBy: 'Budi Sentoso'
+                },
+                {
+                    id: 3,
+                    date: new Date(Date.now() - 86400000 * 4).toISOString(),
+                    supplier: 'UD Jaya Sentosa',
+                    itemName: 'Minyak Goreng 20L',
+                    qty: 20,
+                    price: 25000,
+                    total: 500000,
+                    status: 'rejected',
+                    notes: 'Harga terlalu tinggi',
+                    submittedBy: 'Budi Sentoso',
+                    rejectedBy: 'Manager',
+                    rejectedAt: new Date(Date.now() - 86400000 * 2).toISOString(),
+                    reason: 'Budget tidak mencukupi'
+                },
+                {
+                    id: 4,
+                    date: new Date(Date.now() - 86400000 * 1).toISOString(),
+                    supplier: 'Toko Maju Jaya',
+                    itemName: 'Telur Ayam 30kg',
+                    qty: 100,
+                    price: 5000,
+                    total: 500000,
+                    status: 'draft',
+                    notes: 'Perlu persetujuan cepat',
+                    submittedBy: 'Budi Sentoso'
+                }
+            ];
+            savePurchases();
+        }
+    } catch(e) {
+        purchases = [];
+    }
+}
+
+function savePurchases() {
+    try {
+        localStorage.setItem('pos_purchases', JSON.stringify(purchases));
+    } catch(e) {}
+}
+
+// ===================== SYNC WITH STOCK & BARANG MASUK =====================
+function syncWithStockAndIncoming(purchase) {
+    // 1. Update stock (tambah stok)
+    try {
+        let stocks = JSON.parse(localStorage.getItem('pos_stocks') || '[]');
+        let stock = stocks.find(s => s.name.toLowerCase() === purchase.itemName.toLowerCase());
+        
+        if (!stock) {
+            // Cari berdasarkan partial match
+            stock = stocks.find(s => purchase.itemName.toLowerCase().includes(s.name.toLowerCase()) || s.name.toLowerCase().includes(purchase.itemName.toLowerCase()));
+        }
+        
+        if (!stock) {
+            // Buat stok baru
+            const newId = stocks.length > 0 ? Math.max(...stocks.map(s => s.id)) + 1 : 1;
+            stock = {
+                id: newId,
+                code: `BRG-${String(newId).padStart(3, '0')}`,
+                name: purchase.itemName,
+                category: 'Lainnya',
+                qty: purchase.qty,
+                unit: 'kg',
+                min: Math.max(1, Math.ceil(purchase.qty * 0.1)),
+                location: 'Rak Baru'
+            };
+            stocks.push(stock);
+        } else {
+            stock.qty += purchase.qty;
+        }
+        localStorage.setItem('pos_stocks', JSON.stringify(stocks));
+    } catch(e) {
+        console.error('Error updating stock:', e);
+    }
+
+    // 2. Tambahkan ke barang masuk
+    try {
+        let inTransactions = JSON.parse(localStorage.getItem('pos_in_transactions') || '[]');
+        const existingIds = inTransactions.map(t => t.purchaseId).filter(Boolean);
+        
+        // Cek apakah sudah ada transaksi masuk untuk pengajuan ini
+        if (!existingIds.includes(purchase.id)) {
+            const newId = inTransactions.length > 0 ? Math.max(...inTransactions.map(t => t.id)) + 1 : 1;
+            inTransactions.push({
+                id: newId,
+                purchaseId: purchase.id,
+                productName: purchase.itemName,
+                qty: purchase.qty,
+                unit: 'kg',
+                supplier: purchase.supplier,
+                status: 'waiting',
+                notes: purchase.notes || '',
+                date: new Date().toISOString()
+            });
+            localStorage.setItem('pos_in_transactions', JSON.stringify(inTransactions));
+        }
+    } catch(e) {
+        console.error('Error adding to incoming:', e);
+    }
+}
+
+// ===================== FORMAT HELPERS =====================
+function formatPrice(num) {
+    return 'Rp ' + (num || 0).toLocaleString('id-ID');
+}
+
+function formatDate(dateStr) {
+    if (!dateStr) return '-';
+    const d = new Date(dateStr);
+    return d.toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' });
+}
+
+function formatDateTime(dateStr) {
+    if (!dateStr) return '-';
+    const d = new Date(dateStr);
+    return d.toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+}
+
+function getStatusBadge(status) {
+    const map = {
+        'draft': '<span class="status-badge status-draft">Draft</span>',
+        'pending': '<span class="status-badge status-pending">Menunggu</span>',
+        'approved': '<span class="status-badge status-approved">Disetujui</span>',
+        'rejected': '<span class="status-badge status-rejected">Ditolak</span>',
+        'received': '<span class="status-badge status-received">Diterima</span>'
+    };
+    return map[status] || '<span class="status-badge status-draft">' + status + '</span>';
+}
+
+function getStatusText(status) {
+    const map = {
+        'draft': 'Draft',
+        'pending': 'Menunggu',
+        'approved': 'Disetujui',
+        'rejected': 'Ditolak',
+        'received': 'Diterima'
+    };
+    return map[status] || status;
+}
+
+// ===================== GENERATE ID =====================
+function generateId() {
+    return purchases.length > 0 ? Math.max(...purchases.map(p => p.id)) + 1 : 1;
+}
+
+// ===================== UPDATE DISPLAY =====================
+function updateAdminDisplay() {
+    const nameEl = document.getElementById('admin-name');
+    const avatarEl = document.getElementById('admin-avatar');
+    if (nameEl) nameEl.textContent = ADMIN_PROFILE.name;
+    if (avatarEl) avatarEl.src = ADMIN_PROFILE.avatar;
+}
+
+function updateDashboard() {
+    // Update date
+    const now = new Date();
+    const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+    const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+    document.getElementById('current-date').textContent = `Buat dan kelola pengajuan pembelian barang untuk atasan - ${days[now.getDay()]}, ${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
+
+    // Filter purchases
+    let filtered = purchases;
+    if (currentFilter !== 'all') {
+        filtered = purchases.filter(p => p.status === currentFilter);
+    }
+
+    // Search
+    const searchQuery = document.getElementById('search-input')?.value?.toLowerCase() || '';
+    if (searchQuery) {
+        filtered = filtered.filter(p => 
+            p.itemName.toLowerCase().includes(searchQuery) || 
+            p.supplier.toLowerCase().includes(searchQuery)
+        );
+    }
+
+    // Update summary
+    document.getElementById('total-purchases').textContent = purchases.length;
+    document.getElementById('pending-count').textContent = purchases.filter(p => p.status === 'pending').length;
+    document.getElementById('approved-count').textContent = purchases.filter(p => p.status === 'approved').length;
+    document.getElementById('rejected-count').textContent = purchases.filter(p => p.status === 'rejected').length;
+
+    // Render table
+    const tbody = document.getElementById('purchase-table-body');
+    if (filtered.length === 0) {
+        const msg = currentFilter === 'all' ? 'Belum ada pengajuan pembelian' : 'Tidak ada data dengan status ini';
+        tbody.innerHTML = `<tr><td colspan="8" class="text-center py-8 text-gray-400">${msg}</td></tr>`;
+        return;
+    }
+
+    tbody.innerHTML = filtered.map((p, index) => `
+        <tr>
+            <td class="text-center font-medium text-gray-500">${index + 1}</td>
+            <td class="text-gray-700">${formatDate(p.date)}</td>
+            <td class="font-medium text-gray-700">${p.supplier}</td>
+            <td class="text-gray-700">${p.itemName}</td>
+            <td class="text-center text-gray-700">${p.qty}</td>
+            <td class="font-semibold text-gray-700">${formatPrice(p.total)}</td>
+            <td class="text-center">${getStatusBadge(p.status)}</td>
+            <td>
+                <div class="action-buttons">
+                    <button class="btn btn-detail detail-btn" data-id="${p.id}">
+                        <svg fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/><path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+                        Detail
+                    </button>
+                    ${p.status === 'draft' ? `
+                        <button class="btn btn-edit edit-btn" data-id="${p.id}">
+                            <svg fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+                            Edit
+                        </button>
+                        <button class="btn btn-submit submit-btn" data-id="${p.id}">
+                            <svg fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+                            Ajukan
+                        </button>
+                        <button class="btn btn-delete delete-btn" data-id="${p.id}">
+                            <svg fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+                            Hapus
+                        </button>
+                    ` : ''}
+                </div>
+            </td>
+        </tr>
+    `).join('');
+
+    // Attach event listeners for buttons
+    document.querySelectorAll('.detail-btn').forEach(btn => {
+        btn.addEventListener('click', () => openDetail(parseInt(btn.dataset.id)));
+    });
+    document.querySelectorAll('.edit-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            openEditModal(parseInt(btn.dataset.id));
+        });
+    });
+    document.querySelectorAll('.submit-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            submitPurchase(parseInt(btn.dataset.id));
+        });
+    });
+    document.querySelectorAll('.delete-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            deletePurchase(parseInt(btn.dataset.id));
+        });
+    });
+}
+
+// ===================== OPEN DETAIL =====================
+function openDetail(id) {
+    const p = purchases.find(item => item.id === id);
+    if (!p) return;
+
+    document.getElementById('detail-title').textContent = `Detail Pengajuan #${p.id}`;
+    document.getElementById('d-supplier').textContent = p.supplier;
+    document.getElementById('d-date').textContent = formatDateTime(p.date);
+    document.getElementById('d-item').textContent = p.itemName;
+    document.getElementById('d-qty').textContent = p.qty + ' unit';
+    document.getElementById('d-total').textContent = formatPrice(p.total);
+    document.getElementById('d-status').innerHTML = getStatusBadge(p.status);
+    document.getElementById('d-notes').textContent = p.notes || '-';
+    document.getElementById('d-submitted-by').textContent = p.submittedBy;
+
+    // Show approval info if available
+    const approvalInfo = document.getElementById('d-approval-info');
+    if (p.status === 'approved' || p.status === 'rejected') {
+        approvalInfo.style.display = 'block';
+        if (p.status === 'approved') {
+            document.getElementById('d-approved-by').textContent = `✅ Disetujui oleh: ${p.approvedBy || 'Manager'}`;
+            document.getElementById('d-approved-at').textContent = p.approvedAt ? formatDateTime(p.approvedAt) : '-';
+        } else {
+            document.getElementById('d-approved-by').textContent = `❌ Ditolak oleh: ${p.rejectedBy || 'Manager'}`;
+            document.getElementById('d-approved-at').textContent = `Alasan: ${p.reason || 'Tidak ada alasan'}`;
+        }
+    } else {
+        approvalInfo.style.display = 'none';
+    }
+
+    // Show received info if available
+    const receivedInfo = document.getElementById('d-received-info');
+    const inTransactions = JSON.parse(localStorage.getItem('pos_in_transactions') || '[]');
+    const incoming = inTransactions.find(t => t.purchaseId === p.id && t.status === 'received');
+    if (incoming) {
+        receivedInfo.style.display = 'block';
+        document.getElementById('d-received-status').textContent = `✅ Barang sudah diterima pada ${formatDateTime(incoming.receivedAt)}`;
+        // Update status to received if not already
+        if (p.status !== 'received') {
+            p.status = 'received';
+            savePurchases();
+        }
+    } else {
+        receivedInfo.style.display = 'none';
+    }
+
+    const actions = document.getElementById('detail-actions');
+    if (p.status === 'draft') {
+        actions.innerHTML = `
+            <button class="flex-1 bg-blue-600 text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-blue-700 transition edit-btn" data-id="${p.id}">Edit</button>
+            <button class="flex-1 bg-green-600 text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-green-700 transition submit-btn" data-id="${p.id}">Ajukan</button>
+            <button class="flex-1 bg-gray-200 text-gray-600 px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-gray-300 transition close-modal-btn">Tutup</button>
+        `;
+        actions.querySelector('.edit-btn').addEventListener('click', () => {
+            document.getElementById('detail-modal').classList.remove('active');
+            openEditModal(p.id);
+        });
+        actions.querySelector('.submit-btn').addEventListener('click', () => {
+            submitPurchase(p.id);
+            document.getElementById('detail-modal').classList.remove('active');
+        });
+        actions.querySelector('.close-modal-btn').addEventListener('click', () => {
+            document.getElementById('detail-modal').classList.remove('active');
+        });
+    } else {
+        actions.innerHTML = `
+            <button class="flex-1 bg-gray-200 text-gray-600 px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-gray-300 transition close-modal-btn">Tutup</button>
+        `;
+        actions.querySelector('.close-modal-btn').addEventListener('click', () => {
+            document.getElementById('detail-modal').classList.remove('active');
+        });
+    }
+
+    document.getElementById('detail-modal').classList.add('active');
+}
+
+// ===================== OPEN EDIT MODAL =====================
+function openEditModal(id) {
+    const p = purchases.find(item => item.id === id);
+    if (!p) return;
+
+    editId = id;
+    document.getElementById('modal-title').textContent = 'Edit Pengajuan';
+    document.getElementById('edit-id').value = id;
+    document.getElementById('p-supplier').value = p.supplier;
+    document.getElementById('p-item-name').value = p.itemName;
+    document.getElementById('p-qty').value = p.qty;
+    document.getElementById('p-price').value = p.price;
+    document.getElementById('p-notes').value = p.notes || '';
+    document.getElementById('purchase-modal').classList.add('active');
+}
+
+// ===================== SUBMIT PURCHASE =====================
+function submitPurchase(id) {
+    const p = purchases.find(item => item.id === id);
+    if (!p) return;
+    if (!confirm(`Ajukan pembelian "${p.itemName}" dari ${p.supplier} ke atasan?`)) return;
+    
+    p.status = 'pending';
+    savePurchases();
+    updateDashboard();
+    showNotification('Pengajuan berhasil dikirim ke atasan!', 'success');
+}
+
+// ===================== DELETE PURCHASE =====================
+function deletePurchase(id) {
+    const p = purchases.find(item => item.id === id);
+    if (!p) return;
+    if (!confirm(`Hapus pengajuan "${p.itemName}"?`)) return;
+    
+    purchases = purchases.filter(item => item.id !== id);
+    savePurchases();
+    updateDashboard();
+    showNotification('Pengajuan berhasil dihapus!', 'info');
+}
+
+// ===================== NOTIFICATION =====================
+function showNotification(message, type = 'success') {
+    const colors = {
+        success: 'bg-green-600',
+        error: 'bg-red-600',
+        warning: 'bg-amber-600',
+        info: 'bg-blue-600'
+    };
+    
+    const notification = document.createElement('div');
+    notification.className = `fixed top-4 right-4 ${colors[type] || 'bg-earthy'} text-white px-6 py-3 rounded-xl shadow-lg z-50 transform transition-all duration-500 translate-x-full`;
+    notification.style.transition = 'transform 0.5s ease-in-out';
+    notification.innerHTML = `
+        <div class="flex items-center gap-3">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+                <path d="${type === 'success' ? 'M5 13l4 4L19 7' : type === 'error' ? 'M6 18L18 6M6 6l12 12' : 'M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z'}" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+            </svg>
+            <span class="font-medium">${message}</span>
+        </div>
+    `;
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.style.transform = 'translateX(0)';
+    }, 100);
+    
+    setTimeout(() => {
+        notification.style.transform = 'translateX(100%)';
+        setTimeout(() => {
+            notification.remove();
+        }, 500);
+    }, 3000);
+}
+
+// ===================== STATUS FILTER TABS =====================
+document.querySelectorAll('.status-filter-tab').forEach(tab => {
+    tab.addEventListener('click', function() {
+        document.querySelectorAll('.status-filter-tab').forEach(t => {
+            t.className = 'status-filter-tab px-4 py-1.5 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100';
+        });
+        this.className = 'status-filter-tab px-4 py-1.5 rounded-lg text-sm font-medium bg-earthy text-white';
+        currentFilter = this.dataset.status;
+        updateDashboard();
+    });
+});
+
+// ===================== SEARCH =====================
+document.getElementById('search-input').addEventListener('input', function() {
+    updateDashboard();
+});
+
+// ===================== MODAL CONTROLS =====================
+document.getElementById('new-purchase-btn').addEventListener('click', function() {
+    editId = null;
+    document.getElementById('modal-title').textContent = 'Buat Pengajuan Baru';
+    document.getElementById('edit-id').value = '';
+    document.getElementById('purchase-form').reset();
+    document.getElementById('purchase-modal').classList.add('active');
+});
+
+document.querySelectorAll('.close-modal-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        document.getElementById('purchase-modal').classList.remove('active');
+        document.getElementById('detail-modal').classList.remove('active');
+    });
+});
+
+// Close modal on overlay click
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+    overlay.addEventListener('click', function(e) {
+        if (e.target === this) {
+            this.classList.remove('active');
+        }
+    });
+});
+
+// ===================== CREATE/UPDATE PURCHASE =====================
+document.getElementById('purchase-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    savePurchaseAsDraft();
+});
+
+document.getElementById('submit-purchase-btn').addEventListener('click', function() {
+    savePurchaseAsDraft(true);
+});
+
+function savePurchaseAsDraft(submit = false) {
+    const id = document.getElementById('edit-id').value;
+    const supplier = document.getElementById('p-supplier').value;
+    const itemName = document.getElementById('p-item-name').value.trim();
+    const qty = parseInt(document.getElementById('p-qty').value);
+    const price = parseInt(document.getElementById('p-price').value);
+    const notes = document.getElementById('p-notes').value.trim();
+
+    if (!supplier || !itemName || !qty || !price) {
+        alert('Harap isi semua field yang diperlukan!');
+        return;
+    }
+
+    const purchaseData = {
+        supplier: supplier,
+        itemName: itemName,
+        qty: qty,
+        price: price,
+        total: qty * price,
+        status: submit ? 'pending' : 'draft',
+        notes: notes || '',
+        submittedBy: ADMIN_PROFILE.name
+    };
+
+    if (id) {
+        // Update existing
+        const index = purchases.findIndex(p => p.id === parseInt(id));
+        if (index !== -1) {
+            // Preserve existing status if not changing
+            if (!submit && purchases[index].status === 'pending') {
+                purchaseData.status = 'pending';
+            }
+            purchases[index] = { ...purchases[index], ...purchaseData };
+        }
+    } else {
+        // Create new
+        purchaseData.id = generateId();
+        purchaseData.date = new Date().toISOString();
+        purchases.push(purchaseData);
+    }
+
+    savePurchases();
+    document.getElementById('purchase-modal').classList.remove('active');
+    updateDashboard();
+    
+    if (id) {
+        showNotification('Pengajuan berhasil diperbarui!', 'success');
+    } else {
+        showNotification(submit ? 'Pengajuan berhasil dikirim ke atasan!' : 'Draft berhasil disimpan!', 'success');
+    }
+}
+
+// ===================== APPROVE PURCHASE (untuk simulasi atasan) =====================
+function approvePurchase(id) {
+    const p = purchases.find(item => item.id === id);
+    if (!p) return;
+    
+    p.status = 'approved';
+    p.approvedBy = 'Manager';
+    p.approvedAt = new Date().toISOString();
+    savePurchases();
+    
+    // Sync dengan stok dan barang masuk
+    syncWithStockAndIncoming(p);
+    
+    updateDashboard();
+    showNotification(`Pengajuan "${p.itemName}" telah disetujui dan stok bertambah!`, 'success');
+}
+
+// ===================== REJECT PURCHASE (untuk simulasi atasan) =====================
+function rejectPurchase(id) {
+    const p = purchases.find(item => item.id === id);
+    if (!p) return;
+    
+    p.status = 'rejected';
+    p.rejectedBy = 'Manager';
+    p.rejectedAt = new Date().toISOString();
+    p.reason = 'Budget tidak mencukupi';
+    savePurchases();
+    updateDashboard();
+    showNotification(`Pengajuan "${p.itemName}" ditolak!`, 'error');
+}
+
+// ===================== STORAGE LISTENER =====================
+window.addEventListener('storage', function(e) {
+    if (e.key === 'pos_purchases') {
+        loadPurchases();
+        updateDashboard();
+    }
+    if (e.key === 'pos_in_transactions') {
+        // Refresh status jika ada perubahan di barang masuk
+        updateDashboard();
+    }
+});
+
+// ===================== AUTO REFRESH =====================
+setInterval(() => {
+    loadPurchases();
+    updateDashboard();
+}, 10000);
+
+// ===================== INIT =====================
+document.addEventListener('DOMContentLoaded', function() {
+    updateAdminDisplay();
+    loadPurchases();
+    updateDashboard();
+    
+    // Expose approve/reject functions to console for testing
+    window.approvePurchase = approvePurchase;
+    window.rejectPurchase = rejectPurchase;
+    
+    console.log('📦 Untuk simulasi atasan, ketik di console:');
+    console.log('  approvePurchase(1)  - Menyetujui pengajuan ID 1');
+    console.log('  rejectPurchase(1)   - Menolak pengajuan ID 1');
+    console.log('📋 Saat pengajuan disetujui, stok otomatis bertambah dan muncul di halaman Barang Masuk');
+});
+</script>
+</body>
+</html>

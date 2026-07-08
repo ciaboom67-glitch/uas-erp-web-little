@@ -1,0 +1,1151 @@
+<!DOCTYPE html>
+<html class="dark" lang="id">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Little Story - Penjualan (Owner)</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-surface-variant": "#cac4d2",
+                        "surface-bright": "#37393a",
+                        "on-primary": "#371e73",
+                        "background": "#121414",
+                        "primary": "#cebdff",
+                        "surface-variant": "#333535",
+                        "on-error": "#690005",
+                        "surface-container-lowest": "#0c0f0f",
+                        "surface-container-highest": "#333535",
+                        "primary-fixed": "#e8ddff",
+                        "surface-container": "#1e2020",
+                        "surface-container-high": "#282a2b",
+                        "primary-container": "#513b8f",
+                        "error-container": "#93000a",
+                        "surface-container-low": "#1a1c1c",
+                        "outline": "#948e9c",
+                        "error": "#ffb4ab",
+                        "on-background": "#e2e2e2",
+                        "inverse-surface": "#e2e2e2",
+                        "surface": "#121414",
+                        "secondary": "#e5c367",
+                        "outline-variant": "#494551",
+                        "on-error-container": "#ffdad6",
+                        "inverse-on-surface": "#2f3131",
+                        "on-surface": "#e2e2e2",
+                        "surface-tint": "#cebdff",
+                        "surface-dim": "#121414",
+                        "on-secondary": "#3d2f00",
+                        "secondary-fixed": "#ffe08d"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "gutter-md": "16px",
+                        "container-padding": "24px",
+                        "sidebar-width": "240px",
+                        "inner-padding": "24px"
+                    },
+                    "fontFamily": {
+                        "headline-md": ["Plus Jakarta Sans"],
+                        "body-md": ["Plus Jakarta Sans"],
+                        "stat-value": ["Plus Jakarta Sans"],
+                        "label-sm": ["Plus Jakarta Sans"]
+                    },
+                    "fontSize": {
+                        "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "700"}],
+                        "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "stat-value": ["28px", {"lineHeight": "34px", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                        "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            background-color: #121216;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            color: #e2e2e2;
+        }
+        .sidebar-gold {
+            background-color: #584400;
+        }
+        .glass-card {
+            background-color: #1e2020;
+            border-radius: 16px;
+            padding: 24px;
+            color: #ffffff;
+            border: 1px solid #333535;
+            transition: all 0.2s ease;
+        }
+        .glass-card:hover {
+            border-color: #6359E9;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .nav-link {
+            transition: all 0.2s ease;
+        }
+        .nav-link:hover {
+            transform: translateX(8px);
+        }
+        .nav-link.active {
+            background: white;
+            color: #584400;
+        }
+        .nav-link.active .material-symbols-outlined {
+            font-variation-settings: 'FILL' 1;
+        }
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 9999px;
+            font-size: 11px;
+            font-weight: 600;
+            display: inline-block;
+        }
+        .status-completed {
+            background: #D1FAE5;
+            color: #059669;
+        }
+        .status-pending {
+            background: #FEF3C7;
+            color: #D97706;
+        }
+        .status-cancelled {
+            background: #FEE2E2;
+            color: #DC2626;
+        }
+        .status-match {
+            background: #D1FAE5;
+            color: #059669;
+        }
+        .status-mismatch {
+            background: #FEE2E2;
+            color: #DC2626;
+        }
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 100;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-overlay.active {
+            display: flex;
+        }
+        .modal-content {
+            background: #1e2020;
+            border-radius: 16px;
+            max-width: 720px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 32px;
+            margin: 16px;
+            border: 1px solid #333535;
+            color: #ffffff;
+        }
+        .modal-content .close-btn {
+            color: #cac4d2;
+            transition: color 0.2s;
+        }
+        .modal-content .close-btn:hover {
+            color: #ffffff;
+        }
+        .nav-tab {
+            transition: all 0.2s ease;
+            cursor: pointer;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-weight: 500;
+            font-size: 14px;
+            color: #a0a0a0;
+            border: 1px solid transparent;
+        }
+        .nav-tab:hover {
+            background: #333535;
+            color: #ffffff;
+        }
+        .nav-tab.active {
+            background: #513b8f;
+            color: #ffffff;
+            border-color: #6359E9;
+        }
+        .table-container table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .table-container th {
+            color: #a0a0a0;
+            font-weight: 600;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid #333535;
+            background-color: #282a2b;
+        }
+        .table-container td {
+            padding: 12px 16px;
+            border-bottom: 1px solid #2a2a2a;
+            color: #e2e2e2;
+        }
+        .table-container tr:hover td {
+            background-color: #282a2b;
+        }
+        .text-green-400 {
+            color: #34d399 !important;
+        }
+        .text-red-400 {
+            color: #f87171 !important;
+        }
+        .text-primary {
+            color: #cebdff !important;
+        }
+        .text-amber-400 {
+            color: #fbbf24 !important;
+        }
+        .comparison-card {
+            border-left: 4px solid;
+        }
+        .comparison-card.match {
+            border-left-color: #34d399;
+        }
+        .comparison-card.mismatch {
+            border-left-color: #f87171;
+        }
+        @media (max-width: 768px) {
+            .modal-content {
+                padding: 20px;
+                margin: 10px;
+            }
+            .nav-tab {
+                padding: 8px 14px;
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body class="bg-surface overflow-x-hidden">
+<!-- Sidebar Navigation -->
+<aside class="fixed h-full w-[240px] left-0 top-0 sidebar-gold flex flex-col py-inner-padding z-50">
+<div class="px-6 mb-10 flex items-center gap-3">
+<div class="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined text-white">coffee</span>
+</div>
+<div>
+<h1 class="font-headline-md text-headline-md text-white leading-none">Little Story</h1>
+<p class="text-[10px] text-white/60 uppercase tracking-widest mt-1">Business Suite</p>
+</div>
+</div>
+<nav class="flex-1 flex flex-col px-4 gap-2">
+<a class="nav-link text-white/70 hover:text-white flex items-center gap-3 px-4 py-2 hover:bg-white/10 transition-colors rounded-full" href="pemilik.html">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-body-md text-body-md">Dashboard</span>
+</a>
+
+<a class="nav-link text-white/70 hover:text-white flex items-center gap-3 px-4 py-2 hover:bg-white/10 transition-colors rounded-full" href="laporan-keuangan.html">
+<span class="material-symbols-outlined">payments</span>
+<span class="font-body-md text-body-md">Laporan Keuangan</span>
+</a><a class="nav-link active rounded-full px-4 py-2 flex items-center gap-3 transition-all duration-200" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">trending_up</span>
+<span class="font-body-md text-body-md">Penjualan</span>
+</a>
+<a class="nav-link text-white/70 hover:text-white flex items-center gap-3 px-4 py-2 hover:bg-white/10 transition-colors rounded-full" href="pk.html">
+<span class="material-symbols-outlined">inventory_2</span>
+<span class="font-body-md text-body-md">Produk</span>
+</a>
+<a class="nav-link text-white/70 hover:text-white flex items-center gap-3 px-4 py-2 hover:bg-white/10 transition-colors rounded-full" href="karya.html">
+<span class="material-symbols-outlined">badge</span>
+<span class="font-body-md text-body-md">Karyawan</span>
+</a>
+<a class="nav-link text-white/70 hover:text-white flex items-center gap-3 px-4 py-2 hover:bg-white/10 transition-colors rounded-full" href="pengaturan-pemilik.html">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-body-md text-body-md">Pengaturan</span>
+</a>
+</nav>
+</aside>
+<!-- Main Content Area -->
+<main class="ml-[240px] min-h-screen">
+<!-- TopAppBar -->
+<header class="fixed top-0 right-0 w-[calc(100%-240px)] h-16 bg-surface flex justify-between items-center px-container-padding z-40">
+<h2 class="font-headline-md text-headline-md text-white">Penjualan (Owner)</h2>
+<div class="flex items-center gap-6">
+<button class="relative text-white/60 hover:text-white transition-colors" onclick="showNotification('Tidak ada notifikasi baru', 'info')">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<div class="flex items-center gap-3 pl-4 border-l border-white/20">
+<div class="text-right">
+<p class="font-body-md text-body-md text-white leading-none" id="owner-name">Pak Budi</p>
+<p class="text-[11px] text-white/60">Pemilik (Owner)</p>
+</div>
+<div class="w-10 h-10 rounded-full overflow-hidden bg-surface-container-high border-2 border-secondary">
+<img class="w-full h-full object-cover" alt="Owner Profile" src="https://ui-avatars.com/api/?name=Pak+Budi&background=6359E9&color=fff&size=128"/>
+</div>
+</div>
+</div>
+</header>
+<!-- Page Canvas -->
+<div class="pt-24 pb-12 px-container-padding max-w-[1600px] mx-auto">
+<!-- Page Title Row -->
+<div class="flex flex-wrap justify-between items-center gap-4 mb-6">
+<div>
+<h1 class="text-2xl font-bold text-white">Penjualan & Verifikasi Laporan</h1>
+<p class="text-sm text-white/60 mt-1" id="current-date">Verifikasi kesesuaian data penjualan dengan laporan keuangan manajer</p>
+</div>
+<div class="flex gap-3">
+<button id="verify-btn" class="bg-green-600/20 text-green-400 px-5 py-2.5 rounded-lg text-sm font-semibold flex items-center space-x-2 hover:bg-green-600/30 transition shadow-sm border border-green-600/30">
+<span class="material-symbols-outlined text-sm">verified</span>
+<span>Verifikasi</span>
+</button>
+<button id="export-btn" class="bg-primary-container text-white px-5 py-2.5 rounded-lg text-sm font-semibold flex items-center space-x-2 hover:bg-primary-container/80 transition shadow-sm">
+<span class="material-symbols-outlined text-sm">download</span>
+<span>Export</span>
+</button>
+</div>
+</div>
+
+<!-- Summary Cards -->
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+<div class="glass-card p-4">
+<p class="text-xs text-white/60 font-medium">Total Penjualan</p>
+<p class="text-2xl font-bold text-white" id="total-sales">Rp 0</p>
+</div>
+<div class="glass-card p-4">
+<p class="text-xs text-white/60 font-medium">Total Transaksi</p>
+<p class="text-2xl font-bold text-white" id="total-transactions">0</p>
+</div>
+<div class="glass-card p-4">
+<p class="text-xs text-white/60 font-medium">Total Item Terjual</p>
+<p class="text-2xl font-bold text-primary" id="total-items">0</p>
+</div>
+<div class="glass-card p-4">
+<p class="text-xs text-white/60 font-medium">Status Verifikasi</p>
+<p class="text-2xl font-bold text-green-400" id="verify-status">✅ Sesuai</p>
+</div>
+</div>
+
+<!-- Navigation Tabs -->
+<div class="flex flex-wrap gap-2 border-b border-white/10 pb-3 mb-6">
+<button class="nav-tab active" data-tab="overview">Ringkasan Penjualan</button>
+<button class="nav-tab" data-tab="comparison">Verifikasi Laporan</button>
+<button class="nav-tab" data-tab="details">Detail Transaksi</button>
+</div>
+
+<!-- Tab Content -->
+<div id="tab-content">
+    <!-- OVERVIEW TAB -->
+    <div id="tab-overview" class="tab-panel">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div class="glass-card">
+                <h4 class="font-headline-md text-white mb-4">Grafik Penjualan (7 Hari Terakhir)</h4>
+                <div class="relative" style="height:250px;">
+                    <canvas id="salesChart"></canvas>
+                </div>
+            </div>
+            <div class="glass-card">
+                <h4 class="font-headline-md text-white mb-4">Ringkasan Penjualan</h4>
+                <div class="space-y-4" id="sales-summary">
+                    <div class="flex justify-between items-center py-2 border-b border-white/10">
+                        <span class="text-white/60">Total Pendapatan</span>
+                        <span class="font-bold text-green-400" id="summary-revenue">Rp 0</span>
+                    </div>
+                    <div class="flex justify-between items-center py-2 border-b border-white/10">
+                        <span class="text-white/60">Total Transaksi</span>
+                        <span class="font-bold text-white" id="summary-transactions">0</span>
+                    </div>
+                    <div class="flex justify-between items-center py-2 border-b border-white/10">
+                        <span class="text-white/60">Rata-rata per Transaksi</span>
+                        <span class="font-bold text-primary" id="summary-average">Rp 0</span>
+                    </div>
+                    <div class="flex justify-between items-center py-2 border-b border-white/10">
+                        <span class="text-white/60">Total Item Terjual</span>
+                        <span class="font-bold text-secondary" id="summary-items">0</span>
+                    </div>
+                    <div class="flex justify-between items-center py-3 bg-white/5 rounded-lg px-3">
+                        <span class="font-bold text-white">Metode Pembayaran</span>
+                        <span class="font-bold text-white/80" id="summary-payment">Cash: 0 | QRIS: 0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Top Products -->
+        <div class="glass-card mt-6">
+            <h4 class="font-headline-md text-white mb-4">Top 5 Produk Terlaris</h4>
+            <div class="space-y-3" id="top-products">
+                <div class="text-center py-4 text-white/40">Belum ada data</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- COMPARISON TAB -->
+    <div id="tab-comparison" class="tab-panel" style="display:none;">
+        <div class="glass-card mb-6">
+            <div class="flex justify-between items-center mb-4">
+                <h4 class="font-headline-md text-white">Verifikasi Laporan Keuangan</h4>
+                <span class="text-xs bg-white/10 px-3 py-1 rounded-full text-white/60" id="comparison-date">Periode: Bulan Ini</span>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="comparison-card match p-4 bg-white/5 rounded-lg">
+                    <p class="text-xs text-white/60">Total Penjualan (Kasir)</p>
+                    <p class="text-2xl font-bold text-green-400" id="comp-cashier-sales">Rp 0</p>
+                </div>
+                <div class="comparison-card match p-4 bg-white/5 rounded-lg">
+                    <p class="text-xs text-white/60">Total Laporan (Manajer)</p>
+                    <p class="text-2xl font-bold text-primary" id="comp-manager-sales">Rp 0</p>
+                </div>
+                <div class="comparison-card match p-4 bg-white/5 rounded-lg">
+                    <p class="text-xs text-white/60">Status Verifikasi</p>
+                    <p class="text-2xl font-bold text-green-400" id="comp-status">✅ Sesuai</p>
+                    <p class="text-xs text-white/40" id="comp-difference">Selisih: Rp 0</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Comparison Details -->
+        <div class="glass-card overflow-hidden">
+            <div class="p-4 border-b border-white/10 flex justify-between items-center">
+                <h4 class="font-bold text-white">Detail Perbandingan</h4>
+                <span class="text-xs text-white/40" id="comp-count">0 data</span>
+            </div>
+            <div class="overflow-x-auto table-container">
+                <table class="w-full text-sm">
+                    <thead>
+                        <tr>
+                            <th class="text-left px-4 py-3 text-xs font-semibold text-white/60 uppercase">Periode</th>
+                            <th class="text-left px-4 py-3 text-xs font-semibold text-white/60 uppercase">Penjualan Kasir</th>
+                            <th class="text-left px-4 py-3 text-xs font-semibold text-white/60 uppercase">Laporan Manajer</th>
+                            <th class="text-left px-4 py-3 text-xs font-semibold text-white/60 uppercase">Selisih</th>
+                            <th class="text-left px-4 py-3 text-xs font-semibold text-white/60 uppercase">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="comparison-body">
+                        <tr><td colspan="5" class="text-center py-8 text-white/40">Belum ada data perbandingan</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- DETAILS TAB -->
+    <div id="tab-details" class="tab-panel" style="display:none;">
+        <!-- Filter -->
+        <div class="glass-card p-4 mb-6">
+            <div class="flex flex-wrap gap-4 items-center justify-between">
+                <div class="flex flex-wrap gap-2">
+                    <button class="filter-btn px-4 py-1.5 rounded-lg text-sm font-medium text-white/60 border border-white/10 hover:bg-white/10 transition active" data-filter="all">Semua</button>
+                    <button class="filter-btn px-4 py-1.5 rounded-lg text-sm font-medium text-white/60 border border-white/10 hover:bg-white/10 transition" data-filter="completed">Selesai</button>
+                    <button class="filter-btn px-4 py-1.5 rounded-lg text-sm font-medium text-white/60 border border-white/10 hover:bg-white/10 transition" data-filter="pending">Pending</button>
+                    <button class="filter-btn px-4 py-1.5 rounded-lg text-sm font-medium text-white/60 border border-white/10 hover:bg-white/10 transition" data-filter="cancelled">Dibatalkan</button>
+                </div>
+                <div class="flex gap-3">
+                    <input type="date" id="start-date" class="bg-surface-container border border-white/10 rounded-lg px-3 py-1.5 text-sm text-white focus:border-primary focus:outline-none"/>
+                    <span class="text-white/40 self-center">-</span>
+                    <input type="date" id="end-date" class="bg-surface-container border border-white/10 rounded-lg px-3 py-1.5 text-sm text-white focus:border-primary focus:outline-none"/>
+                </div>
+            </div>
+        </div>
+
+        <!-- Transactions List -->
+        <div class="glass-card overflow-hidden">
+            <div class="p-4 border-b border-white/10 flex justify-between items-center">
+                <h3 class="font-bold text-white">Daftar Transaksi</h3>
+                <span class="text-xs text-white/40" id="detail-count">0 transaksi</span>
+            </div>
+            <div class="overflow-x-auto table-container">
+                <table class="w-full text-sm">
+                    <thead>
+                        <tr>
+                            <th class="text-left px-4 py-3 text-xs font-semibold text-white/60 uppercase">No.</th>
+                            <th class="text-left px-4 py-3 text-xs font-semibold text-white/60 uppercase">ID Transaksi</th>
+                            <th class="text-left px-4 py-3 text-xs font-semibold text-white/60 uppercase">Tanggal</th>
+                            <th class="text-left px-4 py-3 text-xs font-semibold text-white/60 uppercase">Kasir</th>
+                            <th class="text-left px-4 py-3 text-xs font-semibold text-white/60 uppercase">Total</th>
+                            <th class="text-left px-4 py-3 text-xs font-semibold text-white/60 uppercase">Status</th>
+                            <th class="text-center px-4 py-3 text-xs font-semibold text-white/60 uppercase">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="details-body">
+                        <tr><td colspan="7" class="text-center py-8 text-white/40">Belum ada transaksi</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+</main>
+
+<!-- BEGIN: Modal Detail Transaksi -->
+<div class="modal-overlay" id="detail-modal">
+<div class="modal-content">
+<div class="flex justify-between items-center mb-5">
+<h2 class="text-xl font-bold text-white" id="detail-title">Detail Transaksi</h2>
+<button class="close-btn" onclick="closeModal('detail-modal')">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<div id="detail-content" class="space-y-3">
+<div class="grid grid-cols-2 gap-3">
+<div><span class="text-white/60 text-sm">ID Transaksi</span><p class="font-semibold text-white" id="d-id">-</p></div>
+<div><span class="text-white/60 text-sm">Tanggal</span><p class="font-semibold text-white" id="d-date">-</p></div>
+</div>
+<div class="grid grid-cols-2 gap-3">
+<div><span class="text-white/60 text-sm">Kasir</span><p class="font-semibold text-white" id="d-cashier">-</p></div>
+<div><span class="text-white/60 text-sm">Status</span><p id="d-status">-</p></div>
+</div>
+<div class="grid grid-cols-2 gap-3">
+<div><span class="text-white/60 text-sm">Metode Pembayaran</span><p class="font-semibold text-white" id="d-payment">-</p></div>
+<div><span class="text-white/60 text-sm">Total</span><p class="font-semibold text-xl text-primary" id="d-total">-</p></div>
+</div>
+<div><span class="text-white/60 text-sm">Item</span><div id="d-items" class="mt-2 space-y-1"></div></div>
+</div>
+</div>
+</div>
+<!-- END: Modal Detail -->
+
+<script>
+// ===================== ADMIN PROFILE =====================
+const ADMIN_PROFILE = {
+    name: 'Pak Budi',
+    avatar: 'https://ui-avatars.com/api/?name=Pak+Budi&background=6359E9&color=fff&size=128'
+};
+
+// ===================== DATA STORE =====================
+let transactions = [];
+let submissions = [];
+let currentFilter = 'all';
+let filteredTransactions = [];
+let salesChartInstance = null;
+
+// ===================== LOAD DATA =====================
+function loadData() {
+    try {
+        // Load transactions from kasir (same as riwayat transaksi)
+        const savedTransactions = localStorage.getItem('pos_transactions');
+        if (savedTransactions) {
+            transactions = JSON.parse(savedTransactions);
+        } else {
+            transactions = generateSampleTransactions();
+            localStorage.setItem('pos_transactions', JSON.stringify(transactions));
+        }
+        
+        // Load submissions from manager
+        const savedSubmissions = localStorage.getItem('pos_submissions');
+        if (savedSubmissions) {
+            submissions = JSON.parse(savedSubmissions);
+        } else {
+            submissions = generateSampleSubmissions();
+            localStorage.setItem('pos_submissions', JSON.stringify(submissions));
+        }
+    } catch(e) {
+        transactions = generateSampleTransactions();
+        submissions = generateSampleSubmissions();
+    }
+    applyFilters();
+}
+
+function getTransactionId(tx) {
+    return tx.transactionId || tx.id || tx.invoiceNumber || 'TRX-' + String(Math.random().toString(36).substr(2, 6)).toUpperCase();
+}
+
+function formatDateTime(timestamp) {
+    if (!timestamp) return '-';
+    try {
+        const date = new Date(timestamp);
+        if (!isNaN(date.getTime())) {
+            return date.toLocaleDateString('id-ID', { 
+                day: '2-digit', 
+                month: 'short', 
+                year: 'numeric' 
+            }) + ', ' + date.toLocaleTimeString('id-ID', { 
+                hour: '2-digit', 
+                minute: '2-digit' 
+            });
+        }
+        return timestamp;
+    } catch(e) {
+        return timestamp || '-';
+    }
+}
+
+function generateSampleTransactions() {
+    const sample = [];
+    const now = new Date();
+    const statuses = ['completed', 'completed', 'completed', 'pending', 'completed', 'cancelled'];
+    const cashiers = ['Budi Santoso', 'Siti Rahayu', 'Ahmad Fauzi'];
+    const paymentMethods = ['Cash', 'QRIS', 'Cash', 'QRIS'];
+    const items = [
+        { name: 'Milo Tea', price: 15000 },
+        { name: 'Green Teah', price: 12000 },
+        { name: 'Cappuccino', price: 18000 },
+        { name: 'Matcha Latte', price: 22000 },
+        { name: 'Croissant', price: 10000 },
+        { name: 'Cheesecake', price: 25000 }
+    ];
+    
+    for (let i = 0; i < 50; i++) {
+        const date = new Date(now);
+        date.setDate(date.getDate() - Math.floor(Math.random() * 30));
+        date.setHours(Math.floor(Math.random() * 12) + 8, Math.floor(Math.random() * 60), 0);
+        
+        const numItems = Math.floor(Math.random() * 4) + 1;
+        const selectedItems = [];
+        let total = 0;
+        const used = new Set();
+        for (let j = 0; j < numItems; j++) {
+            let idx;
+            do {
+                idx = Math.floor(Math.random() * items.length);
+            } while (used.has(idx));
+            used.add(idx);
+            const qty = Math.floor(Math.random() * 3) + 1;
+            selectedItems.push({
+                name: items[idx].name,
+                qty: qty,
+                price: items[idx].price,
+                subtotal: qty * items[idx].price
+            });
+            total += qty * items[idx].price;
+        }
+        
+        sample.push({
+            id: i + 1,
+            transactionId: 'TRX-' + String(i + 1).padStart(4, '0'),
+            timestamp: date.toISOString(),
+            cashier: cashiers[i % cashiers.length],
+            items: selectedItems,
+            total: total,
+            status: statuses[i % statuses.length],
+            paymentMethod: paymentMethods[i % paymentMethods.length]
+        });
+    }
+    return sample.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+}
+
+function generateSampleSubmissions() {
+    const now = new Date();
+    return [
+        {
+            id: 1,
+            date: new Date(now.getFullYear(), now.getMonth(), 1).toISOString(),
+            period: 'Bulan Ini (' + now.toLocaleDateString('id-ID', { month: 'long', year: 'numeric' }) + ')',
+            revenue: 125000000,
+            expenses: 65000000,
+            profit: 60000000,
+            notes: 'Laporan keuangan bulan ini',
+            status: 'pending',
+            submittedBy: 'Admin Keuangan'
+        },
+        {
+            id: 2,
+            date: new Date(now.getFullYear(), now.getMonth() - 1, 1).toISOString(),
+            period: 'Bulan Lalu (' + new Date(now.getFullYear(), now.getMonth() - 1, 1).toLocaleDateString('id-ID', { month: 'long', year: 'numeric' }) + ')',
+            revenue: 105000000,
+            expenses: 70000000,
+            profit: 35000000,
+            notes: 'Laporan keuangan bulan lalu',
+            status: 'approved',
+            submittedBy: 'Admin Keuangan',
+            reviewedBy: 'Pak Budi',
+            reviewedAt: new Date().toISOString()
+        }
+    ];
+}
+
+// ===================== FORMAT HELPERS =====================
+function formatPrice(num) {
+    return 'Rp ' + (num || 0).toLocaleString('id-ID');
+}
+
+function getStatusBadge(status) {
+    const map = {
+        'completed': '<span class="status-badge status-completed">Selesai</span>',
+        'pending': '<span class="status-badge status-pending">Pending</span>',
+        'cancelled': '<span class="status-badge status-cancelled">Dibatalkan</span>'
+    };
+    return map[status] || '<span class="status-badge status-pending">' + status + '</span>';
+}
+
+// ===================== APPLY FILTERS =====================
+function applyFilters() {
+    const startDate = document.getElementById('start-date').value;
+    const endDate = document.getElementById('end-date').value;
+    
+    filteredTransactions = transactions.filter(t => {
+        if (currentFilter !== 'all' && t.status !== currentFilter) return false;
+        if (startDate) {
+            const txDate = new Date(t.timestamp);
+            const start = new Date(startDate);
+            start.setHours(0, 0, 0, 0);
+            if (txDate < start) return false;
+        }
+        if (endDate) {
+            const txDate = new Date(t.timestamp);
+            const end = new Date(endDate);
+            end.setHours(23, 59, 59, 999);
+            if (txDate > end) return false;
+        }
+        return true;
+    });
+    
+    updateDashboard();
+}
+
+// ===================== UPDATE DISPLAY =====================
+function updateAdminDisplay() {
+    const nameEl = document.getElementById('owner-name');
+    if (nameEl) nameEl.textContent = ADMIN_PROFILE.name;
+}
+
+function updateDate() {
+    const now = new Date();
+    const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+    const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+    document.getElementById('current-date').textContent = `Verifikasi kesesuaian data penjualan dengan laporan keuangan manajer - ${days[now.getDay()]}, ${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
+}
+
+function updateDashboard() {
+    // Calculate stats
+    const totalSales = filteredTransactions.reduce((sum, t) => sum + (t.total || 0), 0);
+    const totalTrans = filteredTransactions.length;
+    const totalItems = filteredTransactions.reduce((sum, t) => {
+        return sum + (t.items || []).reduce((s, item) => s + (item.qty || 0), 0);
+    }, 0);
+    const avgTrans = totalTrans > 0 ? totalSales / totalTrans : 0;
+    
+    // Payment method stats
+    const cashCount = filteredTransactions.filter(t => t.paymentMethod === 'Cash' || t.paymentMethod === 'Tunai').length;
+    const qrisCount = filteredTransactions.filter(t => t.paymentMethod === 'QRIS').length;
+    const otherCount = totalTrans - cashCount - qrisCount;
+    
+    // Update summary cards
+    document.getElementById('total-sales').textContent = formatPrice(totalSales);
+    document.getElementById('total-transactions').textContent = totalTrans;
+    document.getElementById('total-items').textContent = totalItems;
+    
+    // Update overview tab
+    document.getElementById('summary-revenue').textContent = formatPrice(totalSales);
+    document.getElementById('summary-transactions').textContent = totalTrans;
+    document.getElementById('summary-average').textContent = formatPrice(avgTrans);
+    document.getElementById('summary-items').textContent = totalItems;
+    document.getElementById('summary-payment').textContent = `Cash: ${cashCount} | QRIS: ${qrisCount} | Lainnya: ${otherCount}`;
+    
+    // Update charts
+    updateSalesChart();
+    updateTopProducts();
+    updateDetailsTable();
+    updateComparison();
+    
+    // Update verification status
+    updateVerificationStatus();
+}
+
+// ===================== UPDATE SALES CHART =====================
+function updateSalesChart() {
+    const canvas = document.getElementById('salesChart');
+    if (!canvas) return;
+    
+    const ctx = canvas.getContext('2d');
+    const now = new Date();
+    const days = [];
+    const salesData = [];
+    
+    for (let i = 6; i >= 0; i--) {
+        const date = new Date(now);
+        date.setDate(date.getDate() - i);
+        const dateStr = date.toLocaleDateString('id-ID', { day: '2-digit', month: 'short' });
+        days.push(dateStr);
+        
+        const daySales = transactions.filter(t => {
+            const txDate = new Date(t.timestamp);
+            return txDate.toDateString() === date.toDateString() && t.status === 'completed';
+        }).reduce((sum, t) => sum + (t.total || 0), 0);
+        salesData.push(daySales);
+    }
+    
+    if (salesChartInstance) {
+        salesChartInstance.destroy();
+    }
+    
+    salesChartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: days,
+            datasets: [{
+                label: 'Penjualan',
+                data: salesData,
+                borderColor: '#6359E9',
+                backgroundColor: 'rgba(99, 89, 233, 0.1)',
+                fill: true,
+                tension: 0.4,
+                pointBackgroundColor: '#6359E9',
+                pointBorderColor: '#ffffff',
+                pointBorderWidth: 2,
+                pointRadius: 4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    labels: { color: '#cac4d2', boxWidth: 12, padding: 15, font: { size: 11 } }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        color: '#cac4d2',
+                        callback: function(value) {
+                            return 'Rp ' + (value / 1000).toFixed(0) + 'k';
+                        }
+                    },
+                    grid: { color: '#333535' }
+                },
+                x: {
+                    ticks: { color: '#cac4d2' },
+                    grid: { color: '#333535' }
+                }
+            }
+        }
+    });
+}
+
+// ===================== UPDATE TOP PRODUCTS =====================
+function updateTopProducts() {
+    const productSales = {};
+    transactions.filter(t => t.status === 'completed').forEach(t => {
+        if (t.items) {
+            t.items.forEach(item => {
+                const name = item.name || 'Unknown';
+                productSales[name] = (productSales[name] || 0) + (item.qty || 0);
+            });
+        }
+    });
+    
+    const sorted = Object.entries(productSales)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 5);
+    
+    const container = document.getElementById('top-products');
+    if (sorted.length === 0) {
+        container.innerHTML = '<div class="text-center py-4 text-white/40">Belum ada data</div>';
+        return;
+    }
+    
+    container.innerHTML = sorted.map(([name, qty], index) => `
+        <div class="flex items-center justify-between p-3 rounded-xl bg-white/5">
+            <div class="flex items-center gap-4">
+                <div class="w-8 h-8 rounded-lg bg-primary-container text-white flex items-center justify-center font-bold">${index + 1}</div>
+                <span class="font-body-md text-white">${name}</span>
+            </div>
+            <span class="font-bold text-primary">${qty} terjual</span>
+        </div>
+    `).join('');
+}
+
+// ===================== UPDATE COMPARISON =====================
+function updateComparison() {
+    const now = new Date();
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    
+    // Calculate cashier sales (from transactions)
+    const monthlyTransactions = transactions.filter(t => {
+        const date = new Date(t.timestamp);
+        return date >= startOfMonth && t.status === 'completed';
+    });
+    const cashierSales = monthlyTransactions.reduce((sum, t) => sum + (t.total || 0), 0);
+    
+    // Get manager report (latest approved or pending)
+    const managerReport = submissions.find(s => s.status === 'approved' || s.status === 'pending');
+    const managerSales = managerReport ? managerReport.revenue : 0;
+    
+    const difference = cashierSales - managerSales;
+    const isMatch = Math.abs(difference) < 1000;
+    
+    document.getElementById('comp-cashier-sales').textContent = formatPrice(cashierSales);
+    document.getElementById('comp-manager-sales').textContent = formatPrice(managerSales);
+    document.getElementById('comp-status').textContent = isMatch ? '✅ Sesuai' : '⚠️ Tidak Sesuai';
+    document.getElementById('comp-status').className = `text-2xl font-bold ${isMatch ? 'text-green-400' : 'text-red-400'}`;
+    document.getElementById('comp-difference').textContent = `Selisih: ${formatPrice(Math.abs(difference))}`;
+    document.getElementById('verify-status').textContent = isMatch ? '✅ Sesuai' : '⚠️ Perlu Review';
+    document.getElementById('verify-status').className = `text-2xl font-bold ${isMatch ? 'text-green-400' : 'text-amber-400'}`;
+    
+    updateComparisonTable();
+}
+
+// ===================== UPDATE COMPARISON TABLE =====================
+function updateComparisonTable() {
+    const tbody = document.getElementById('comparison-body');
+    const now = new Date();
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Ags', 'Sep', 'Okt', 'Nov', 'Des'];
+    
+    const comparisons = [];
+    for (let i = 5; i >= 0; i--) {
+        const monthDate = new Date(now.getFullYear(), now.getMonth() - i, 1);
+        const monthEnd = new Date(now.getFullYear(), now.getMonth() - i + 1, 0);
+        
+        const monthTransactions = transactions.filter(t => {
+            const date = new Date(t.timestamp);
+            return date >= monthDate && date <= monthEnd && t.status === 'completed';
+        });
+        const monthSales = monthTransactions.reduce((sum, t) => sum + (t.total || 0), 0);
+        
+        const monthReport = submissions.find(s => {
+            const sDate = new Date(s.date);
+            return sDate.getMonth() === monthDate.getMonth() && sDate.getFullYear() === monthDate.getFullYear();
+        });
+        const reportSales = monthReport ? monthReport.revenue : 0;
+        
+        const diff = monthSales - reportSales;
+        const isMatch = Math.abs(diff) < 1000;
+        
+        comparisons.push({
+            period: months[monthDate.getMonth()] + ' ' + monthDate.getFullYear(),
+            cashierSales: monthSales,
+            reportSales: reportSales,
+            difference: diff,
+            isMatch: isMatch
+        });
+    }
+    
+    document.getElementById('comp-count').textContent = comparisons.length + ' data';
+    
+    if (comparisons.length === 0 || comparisons.every(c => c.cashierSales === 0 && c.reportSales === 0)) {
+        tbody.innerHTML = '<tr><td colspan="5" class="text-center py-8 text-white/40">Belum ada data perbandingan</td></tr>';
+        return;
+    }
+    
+    tbody.innerHTML = comparisons.map(c => `
+        <tr class="border-b border-white/5 hover:bg-white/5 transition">
+            <td class="px-4 py-3 text-white">${c.period}</td>
+            <td class="px-4 py-3 text-green-400 font-semibold">${formatPrice(c.cashierSales)}</td>
+            <td class="px-4 py-3 text-primary font-semibold">${formatPrice(c.reportSales)}</td>
+            <td class="px-4 py-3 ${c.isMatch ? 'text-green-400' : 'text-red-400'} font-semibold">${formatPrice(Math.abs(c.difference))}</td>
+            <td class="px-4 py-3">${c.isMatch ? '✅ Sesuai' : '❌ Tidak Sesuai'}</td>
+        </tr>
+    `).join('');
+}
+
+// ===================== UPDATE VERIFICATION STATUS =====================
+function updateVerificationStatus() {
+    const now = new Date();
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    
+    const monthlyTransactions = transactions.filter(t => {
+        const date = new Date(t.timestamp);
+        return date >= startOfMonth && t.status === 'completed';
+    });
+    const cashierSales = monthlyTransactions.reduce((sum, t) => sum + (t.total || 0), 0);
+    
+    const managerReport = submissions.find(s => s.status === 'approved' || s.status === 'pending');
+    const managerSales = managerReport ? managerReport.revenue : 0;
+    
+    const isMatch = Math.abs(cashierSales - managerSales) < 1000;
+    document.getElementById('verify-status').textContent = isMatch ? '✅ Sesuai' : '⚠️ Perlu Review';
+    document.getElementById('verify-status').className = `text-2xl font-bold ${isMatch ? 'text-green-400' : 'text-amber-400'}`;
+}
+
+// ===================== UPDATE DETAILS TABLE =====================
+function updateDetailsTable() {
+    const tbody = document.getElementById('details-body');
+    document.getElementById('detail-count').textContent = filteredTransactions.length + ' transaksi';
+    
+    if (filteredTransactions.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" class="text-center py-8 text-white/40">Tidak ada transaksi</td></tr>';
+        return;
+    }
+    
+    tbody.innerHTML = filteredTransactions.map((t, index) => {
+        const txId = getTransactionId(t);
+        const formattedDate = formatDateTime(t.timestamp);
+        return `
+            <tr class="border-b border-white/5 hover:bg-white/5 transition cursor-pointer" onclick="openDetail(${t.id})">
+                <td class="px-4 py-3 text-white/60">${index + 1}</td>
+                <td class="px-4 py-3 text-white font-mono text-xs">${txId}</td>
+                <td class="px-4 py-3 text-white/80">${formattedDate}</td>
+                <td class="px-4 py-3 text-white/80">${t.cashier || 'Kasir'}</td>
+                <td class="px-4 py-3 text-primary font-semibold">${formatPrice(t.total)}</td>
+                <td class="px-4 py-3">${getStatusBadge(t.status)}</td>
+                <td class="px-4 py-3 text-center">
+                    <button class="text-primary hover:text-primary/80 transition" onclick="event.stopPropagation(); openDetail(${t.id})">
+                        <span class="material-symbols-outlined text-sm">visibility</span>
+                    </button>
+                </td>
+            </tr>
+        `;
+    }).join('');
+}
+
+// ===================== OPEN DETAIL =====================
+function openDetail(id) {
+    const t = transactions.find(item => item.id === id);
+    if (!t) return;
+    
+    const txId = getTransactionId(t);
+    const formattedDate = formatDateTime(t.timestamp);
+    
+    document.getElementById('detail-title').textContent = 'Detail Transaksi';
+    document.getElementById('d-id').textContent = txId;
+    document.getElementById('d-date').textContent = formattedDate;
+    document.getElementById('d-cashier').textContent = t.cashier || 'Kasir';
+    document.getElementById('d-status').innerHTML = getStatusBadge(t.status);
+    document.getElementById('d-payment').textContent = t.paymentMethod || '-';
+    document.getElementById('d-total').textContent = formatPrice(t.total);
+    
+    const itemsContainer = document.getElementById('d-items');
+    if (t.items && t.items.length > 0) {
+        itemsContainer.innerHTML = t.items.map(item => `
+            <div class="flex justify-between items-center py-1 border-b border-white/5">
+                <span class="text-white/80">${item.name} x${item.qty}</span>
+                <span class="text-primary">${formatPrice(item.subtotal || item.price * item.qty)}</span>
+            </div>
+        `).join('');
+    } else {
+        itemsContainer.innerHTML = '<span class="text-white/40 text-sm">Tidak ada item</span>';
+    }
+    
+    document.getElementById('detail-modal').classList.add('active');
+}
+
+// ===================== NOTIFICATION =====================
+function showNotification(message, type = 'success') {
+    const colors = {
+        success: 'bg-green-600',
+        error: 'bg-red-600',
+        warning: 'bg-amber-600',
+        info: 'bg-blue-600'
+    };
+    
+    const notification = document.createElement('div');
+    notification.className = `fixed top-20 right-4 ${colors[type] || 'bg-brand-purple'} text-white px-6 py-3 rounded-xl shadow-lg z-50 transform transition-all duration-500 translate-x-full`;
+    notification.style.transition = 'transform 0.5s ease-in-out';
+    notification.innerHTML = `
+        <div class="flex items-center gap-3">
+            <span class="material-symbols-outlined">${type === 'success' ? 'check_circle' : type === 'error' ? 'error' : 'info'}</span>
+            <span class="font-medium">${message}</span>
+        </div>
+    `;
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.style.transform = 'translateX(0)';
+    }, 100);
+    
+    setTimeout(() => {
+        notification.style.transform = 'translateX(100%)';
+        setTimeout(() => {
+            notification.remove();
+        }, 500);
+    }, 3000);
+}
+
+// ===================== VERIFY BUTTON =====================
+document.getElementById('verify-btn').addEventListener('click', function() {
+    updateComparison();
+    showNotification('Verifikasi data berhasil dilakukan!', 'success');
+});
+
+// ===================== EXPORT BUTTON =====================
+document.getElementById('export-btn').addEventListener('click', function() {
+    const data = {
+        exportedAt: new Date().toISOString(),
+        totalTransactions: filteredTransactions.length,
+        totalSales: filteredTransactions.reduce((sum, t) => sum + (t.total || 0), 0),
+        transactions: filteredTransactions.map(t => ({
+            id: getTransactionId(t),
+            date: formatDateTime(t.timestamp),
+            cashier: t.cashier,
+            total: t.total,
+            status: t.status,
+            paymentMethod: t.paymentMethod,
+            items: t.items
+        }))
+    };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `penjualan-owner-${new Date().toISOString().split('T')[0]}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    showNotification('Data berhasil diexport!', 'success');
+});
+
+// ===================== TAB NAVIGATION =====================
+document.querySelectorAll('.nav-tab').forEach(tab => {
+    tab.addEventListener('click', function() {
+        document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+        this.classList.add('active');
+        document.querySelectorAll('.tab-panel').forEach(p => p.style.display = 'none');
+        document.getElementById('tab-' + this.dataset.tab).style.display = 'block';
+    });
+});
+
+// ===================== FILTER BUTTONS =====================
+document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        currentFilter = this.dataset.filter;
+        applyFilters();
+    });
+});
+
+// ===================== DATE FILTERS =====================
+document.getElementById('start-date').addEventListener('change', applyFilters);
+document.getElementById('end-date').addEventListener('change', applyFilters);
+
+// ===================== MODAL CONTROLS =====================
+function closeModal(id) {
+    document.getElementById(id).classList.remove('active');
+}
+
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+    overlay.addEventListener('click', function(e) {
+        if (e.target === this) {
+            this.classList.remove('active');
+        }
+    });
+});
+
+// ===================== STORAGE LISTENER =====================
+window.addEventListener('storage', function(e) {
+    if (e.key === 'pos_transactions' || e.key === 'pos_submissions') {
+        loadData();
+    }
+});
+
+// ===================== INIT =====================
+document.addEventListener('DOMContentLoaded', function() {
+    updateAdminDisplay();
+    updateDate();
+    loadData();
+    
+    // Auto refresh setiap 30 detik
+    setInterval(() => {
+        loadData();
+    }, 30000);
+});
+</script>
+</body>
+</html>

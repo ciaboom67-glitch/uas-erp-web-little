@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Little Story - Barang Masuk</title>
+<!-- Tailwind CSS v3 CDN -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Google Fonts: Inter -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            earthy: {
+              DEFAULT: '#4d3310',
+              sidebar: '#4d3310',
+              surface: '#f8f9fa',
+              'surface-dim': '#d9dadb',
+              'surface-container': '#ffffff',
+            },
+            status: {
+              kritis: '#fee2e2',
+              'kritis-text': '#dc2626',
+              rendah: '#ffedd5',
+              'rendah-text': '#ea580c',
+              aman: '#dcfce7',
+              'aman-text': '#16a34a',
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          },
+        }
+      }
+    }
+  </script>
+<style>
+    * { box-sizing: border-box; }
+    body { background-color: #F8F9FA; }
+    .custom-shadow { box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03); }
+    aside::-webkit-scrollbar { width: 4px; }
+    aside::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 2px; }
+    .dashboard-content { padding: 24px 32px; }
+    .status-badge { padding: 4px 12px; border-radius: 9999px; font-size: 11px; font-weight: 600; display: inline-block; white-space: nowrap; }
+    .status-pending { background: #FEF3C7; color: #D97706; }
+    .status-approved { background: #D1FAE5; color: #059669; }
+    .status-rejected { background: #FEE2E2; color: #DC2626; }
+    .status-draft { background: #E5E7EB; color: #6B7280; }
+    .status-waiting { background: #FEF3C7; color: #D97706; }
+    .status-received { background: #D1FAE5; color: #059669; }
+    .status-kritis { background: #FEE2E2; color: #DC2626; }
+    .status-rendah { background: #FEF3C7; color: #D97706; }
+    .status-aman { background: #D1FAE5; color: #059669; }
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 100; align-items: center; justify-content: center; }
+    .modal-overlay.active { display: flex; }
+    .modal-content { background: white; border-radius: 16px; max-width: 640px; width: 100%; max-height: 90vh; overflow-y: auto; padding: 32px; margin: 16px; }
+    .table-container { padding: 4px 0; }
+    .table-container table { border-collapse: separate; border-spacing: 0; width: 100%; }
+    .table-container th, .table-container td { padding: 12px 14px; vertical-align: middle; }
+    .table-container thead th { padding: 12px 14px; font-weight: 600; font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em; color: #6B7280; background: #F9FAFB; border-bottom: 2px solid #E5E7EB; }
+    .table-container tbody tr { border-bottom: 1px solid #F3F4F6; transition: background-color 0.15s ease; }
+    .table-container tbody tr:last-child { border-bottom: none; }
+    .table-container tbody tr:hover { background-color: #FAFBFC; }
+    .table-container tbody td { padding: 12px 14px; font-size: 13px; line-height: 1.5; }
+    .action-buttons { display: flex; align-items: center; justify-content: center; gap: 5px; flex-wrap: nowrap; }
+    .action-buttons .btn { padding: 5px 10px; border-radius: 6px; font-size: 11px; font-weight: 600; transition: all 0.15s ease; cursor: pointer; border: none; text-decoration: none; display: inline-flex; align-items: center; gap: 3px; white-space: nowrap; line-height: 1.4; }
+    .action-buttons .btn svg { width: 14px; height: 14px; flex-shrink: 0; }
+    .action-buttons .btn-detail { color: #4d3310; background: #f0ebe6; }
+    .action-buttons .btn-detail:hover { background: #e0d6cc; }
+    .action-buttons .btn-delete { color: white; background: #DC2626; }
+    .action-buttons .btn-delete:hover { background: #B91C1C; }
+    .action-buttons .btn-receive { color: white; background: #16A34A; }
+    .action-buttons .btn-receive:hover { background: #15803D; }
+    .table-container td:first-child, .table-container th:first-child { width: 40px; text-align: center; }
+    @media (max-width: 768px) {
+      .dashboard-content { padding: 16px; }
+      .modal-content { padding: 20px; }
+      .table-container th, .table-container td { padding: 8px 10px; }
+      .table-container tbody td { font-size: 12px; }
+      .action-buttons { flex-wrap: wrap; gap: 3px; }
+      .action-buttons .btn { font-size: 10px; padding: 3px 7px; }
+      .action-buttons .btn svg { width: 12px; height: 12px; }
+    }
+  </style>
+</head>
+<body class="flex min-h-screen text-slate-800 bg-earthy-surface">
+<!-- BEGIN: Sidebar -->
+<aside class="w-64 bg-earthy-sidebar text-white flex-shrink-0 flex flex-col hidden lg:flex h-screen sticky top-0">
+<div class="p-5 flex items-center gap-3">
+<div class="w-8 h-8 bg-white rounded-md flex items-center justify-center flex-shrink-0">
+<div class="w-5 h-5 bg-earthy-sidebar rounded-sm"></div>
+</div>
+<div class="min-w-0">
+<h1 class="text-sm font-bold leading-none">Little Story</h1>
+<span class="text-[10px] opacity-70 tracking-wider">ENTERPRISE ERP</span>
+</div>
+</div>
+<nav class="flex-1 px-3 space-y-1 mt-4 overflow-y-auto">
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-white/60 hover:text-white hover:bg-white/5 transition-colors" href="gudang.html">
+<svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+          Dashboard
+        </a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-white/60 hover:text-white hover:bg-white/5 transition-colors" href="st.html">
+<svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+          Stok
+        </a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-white/10 text-white font-medium" href="#">
+<svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M7 16l-4-4m0 0l4-4m-4 4h18" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+          Barang Masuk
+        </a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-white/60 hover:text-white hover:bg-white/5 transition-colors" href="bk.html">
+<svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M17 8l4 4m0 0l-4 4m4-4H3" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+          Barang Keluar
+        </a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-white/60 hover:text-white hover:bg-white/5 transition-colors" href="pengajuan.html">
+<svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+          Pengajuan
+        </a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-white/60 hover:text-white hover:bg-white/5 transition-colors" href="pen.html">
+<svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+          Pengaturan
+        </a>
+</nav>
+</aside>
+<!-- END: Sidebar -->
+
+<!-- BEGIN: Main Content -->
+<main class="flex-1 flex flex-col min-w-0 bg-earthy-surface h-screen overflow-hidden">
+<!-- BEGIN: Top Header -->
+<header class="h-16 bg-white border-b border-earthy-surface-dim flex items-center justify-between px-6 lg:px-8 flex-shrink-0">
+<div class="relative w-64 lg:w-96">
+<span class="absolute inset-y-0 left-0 flex items-center pl-3">
+<svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</span>
+<input class="w-full pl-10 pr-4 py-2 bg-slate-100 border-none rounded-lg text-xs focus:ring-1 focus:ring-earthy placeholder:text-slate-400" placeholder="Cari transaksi barang masuk..." type="text" id="search-input"/>
+</div>
+<div class="flex items-center gap-4 lg:gap-6 flex-shrink-0">
+<div class="relative">
+<svg class="w-6 h-6 text-slate-500" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span class="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-white">3</span>
+</div>
+<div class="flex items-center gap-3">
+<div class="text-right hidden sm:block">
+<p class="text-sm font-semibold text-slate-800" id="admin-name">Budi Sentoso</p>
+<p class="text-xs text-slate-400 font-medium">KEPALA GUDANG</p>
+</div>
+<img alt="Admin Profile" class="w-10 h-10 rounded-full border-2 border-white custom-shadow object-cover flex-shrink-0" id="admin-avatar" src="https://ui-avatars.com/api/?name=Budi+Sentoso&background=4d3310&color=fff&size=128"/>
+<svg class="w-4 h-4 text-slate-400 hidden sm:block" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+</div>
+</header>
+<!-- END: Top Header -->
+
+<!-- BEGIN: Dashboard Body -->
+<div class="flex-1 overflow-y-auto dashboard-content">
+<div class="dashboard-container max-w-7xl mx-auto space-y-6">
+<!-- Page Title Row -->
+<div class="flex flex-wrap justify-between items-start gap-4 mb-2">
+<div class="min-w-0">
+<h2 class="text-2xl font-bold text-slate-800">Barang Masuk</h2>
+<p class="text-sm text-slate-500 mt-1" id="current-date">Kelola barang masuk berdasarkan pengajuan yang disetujui atasan</p>
+</div>
+</div>
+
+<!-- Summary Cards -->
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+<div class="bg-white rounded-xl custom-shadow border border-slate-100 p-4">
+<p class="text-xs text-slate-400 font-medium">Total Masuk</p>
+<p class="text-2xl font-bold text-slate-800" id="total-in">0</p>
+</div>
+<div class="bg-white rounded-xl custom-shadow border border-slate-100 p-4">
+<p class="text-xs text-slate-400 font-medium">Menunggu Diterima</p>
+<p class="text-2xl font-bold text-amber-600" id="pending-in">0</p>
+</div>
+<div class="bg-white rounded-xl custom-shadow border border-slate-100 p-4">
+<p class="text-xs text-slate-400 font-medium">Sudah Diterima</p>
+<p class="text-2xl font-bold text-green-600" id="received-in">0</p>
+</div>
+<div class="bg-white rounded-xl custom-shadow border border-slate-100 p-4">
+<p class="text-xs text-slate-400 font-medium">Total Item Masuk</p>
+<p class="text-2xl font-bold text-slate-800" id="total-items-in">0</p>
+</div>
+</div>
+
+<!-- Filter -->
+<div class="flex flex-wrap items-center justify-between gap-4">
+<div class="flex flex-wrap gap-2">
+<button class="status-filter-tab px-4 py-1.5 rounded-lg text-sm font-medium bg-earthy text-white" data-filter="all">Semua</button>
+<button class="status-filter-tab px-4 py-1.5 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100" data-filter="waiting">Menunggu</button>
+<button class="status-filter-tab px-4 py-1.5 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100" data-filter="received">Diterima</button>
+</div>
+<button class="text-sm text-slate-500 hover:text-earthy flex items-center gap-2" onclick="exportData()">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+Export
+</button>
+</div>
+
+<!-- In List -->
+<div class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden table-container">
+<div class="overflow-x-auto">
+<table>
+<thead>
+<tr>
+<th class="text-center">No.</th>
+<th>Tanggal</th>
+<th>Produk</th>
+<th class="text-center">Jumlah</th>
+<th>Satuan</th>
+<th>Supplier</th>
+<th class="text-center">Status</th>
+<th class="text-center">Aksi</th>
+</tr>
+</thead>
+<tbody id="in-table-body">
+<tr>
+<td colspan="8" class="text-center py-8 text-gray-400">Belum ada data barang masuk</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+<!-- END: Dashboard Body -->
+</main>
+<!-- END: Main Content -->
+
+<!-- BEGIN: Modal Detail -->
+<div class="modal-overlay" id="detail-modal">
+<div class="modal-content">
+<div class="flex justify-between items-center mb-5">
+<h2 class="text-xl font-bold text-gray-900" id="detail-title">Detail Barang Masuk</h2>
+<button class="text-gray-400 hover:text-gray-600 close-modal-btn">
+<svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12" stroke-width="2"/></svg>
+</button>
+</div>
+<div id="detail-content" class="space-y-3">
+<div class="grid grid-cols-2 gap-3">
+<div><span class="text-gray-500 text-sm">Tanggal</span><p class="font-semibold" id="d-date">-</p></div>
+<div><span class="text-gray-500 text-sm">Produk</span><p class="font-semibold" id="d-product">-</p></div>
+</div>
+<div class="grid grid-cols-2 gap-3">
+<div><span class="text-gray-500 text-sm">Jumlah</span><p class="font-semibold" id="d-qty">-</p></div>
+<div><span class="text-gray-500 text-sm">Satuan</span><p class="font-semibold" id="d-unit">-</p></div>
+</div>
+<div><span class="text-gray-500 text-sm">Supplier</span><p class="font-semibold" id="d-supplier">-</p></div>
+<div><span class="text-gray-500 text-sm">Status</span><p id="d-status">-</p></div>
+<div><span class="text-gray-500 text-sm">Catatan</span><p class="text-gray-700" id="d-notes">-</p></div>
+<div><span class="text-gray-500 text-sm">Dari Pengajuan</span><p class="font-semibold text-xs text-gray-500" id="d-purchase-id">-</p></div>
+<div id="d-received-info" style="display:none;">
+<span class="text-gray-500 text-sm">Diterima Pada</span>
+<p class="font-semibold" id="d-received-at">-</p>
+</div>
+</div>
+<div id="detail-actions" class="flex gap-3 mt-5 pt-4 border-t border-gray-100">
+<button class="flex-1 bg-gray-200 text-gray-600 px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-gray-300 transition close-modal-btn">Tutup</button>
+</div>
+</div>
+</div>
+<!-- END: Modal Detail -->
+
+<script>
+// ===================== ADMIN PROFILE =====================
+const ADMIN_PROFILE = {
+    name: 'Budi Sentoso',
+    avatar: 'https://ui-avatars.com/api/?name=Budi+Sentoso&background=4d3310&color=fff&size=128'
+};
+
+// ===================== DATA STORE =====================
+let stocks = [];
+let purchases = [];
+let inTransactions = [];
+let currentFilter = 'all';
+let syncInterval = null;
+
+// ===================== LOAD DATA =====================
+function loadStocks() {
+    try {
+        const saved = localStorage.getItem('pos_stocks');
+        if (saved) {
+            stocks = JSON.parse(saved);
+        } else {
+            stocks = [
+                { id: 1, code: 'BRG-001', name: 'Biji Kopi Arabica', category: 'Kopi', qty: 1.2, unit: 'kg', min: 2, location: 'Rak A-1' },
+                { id: 2, code: 'BRG-002', name: 'Susu Fresh Milk', category: 'Susu', qty: 2, unit: 'liter', min: 5, location: 'Rak B-2' },
+                { id: 3, code: 'BRG-003', name: 'Sirup Vanilla', category: 'Gula', qty: 1, unit: 'botol', min: 3, location: 'Rak C-1' },
+                { id: 4, code: 'BRG-004', name: 'Whipped Cream', category: 'Susu', qty: 3, unit: 'kaleng', min: 5, location: 'Rak B-3' },
+                { id: 5, code: 'BRG-005', name: 'Gula Aren Cair', category: 'Gula', qty: 12, unit: 'botol', min: 3, location: 'Rak C-2' },
+                { id: 6, code: 'BRG-006', name: 'Cokelat Bubuk', category: 'Cokelat', qty: 5, unit: 'kg', min: 2, location: 'Rak D-1' },
+                { id: 7, code: 'BRG-007', name: 'Paper Cup', category: 'Kemasan', qty: 500, unit: 'pcs', min: 100, location: 'Rak E-1' }
+            ];
+            localStorage.setItem('pos_stocks', JSON.stringify(stocks));
+        }
+    } catch(e) {
+        stocks = [];
+    }
+}
+
+function loadPurchases() {
+    try {
+        const saved = localStorage.getItem('pos_purchases');
+        if (saved) {
+            purchases = JSON.parse(saved);
+        } else {
+            purchases = [
+                { id: 1, date: new Date(Date.now() - 86400000 * 2).toISOString(), supplier: 'PT Sumber Makmur', itemName: 'Tepung Terigu 25kg', qty: 50, price: 12000, total: 600000, status: 'approved', notes: 'Untuk produksi roti bulan ini', submittedBy: 'Budi Sentoso', approvedBy: 'Manager', approvedAt: new Date(Date.now() - 86400000).toISOString() },
+                { id: 2, date: new Date(Date.now() - 86400000 * 3).toISOString(), supplier: 'CV Berkah Abadi', itemName: 'Gula Pasir 50kg', qty: 30, price: 15000, total: 450000, status: 'approved', notes: 'Stok gula menipis', submittedBy: 'Budi Sentoso', approvedBy: 'Manager', approvedAt: new Date(Date.now() - 86400000 * 2).toISOString() },
+                { id: 3, date: new Date(Date.now() - 86400000 * 4).toISOString(), supplier: 'UD Jaya Sentosa', itemName: 'Minyak Goreng 20L', qty: 20, price: 25000, total: 500000, status: 'rejected', notes: 'Harga terlalu tinggi', submittedBy: 'Budi Sentoso', rejectedBy: 'Manager', reason: 'Budget tidak mencukupi' },
+                { id: 4, date: new Date(Date.now() - 86400000 * 1).toISOString(), supplier: 'Toko Maju Jaya', itemName: 'Telur Ayam 30kg', qty: 100, price: 5000, total: 500000, status: 'pending', notes: 'Perlu persetujuan cepat', submittedBy: 'Budi Sentoso' }
+            ];
+            localStorage.setItem('pos_purchases', JSON.stringify(purchases));
+        }
+    } catch(e) {
+        purchases = [];
+    }
+}
+
+function loadInTransactions() {
+    try {
+        const saved = localStorage.getItem('pos_in_transactions');
+        if (saved) {
+            inTransactions = JSON.parse(saved);
+        } else {
+            inTransactions = [];
+            localStorage.setItem('pos_in_transactions', JSON.stringify(inTransactions));
+        }
+    } catch(e) {
+        inTransactions = [];
+    }
+}
+
+function saveStocks() {
+    try {
+        localStorage.setItem('pos_stocks', JSON.stringify(stocks));
+    } catch(e) {}
+}
+
+function savePurchases() {
+    try {
+        localStorage.setItem('pos_purchases', JSON.stringify(purchases));
+    } catch(e) {}
+}
+
+function saveInTransactions() {
+    try {
+        localStorage.setItem('pos_in_transactions', JSON.stringify(inTransactions));
+    } catch(e) {}
+}
+
+// ===================== SYNC WITH PURCHASES =====================
+function syncWithPurchases() {
+    // Cari semua pengajuan yang sudah disetujui tapi belum masuk ke inTransactions
+    const approvedPurchases = purchases.filter(p => p.status === 'approved' || p.status === 'received');
+    const existingPurchaseIds = inTransactions.map(t => t.purchaseId).filter(Boolean);
+    
+    let newTransactions = [];
+    let maxId = inTransactions.length > 0 ? Math.max(...inTransactions.map(t => t.id)) : 0;
+    
+    approvedPurchases.forEach(p => {
+        // Skip jika sudah ada di inTransactions
+        if (existingPurchaseIds.includes(p.id)) return;
+        
+        // Skip jika statusnya received tapi belum ada di inTransactions (kemungkinan data corrupt)
+        if (p.status === 'received') return;
+        
+        maxId++;
+        newTransactions.push({
+            id: maxId,
+            purchaseId: p.id,
+            productName: p.itemName,
+            qty: p.qty,
+            unit: 'kg',
+            supplier: p.supplier,
+            status: 'waiting',
+            notes: p.notes || '',
+            date: new Date().toISOString()
+        });
+    });
+    
+    if (newTransactions.length > 0) {
+        inTransactions = [...inTransactions, ...newTransactions];
+        saveInTransactions();
+        showNotification(`${newTransactions.length} pengajuan baru masuk ke daftar barang masuk!`, 'success');
+    }
+}
+
+// ===================== HELPERS =====================
+function formatDate(dateStr) {
+    if (!dateStr) return '-';
+    const d = new Date(dateStr);
+    return d.toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+}
+
+function formatDateShort(dateStr) {
+    if (!dateStr) return '-';
+    const d = new Date(dateStr);
+    return d.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
+}
+
+function getStatusBadge(status) {
+    const map = {
+        'waiting': '<span class="status-badge status-waiting">Menunggu</span>',
+        'received': '<span class="status-badge status-received">Diterima</span>',
+        'approved': '<span class="status-badge status-approved">Disetujui</span>',
+        'rejected': '<span class="status-badge status-rejected">Ditolak</span>',
+        'pending': '<span class="status-badge status-pending">Menunggu</span>',
+        'draft': '<span class="status-badge status-draft">Draft</span>'
+    };
+    return map[status] || '<span class="status-badge status-draft">' + status + '</span>';
+}
+
+function getStockByName(name) {
+    return stocks.find(s => s.name.toLowerCase() === name.toLowerCase());
+}
+
+function findOrCreateStock(productName, unit, qty) {
+    let stock = getStockByName(productName);
+    
+    if (!stock) {
+        // Try to find by partial match
+        stock = stocks.find(s => productName.toLowerCase().includes(s.name.toLowerCase()) || s.name.toLowerCase().includes(productName.toLowerCase()));
+    }
+    
+    if (!stock) {
+        // Create new stock item
+        const newId = stocks.length > 0 ? Math.max(...stocks.map(s => s.id)) + 1 : 1;
+        const newStock = {
+            id: newId,
+            code: `BRG-${String(newId).padStart(3, '0')}`,
+            name: productName,
+            category: 'Lainnya',
+            qty: 0,
+            unit: unit || 'kg',
+            min: Math.max(1, Math.ceil(qty * 0.1)),
+            location: 'Rak Baru'
+        };
+        stocks.push(newStock);
+        saveStocks();
+        return newStock;
+    }
+    
+    return stock;
+}
+
+// ===================== UPDATE DISPLAY =====================
+function updateAdminDisplay() {
+    const nameEl = document.getElementById('admin-name');
+    const avatarEl = document.getElementById('admin-avatar');
+    if (nameEl) nameEl.textContent = ADMIN_PROFILE.name;
+    if (avatarEl) avatarEl.src = ADMIN_PROFILE.avatar;
+}
+
+function updateDashboard() {
+    // Update date
+    const now = new Date();
+    const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+    const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+    document.getElementById('current-date').textContent = `Kelola barang masuk berdasarkan pengajuan yang disetujui atasan - ${days[now.getDay()]}, ${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
+
+    // Filter transactions
+    let filtered = inTransactions;
+    if (currentFilter === 'waiting') {
+        filtered = inTransactions.filter(t => t.status === 'waiting');
+    } else if (currentFilter === 'received') {
+        filtered = inTransactions.filter(t => t.status === 'received');
+    }
+
+    // Search
+    const searchQuery = document.getElementById('search-input')?.value?.toLowerCase() || '';
+    if (searchQuery) {
+        filtered = filtered.filter(t => 
+            t.productName.toLowerCase().includes(searchQuery) || 
+            t.supplier.toLowerCase().includes(searchQuery)
+        );
+    }
+
+    // Update summary
+    document.getElementById('total-in').textContent = inTransactions.length;
+    document.getElementById('pending-in').textContent = inTransactions.filter(t => t.status === 'waiting').length;
+    document.getElementById('received-in').textContent = inTransactions.filter(t => t.status === 'received').length;
+    document.getElementById('total-items-in').textContent = inTransactions.reduce((sum, t) => sum + t.qty, 0);
+
+    // Render table
+    const tbody = document.getElementById('in-table-body');
+    if (filtered.length === 0) {
+        const msg = currentFilter === 'all' ? 'Belum ada data barang masuk' : 'Tidak ada data dengan filter ini';
+        tbody.innerHTML = `<tr><td colspan="8" class="text-center py-8 text-gray-400">${msg}</td></tr>`;
+        return;
+    }
+
+    tbody.innerHTML = filtered.map((t, index) => `
+        <tr>
+            <td class="text-center font-medium text-gray-500">${index + 1}</td>
+            <td class="text-gray-700">${formatDateShort(t.date)}</td>
+            <td class="font-semibold text-gray-700">${t.productName}</td>
+            <td class="text-center font-medium text-slate-800">${t.qty}</td>
+            <td class="text-gray-500">${t.unit || 'kg'}</td>
+            <td class="text-gray-600">${t.supplier}</td>
+            <td class="text-center">${getStatusBadge(t.status)}</td>
+            <td>
+                <div class="action-buttons">
+                    <button class="btn btn-detail detail-btn" data-id="${t.id}">
+                        <svg fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/><path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+                    </button>
+                    ${t.status === 'waiting' ? `
+                        <button class="btn btn-receive receive-btn" data-id="${t.id}">
+                            <svg fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+                            Terima
+                        </button>
+                    ` : ''}
+                    <button class="btn btn-delete delete-btn" data-id="${t.id}">
+                        <svg fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+                    </button>
+                </div>
+            </td>
+        </tr>
+    `).join('');
+
+    // Attach event listeners
+    document.querySelectorAll('.detail-btn').forEach(btn => {
+        btn.addEventListener('click', () => openDetail(parseInt(btn.dataset.id)));
+    });
+    document.querySelectorAll('.receive-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            receiveStock(parseInt(btn.dataset.id));
+        });
+    });
+    document.querySelectorAll('.delete-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            deleteIn(parseInt(btn.dataset.id));
+        });
+    });
+}
+
+// ===================== RECEIVE STOCK =====================
+function receiveStock(id) {
+    const transaction = inTransactions.find(t => t.id === id);
+    if (!transaction) {
+        alert('Transaksi tidak ditemukan!');
+        return;
+    }
+
+    if (transaction.status === 'received') {
+        alert('Barang ini sudah diterima!');
+        return;
+    }
+
+    if (!confirm(`Terima barang masuk "${transaction.productName}" sebanyak ${transaction.qty} ${transaction.unit || 'kg'} dari ${transaction.supplier}?`)) return;
+
+    // Find or create stock
+    const stock = findOrCreateStock(transaction.productName, transaction.unit, transaction.qty);
+    
+    if (stock) {
+        stock.qty += transaction.qty;
+        saveStocks();
+    }
+
+    // Update transaction status
+    transaction.status = 'received';
+    transaction.receivedAt = new Date().toISOString();
+    
+    // Update the associated purchase status if exists
+    if (transaction.purchaseId) {
+        const purchase = purchases.find(p => p.id === transaction.purchaseId);
+        if (purchase) {
+            purchase.status = 'received';
+            purchase.receivedAt = new Date().toISOString();
+            savePurchases();
+        }
+    }
+
+    saveInTransactions();
+    updateDashboard();
+    showNotification(`${transaction.qty} ${transaction.unit || 'kg'} ${transaction.productName} berhasil diterima dan stok bertambah!`, 'success');
+}
+
+// ===================== OPEN DETAIL =====================
+function openDetail(id) {
+    const t = inTransactions.find(item => item.id === id);
+    if (!t) return;
+
+    document.getElementById('detail-title').textContent = `Detail Barang Masuk #${t.id}`;
+    document.getElementById('d-date').textContent = formatDate(t.date);
+    document.getElementById('d-product').textContent = t.productName;
+    document.getElementById('d-qty').textContent = t.qty;
+    document.getElementById('d-unit').textContent = t.unit || 'kg';
+    document.getElementById('d-supplier').textContent = t.supplier;
+    document.getElementById('d-status').innerHTML = getStatusBadge(t.status);
+    document.getElementById('d-notes').textContent = t.notes || '-';
+    document.getElementById('d-purchase-id').textContent = t.purchaseId ? `Pengajuan #${t.purchaseId}` : '-';
+    
+    // Show received info if received
+    const receivedInfo = document.getElementById('d-received-info');
+    if (t.status === 'received' && t.receivedAt) {
+        receivedInfo.style.display = 'block';
+        document.getElementById('d-received-at').textContent = formatDate(t.receivedAt);
+    } else {
+        receivedInfo.style.display = 'none';
+    }
+
+    document.getElementById('detail-modal').classList.add('active');
+}
+
+// ===================== DELETE IN =====================
+function deleteIn(id) {
+    const t = inTransactions.find(item => item.id === id);
+    if (!t) return;
+    if (!confirm(`Hapus data barang masuk "${t.productName}"?`)) return;
+    
+    // If already received, reduce stock
+    if (t.status === 'received') {
+        const stock = getStockByName(t.productName);
+        if (stock) {
+            stock.qty -= t.qty;
+            if (stock.qty < 0) stock.qty = 0;
+            saveStocks();
+        }
+    }
+    
+    // If has purchase, revert status back to approved
+    if (t.purchaseId) {
+        const purchase = purchases.find(p => p.id === t.purchaseId);
+        if (purchase && purchase.status === 'received') {
+            purchase.status = 'approved';
+            purchase.receivedAt = undefined;
+            savePurchases();
+        }
+    }
+    
+    inTransactions = inTransactions.filter(item => item.id !== id);
+    saveInTransactions();
+    updateDashboard();
+    showNotification('Data barang masuk berhasil dihapus!', 'info');
+}
+
+// ===================== NOTIFICATION =====================
+function showNotification(message, type = 'success') {
+    const colors = {
+        success: 'bg-green-600',
+        error: 'bg-red-600',
+        warning: 'bg-amber-600',
+        info: 'bg-blue-600'
+    };
+    
+    const notification = document.createElement('div');
+    notification.className = `fixed top-4 right-4 ${colors[type] || 'bg-earthy'} text-white px-6 py-3 rounded-xl shadow-lg z-50 transform transition-all duration-500 translate-x-full`;
+    notification.style.transition = 'transform 0.5s ease-in-out';
+    notification.innerHTML = `
+        <div class="flex items-center gap-3">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+                <path d="${type === 'success' ? 'M5 13l4 4L19 7' : type === 'error' ? 'M6 18L18 6M6 6l12 12' : 'M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z'}" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+            </svg>
+            <span class="font-medium">${message}</span>
+        </div>
+    `;
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.style.transform = 'translateX(0)';
+    }, 100);
+    
+    setTimeout(() => {
+        notification.style.transform = 'translateX(100%)';
+        setTimeout(() => {
+            notification.remove();
+        }, 500);
+    }, 3000);
+}
+
+// ===================== EXPORT =====================
+function exportData() {
+    if (inTransactions.length === 0) {
+        alert('Tidak ada data untuk diexport!');
+        return;
+    }
+    
+    let csv = 'No,Tanggal,Produk,Jumlah,Satuan,Supplier,Status,Catatan\n';
+    inTransactions.forEach((t, i) => {
+        const statusText = t.status === 'waiting' ? 'Menunggu' : 'Diterima';
+        csv += `${i+1},${formatDate(t.date)},${t.productName},${t.qty},${t.unit || 'kg'},${t.supplier},${statusText},${t.notes || ''}\n`;
+    });
+    
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    const now = new Date();
+    const dateStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
+    a.download = `barang_masuk_${dateStr}.csv`;
+    a.click();
+    window.URL.revokeObjectURL(url);
+    showNotification('Data berhasil diexport!', 'success');
+}
+
+// ===================== FILTER TABS =====================
+document.querySelectorAll('.status-filter-tab').forEach(tab => {
+    tab.addEventListener('click', function() {
+        document.querySelectorAll('.status-filter-tab').forEach(t => {
+            t.className = 'status-filter-tab px-4 py-1.5 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100';
+        });
+        this.className = 'status-filter-tab px-4 py-1.5 rounded-lg text-sm font-medium bg-earthy text-white';
+        currentFilter = this.dataset.filter;
+        updateDashboard();
+    });
+});
+
+// ===================== SEARCH =====================
+document.getElementById('search-input').addEventListener('input', function() {
+    updateDashboard();
+});
+
+// ===================== MODAL CONTROLS =====================
+document.querySelectorAll('.close-modal-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        document.getElementById('detail-modal').classList.remove('active');
+    });
+});
+
+// Close modal on overlay click
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+    overlay.addEventListener('click', function(e) {
+        if (e.target === this) {
+            this.classList.remove('active');
+        }
+    });
+});
+
+// ===================== STORAGE LISTENER =====================
+window.addEventListener('storage', function(e) {
+    if (e.key === 'pos_stocks') {
+        loadStocks();
+    }
+    if (e.key === 'pos_purchases') {
+        loadPurchases();
+        syncWithPurchases();
+        updateDashboard();
+    }
+    if (e.key === 'pos_in_transactions') {
+        loadInTransactions();
+        updateDashboard();
+    }
+});
+
+// ===================== INIT =====================
+document.addEventListener('DOMContentLoaded', function() {
+    updateAdminDisplay();
+    loadStocks();
+    loadPurchases();
+    loadInTransactions();
+    
+    // Sinkronisasi dengan pengajuan yang sudah disetujui
+    syncWithPurchases();
+    
+    updateDashboard();
+    
+    // Auto-sync every 10 seconds
+    if (syncInterval) clearInterval(syncInterval);
+    syncInterval = setInterval(() => {
+        loadPurchases();
+        syncWithPurchases();
+        updateDashboard();
+    }, 10000);
+});
+</script>
+</body>
+</html>

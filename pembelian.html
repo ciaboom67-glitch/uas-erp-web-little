@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Little Story - Manajemen Pembelian</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'sidebar-bg': '#432C0B',
+            'sidebar-active': '#5D4017',
+            'brand-purple': '#6359E9',
+            'brand-light-purple': '#F5F4FF',
+            'dashboard-bg': '#F8F9FA',
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          },
+        }
+      }
+    }
+  </script>
+<style>
+    body {
+      background-color: #F8F9FA;
+    }
+    .custom-shadow {
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+    }
+    aside::-webkit-scrollbar {
+      width: 4px;
+    }
+    aside::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 2px;
+    }
+    .dashboard-content {
+      padding: 24px 32px;
+    }
+    .status-badge {
+      padding: 4px 12px;
+      border-radius: 9999px;
+      font-size: 11px;
+      font-weight: 600;
+      display: inline-block;
+    }
+    .status-pending {
+      background: #FEF3C7;
+      color: #D97706;
+    }
+    .status-approved {
+      background: #D1FAE5;
+      color: #059669;
+    }
+    .status-rejected {
+      background: #FEE2E2;
+      color: #DC2626;
+    }
+    .status-draft {
+      background: #E5E7EB;
+      color: #6B7280;
+    }
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-overlay.active {
+      display: flex;
+    }
+    .modal-content {
+      background: white;
+      border-radius: 16px;
+      max-width: 640px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 32px;
+      margin: 16px;
+    }
+    @media (max-width: 768px) {
+      .dashboard-content {
+        padding: 16px;
+      }
+      .modal-content {
+        padding: 20px;
+      }
+    }
+  </style>
+</head>
+<body class="flex min-h-screen text-slate-800">
+<!-- BEGIN: Sidebar -->
+<aside class="w-64 bg-sidebar-bg text-white flex-shrink-0 flex flex-col hidden lg:flex h-screen sticky top-0">
+<div class="p-6 flex items-center space-x-3">
+<div class="w-8 h-8 bg-white/20 rounded flex items-center justify-center">
+<svg class="h-5 w-5" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<span class="font-bold text-lg tracking-tight">Little Story</span>
+</div>
+<nav class="flex-1 px-4 py-2 space-y-1 overflow-y-auto">
+<a class="flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium text-white/70 hover:bg-white/5 hover:text-white transition-colors" href="manajer.html">
+<svg class="w-5 h-5" fill="currentColor" viewbox="0 0 20 20"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path></svg>
+<span>Dashboard</span>
+</a>
+<a class="flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium text-white/70 hover:bg-white/5 hover:text-white transition-colors" href="penjualan.html">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span>Penjualan</span>
+</a>
+<a class="flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium text-white/70 hover:bg-white/5 hover:text-white transition-colors" href="pro.html">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span>Produk</span>
+</a>
+<a class="flex items-center space-x-3 bg-sidebar-active px-4 py-3 rounded-lg text-sm font-medium" href="#">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span>Pembelian</span>
+</a>
+<a class="flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium text-white/70 hover:bg-white/5 hover:text-white transition-colors" href="karyawan.html">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span>Karyawan</span>
+</a>
+<a class="flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium text-white/70 hover:bg-white/5 hover:text-white transition-colors" href="laporan.html">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span>Laporan</span>
+</a>
+<a class="flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium text-white/70 hover:bg-white/5 hover:text-white transition-colors" href="persetujuan.html">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span>Persetujuan</span>
+</a>
+<a class="flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium text-white/70 hover:bg-white/5 hover:text-white transition-colors" href="peng.html">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span>Pengaturan</span>
+</a>
+</nav>
+</aside>
+<!-- END: Sidebar -->
+
+<!-- BEGIN: Main Content -->
+<main class="flex-1 flex flex-col min-w-0 bg-dashboard-bg h-screen overflow-hidden">
+<!-- BEGIN: Top Header -->
+<header class="h-16 bg-white border-b border-gray-100 flex items-center justify-between px-8 flex-shrink-0">
+<div class="relative w-96">
+<span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400">
+<svg class="h-5 w-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</span>
+<input class="block w-full pl-10 pr-3 py-2 border-none bg-gray-100 rounded-lg text-sm focus:ring-brand-purple focus:ring-1" placeholder="Cari data, laporan, atau menu..." type="text"/>
+</div>
+<div class="flex items-center space-x-4">
+<div class="text-right">
+<p class="text-sm font-semibold text-gray-800" id="">Manajer</p>
+<p class="text-xs text-gray-400">Siti Rahayu</p>
+</div>
+<img alt="Admin Profile" class="w-10 h-10 rounded-full border-2 border-white custom-shadow" id="admin-avatar" src="https://ui-avatars.com/api/?name=Admin+Gudang&background=6359E9&color=fff&size=128"/>
+</div>
+</header>
+<!-- END: Top Header -->
+
+<!-- BEGIN: Dashboard Body -->
+<div class="flex-1 overflow-y-auto dashboard-content">
+<div class="max-w-7xl mx-auto space-y-6">
+<!-- Page Title Row -->
+<div class="flex flex-wrap justify-between items-center gap-4 mb-2">
+<div>
+<h1 class="text-2xl font-bold text-gray-900">Manajemen Pembelian</h1>
+<p class="text-sm text-gray-500 mt-1" id="current-date">Kelola pengajuan pembelian barang dari bagian gudang</p>
+</div>
+<div class="flex gap-3">
+<button id="filter-btn" class="border border-gray-200 bg-white px-4 py-2.5 rounded-lg text-sm font-medium flex items-center space-x-2 hover:bg-gray-50 transition">
+<svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+<span>Filter</span>
+</button>
+</div>
+</div>
+
+<!-- Status Filter Tabs -->
+<div class="flex flex-wrap gap-2 border-b border-gray-200 pb-3">
+<button class="status-filter-tab px-4 py-1.5 rounded-lg text-sm font-medium bg-brand-purple text-white" data-status="all">Semua</button>
+<button class="status-filter-tab px-4 py-1.5 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100" data-status="pending">Menunggu</button>
+<button class="status-filter-tab px-4 py-1.5 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100" data-status="approved">Disetujui</button>
+<button class="status-filter-tab px-4 py-1.5 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100" data-status="rejected">Ditolak</button>
+</div>
+
+<!-- Summary Cards -->
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+<div class="bg-white rounded-xl custom-shadow border border-gray-50 p-4">
+<p class="text-xs text-gray-400 font-medium">Total Pengajuan</p>
+<p class="text-2xl font-bold text-gray-900" id="total-purchases">0</p>
+</div>
+<div class="bg-white rounded-xl custom-shadow border border-gray-50 p-4">
+<p class="text-xs text-gray-400 font-medium">Menunggu Persetujuan</p>
+<p class="text-2xl font-bold text-amber-600" id="pending-count">0</p>
+</div>
+<div class="bg-white rounded-xl custom-shadow border border-gray-50 p-4">
+<p class="text-xs text-gray-400 font-medium">Disetujui</p>
+<p class="text-2xl font-bold text-green-600" id="approved-count">0</p>
+</div>
+<div class="bg-white rounded-xl custom-shadow border border-gray-50 p-4">
+<p class="text-xs text-gray-400 font-medium">Ditolak</p>
+<p class="text-2xl font-bold text-red-600" id="rejected-count">0</p>
+</div>
+</div>
+
+<!-- Purchase List -->
+<div class="bg-white rounded-2xl custom-shadow border border-gray-50 overflow-hidden">
+<div class="overflow-x-auto">
+<table class="w-full text-sm">
+<thead>
+<tr class="border-b border-gray-100 bg-gray-50/50">
+<th class="text-left px-5 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">No.</th>
+<th class="text-left px-5 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">Tanggal</th>
+<th class="text-left px-5 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">Supplier</th>
+<th class="text-left px-5 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">Item</th>
+<th class="text-left px-5 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">Jumlah</th>
+<th class="text-left px-5 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">Total</th>
+<th class="text-left px-5 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
+<th class="text-left px-5 py-3.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">Diajukan Oleh</th>
+</tr>
+</thead>
+<tbody id="purchase-table-body">
+<tr>
+<td colspan="8" class="text-center py-8 text-gray-400">Belum ada data pembelian</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+<!-- END: Dashboard Body -->
+</main>
+<!-- END: Main Content -->
+
+<!-- BEGIN: Modal Detail Pembelian -->
+<div class="modal-overlay" id="detail-modal">
+<div class="modal-content">
+<div class="flex justify-between items-center mb-5">
+<h2 class="text-xl font-bold text-gray-900" id="detail-title">Detail Pembelian</h2>
+<button class="text-gray-400 hover:text-gray-600 close-modal-btn">
+<svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12" stroke-width="2"/></svg>
+</button>
+</div>
+<div id="detail-content" class="space-y-3">
+<div class="grid grid-cols-2 gap-3">
+<div><span class="text-gray-500 text-sm">Supplier</span><p class="font-semibold" id="d-supplier">-</p></div>
+<div><span class="text-gray-500 text-sm">Tanggal</span><p class="font-semibold" id="d-date">-</p></div>
+</div>
+<div class="grid grid-cols-2 gap-3">
+<div><span class="text-gray-500 text-sm">Item</span><p class="font-semibold" id="d-item">-</p></div>
+<div><span class="text-gray-500 text-sm">Jumlah</span><p class="font-semibold" id="d-qty">-</p></div>
+</div>
+<div><span class="text-gray-500 text-sm">Total Harga</span><p class="font-semibold text-xl text-brand-purple" id="d-total">-</p></div>
+<div><span class="text-gray-500 text-sm">Status</span><p id="d-status">-</p></div>
+<div><span class="text-gray-500 text-sm">Catatan</span><p class="text-gray-700" id="d-notes">-</p></div>
+<div><span class="text-gray-500 text-sm">Diajukan Oleh</span><p class="font-semibold" id="d-submitted-by">-</p></div>
+</div>
+<div id="detail-actions" class="flex gap-3 mt-5 pt-4 border-t border-gray-100"></div>
+</div>
+</div>
+<!-- END: Modal Detail -->
+
+<script>
+// ===================== ADMIN PROFILE =====================
+const ADMIN_PROFILE = {
+    name: 'Admin Gudang',
+    avatar: 'https://ui-avatars.com/api/?name=Admin+Gudang&background=6359E9&color=fff&size=128'
+};
+
+// ===================== DATA STORE =====================
+let purchases = [];
+let currentFilter = 'all';
+let selectedPurchaseId = null;
+
+// Load data from localStorage
+function loadPurchases() {
+    try {
+        const saved = localStorage.getItem('pos_purchases');
+        if (saved) {
+            purchases = JSON.parse(saved);
+        } else {
+            // Sample data - semua diajukan oleh Admin Gudang
+            purchases = [
+                {
+                    id: 1,
+                    date: new Date(Date.now() - 86400000 * 2).toISOString(),
+                    supplier: 'PT Sumber Makmur',
+                    itemName: 'Tepung Terigu 25kg',
+                    qty: 50,
+                    price: 12000,
+                    total: 600000,
+                    status: 'approved',
+                    notes: 'Untuk produksi roti bulan ini',
+                    submittedBy: 'Admin Gudang',
+                    approvedBy: 'Admin Gudang',
+                    approvedAt: new Date(Date.now() - 86400000).toISOString()
+                },
+                {
+                    id: 2,
+                    date: new Date(Date.now() - 86400000 * 3).toISOString(),
+                    supplier: 'CV Berkah Abadi',
+                    itemName: 'Gula Pasir 50kg',
+                    qty: 30,
+                    price: 15000,
+                    total: 450000,
+                    status: 'pending',
+                    notes: 'Stok gula menipis',
+                    submittedBy: 'Admin Gudang'
+                },
+                {
+                    id: 3,
+                    date: new Date(Date.now() - 86400000 * 4).toISOString(),
+                    supplier: 'UD Jaya Sentosa',
+                    itemName: 'Minyak Goreng 20L',
+                    qty: 20,
+                    price: 25000,
+                    total: 500000,
+                    status: 'rejected',
+                    notes: 'Harga terlalu tinggi',
+                    submittedBy: 'Admin Gudang',
+                    rejectedBy: 'Admin Gudang',
+                    rejectedAt: new Date(Date.now() - 86400000 * 2).toISOString(),
+                    reason: 'Budget tidak mencukupi'
+                },
+                {
+                    id: 4,
+                    date: new Date(Date.now() - 86400000 * 1).toISOString(),
+                    supplier: 'Toko Maju Jaya',
+                    itemName: 'Telur Ayam 30kg',
+                    qty: 100,
+                    price: 5000,
+                    total: 500000,
+                    status: 'draft',
+                    notes: 'Perlu persetujuan cepat',
+                    submittedBy: 'Admin Gudang'
+                }
+            ];
+            savePurchases();
+        }
+    } catch(e) {
+        purchases = [];
+    }
+}
+
+function savePurchases() {
+    try {
+        localStorage.setItem('pos_purchases', JSON.stringify(purchases));
+    } catch(e) {}
+}
+
+// ===================== FORMAT HELPERS =====================
+function formatPrice(num) {
+    return 'Rp ' + (num || 0).toLocaleString('id-ID');
+}
+
+function formatDate(dateStr) {
+    if (!dateStr) return '-';
+    const d = new Date(dateStr);
+    return d.toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' });
+}
+
+function formatDateTime(dateStr) {
+    if (!dateStr) return '-';
+    const d = new Date(dateStr);
+    return d.toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+}
+
+function getStatusBadge(status) {
+    const map = {
+        'draft': '<span class="status-badge status-draft">Draft</span>',
+        'pending': '<span class="status-badge status-pending">Menunggu</span>',
+        'approved': '<span class="status-badge status-approved">Disetujui</span>',
+        'rejected': '<span class="status-badge status-rejected">Ditolak</span>'
+    };
+    return map[status] || '<span class="status-badge status-draft">' + status + '</span>';
+}
+
+// ===================== GENERATE ID =====================
+function generateId() {
+    return purchases.length > 0 ? Math.max(...purchases.map(p => p.id)) + 1 : 1;
+}
+
+// ===================== UPDATE DISPLAY =====================
+function updateAdminDisplay() {
+    const nameEl = document.getElementById('admin-name');
+    const avatarEl = document.getElementById('admin-avatar');
+    if (nameEl) nameEl.textContent = ADMIN_PROFILE.name;
+    if (avatarEl) avatarEl.src = ADMIN_PROFILE.avatar;
+}
+
+function updateDashboard() {
+    // Update date
+    const now = new Date();
+    const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+    const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+    document.getElementById('current-date').textContent = `Kelola pengajuan pembelian barang dari bagian gudang - ${days[now.getDay()]}, ${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
+
+    // Filter purchases
+    let filtered = purchases;
+    if (currentFilter !== 'all') {
+        filtered = purchases.filter(p => p.status === currentFilter);
+    }
+
+    // Update summary
+    document.getElementById('total-purchases').textContent = purchases.length;
+    document.getElementById('pending-count').textContent = purchases.filter(p => p.status === 'pending').length;
+    document.getElementById('approved-count').textContent = purchases.filter(p => p.status === 'approved').length;
+    document.getElementById('rejected-count').textContent = purchases.filter(p => p.status === 'rejected').length;
+
+    // Render table
+    const tbody = document.getElementById('purchase-table-body');
+    if (filtered.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" class="text-center py-8 text-gray-400">Tidak ada data pembelian dengan status ini</td></tr>';
+        return;
+    }
+
+    tbody.innerHTML = filtered.map((p, index) => `
+        <tr class="border-b border-gray-50 hover:bg-gray-50/50 transition cursor-pointer" onclick="openDetail(${p.id})">
+            <td class="px-5 py-3.5 text-gray-500 font-medium">${index + 1}</td>
+            <td class="px-5 py-3.5 text-gray-700">${formatDate(p.date)}</td>
+            <td class="px-5 py-3.5 text-gray-700 font-medium">${p.supplier}</td>
+            <td class="px-5 py-3.5 text-gray-700">${p.itemName}</td>
+            <td class="px-5 py-3.5 text-gray-700">${p.qty} unit</td>
+            <td class="px-5 py-3.5 text-gray-700 font-semibold">${formatPrice(p.total)}</td>
+            <td class="px-5 py-3.5">${getStatusBadge(p.status)}</td>
+            <td class="px-5 py-3.5 text-gray-600 text-sm">${p.submittedBy}</td>
+        </tr>
+    `).join('');
+}
+
+// ===================== OPEN DETAIL =====================
+function openDetail(id) {
+    const p = purchases.find(item => item.id === id);
+    if (!p) return;
+
+    selectedPurchaseId = id;
+    document.getElementById('detail-title').textContent = `Detail Pembelian #${p.id}`;
+    document.getElementById('d-supplier').textContent = p.supplier;
+    document.getElementById('d-date').textContent = formatDateTime(p.date);
+    document.getElementById('d-item').textContent = p.itemName;
+    document.getElementById('d-qty').textContent = p.qty + ' unit';
+    document.getElementById('d-total').textContent = formatPrice(p.total);
+    document.getElementById('d-status').innerHTML = getStatusBadge(p.status);
+    document.getElementById('d-notes').textContent = p.notes || '-';
+    document.getElementById('d-submitted-by').textContent = p.submittedBy;
+
+    const actions = document.getElementById('detail-actions');
+    if (p.status === 'pending') {
+        actions.innerHTML = `
+            <button class="flex-1 bg-green-600 text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-green-700 transition approve-btn" data-id="${p.id}">Setujui</button>
+            <button class="flex-1 bg-red-600 text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-red-700 transition reject-btn" data-id="${p.id}">Tolak</button>
+            <button class="flex-1 bg-gray-200 text-gray-600 px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-gray-300 transition close-modal-btn">Tutup</button>
+        `;
+        actions.querySelector('.approve-btn').addEventListener('click', (e) => {
+            e.stopPropagation();
+            approvePurchase(p.id);
+            document.getElementById('detail-modal').classList.remove('active');
+        });
+        actions.querySelector('.reject-btn').addEventListener('click', (e) => {
+            e.stopPropagation();
+            rejectPurchase(p.id);
+            document.getElementById('detail-modal').classList.remove('active');
+        });
+        actions.querySelector('.close-modal-btn').addEventListener('click', () => {
+            document.getElementById('detail-modal').classList.remove('active');
+        });
+    } else {
+        actions.innerHTML = `
+            <button class="flex-1 bg-gray-200 text-gray-600 px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-gray-300 transition close-modal-btn">Tutup</button>
+        `;
+        actions.querySelector('.close-modal-btn').addEventListener('click', () => {
+            document.getElementById('detail-modal').classList.remove('active');
+        });
+    }
+
+    document.getElementById('detail-modal').classList.add('active');
+}
+
+// ===================== APPROVE PURCHASE =====================
+function approvePurchase(id) {
+    const p = purchases.find(item => item.id === id);
+    if (!p) return;
+    if (!confirm(`Setujui pembelian "${p.itemName}" dari ${p.supplier}?`)) return;
+    
+    p.status = 'approved';
+    p.approvedBy = 'Admin Gudang';
+    p.approvedAt = new Date().toISOString();
+    savePurchases();
+    updateDashboard();
+    alert('Pembelian berhasil disetujui!');
+}
+
+// ===================== REJECT PURCHASE =====================
+function rejectPurchase(id) {
+    const p = purchases.find(item => item.id === id);
+    if (!p) return;
+    const reason = prompt('Masukkan alasan penolakan:', 'Budget tidak mencukupi');
+    if (reason === null) return;
+    
+    p.status = 'rejected';
+    p.rejectedBy = 'Admin Gudang';
+    p.rejectedAt = new Date().toISOString();
+    p.reason = reason || 'Tidak ada alasan';
+    savePurchases();
+    updateDashboard();
+    alert('Pembelian ditolak!');
+}
+
+// ===================== STATUS FILTER TABS =====================
+document.querySelectorAll('.status-filter-tab').forEach(tab => {
+    tab.addEventListener('click', function() {
+        document.querySelectorAll('.status-filter-tab').forEach(t => {
+            t.className = 'status-filter-tab px-4 py-1.5 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100';
+        });
+        this.className = 'status-filter-tab px-4 py-1.5 rounded-lg text-sm font-medium bg-brand-purple text-white';
+        currentFilter = this.dataset.status;
+        updateDashboard();
+    });
+});
+
+// ===================== MODAL CONTROLS =====================
+document.querySelectorAll('.close-modal-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        document.getElementById('detail-modal').classList.remove('active');
+    });
+});
+
+// Close modal on overlay click
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+    overlay.addEventListener('click', function(e) {
+        if (e.target === this) {
+            this.classList.remove('active');
+        }
+    });
+});
+
+// ===================== FILTER BUTTON =====================
+document.getElementById('filter-btn').addEventListener('click', function() {
+    const tabs = document.querySelectorAll('.status-filter-tab');
+    const currentActive = document.querySelector('.status-filter-tab.bg-brand-purple');
+    if (currentActive) {
+        const nextIndex = (Array.from(tabs).indexOf(currentActive) + 1) % tabs.length;
+        tabs[nextIndex].click();
+    }
+});
+
+// ===================== INIT =====================
+document.addEventListener('DOMContentLoaded', function() {
+    updateAdminDisplay();
+    loadPurchases();
+    updateDashboard();
+});
+
+// ===================== STORAGE LISTENER =====================
+window.addEventListener('storage', function(e) {
+    if (e.key === 'pos_purchases') {
+        loadPurchases();
+        updateDashboard();
+    }
+});
+</script>
+</body>
+</html>

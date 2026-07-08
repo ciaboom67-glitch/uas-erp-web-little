@@ -1,0 +1,1058 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Little Story - Laporan Keuangan</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'sidebar-bg': '#432C0B',
+            'sidebar-active': '#5D4017',
+            'brand-purple': '#6359E9',
+            'brand-light-purple': '#F5F4FF',
+            'dashboard-bg': '#F8F9FA',
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          },
+        }
+      }
+    }
+  </script>
+<style>
+    body {
+      background-color: #F8F9FA;
+    }
+    .custom-shadow {
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+    }
+    aside::-webkit-scrollbar {
+      width: 4px;
+    }
+    aside::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 2px;
+    }
+    .dashboard-content {
+      padding: 24px 32px;
+    }
+    .report-card {
+      transition: all 0.2s ease;
+    }
+    .report-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+    }
+    .status-badge {
+      padding: 4px 12px;
+      border-radius: 9999px;
+      font-size: 11px;
+      font-weight: 600;
+      display: inline-block;
+    }
+    .status-pending {
+      background: #FEF3C7;
+      color: #D97706;
+    }
+    .status-approved {
+      background: #D1FAE5;
+      color: #059669;
+    }
+    .status-rejected {
+      background: #FEE2E2;
+      color: #DC2626;
+    }
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-overlay.active {
+      display: flex;
+    }
+    .modal-content {
+      background: white;
+      border-radius: 16px;
+      max-width: 640px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 32px;
+      margin: 16px;
+    }
+    .nav-tab {
+      transition: all 0.2s ease;
+      cursor: pointer;
+      padding: 10px 20px;
+      border-radius: 10px;
+      font-weight: 500;
+      font-size: 14px;
+      color: #6B7280;
+      border: 1px solid transparent;
+    }
+    .nav-tab:hover {
+      background: #F3F4F6;
+    }
+    .nav-tab.active {
+      background: #F5F4FF;
+      color: #6359E9;
+      border-color: #6359E9;
+    }
+    @media (max-width: 768px) {
+      .dashboard-content {
+        padding: 16px;
+      }
+      .modal-content {
+        padding: 20px;
+      }
+      .nav-tab {
+        padding: 8px 14px;
+        font-size: 12px;
+      }
+    }
+  </style>
+</head>
+<body class="flex min-h-screen text-slate-800">
+<!-- BEGIN: Sidebar -->
+<aside class="w-64 bg-sidebar-bg text-white flex-shrink-0 flex flex-col hidden lg:flex h-screen sticky top-0">
+<div class="p-6 flex items-center space-x-3">
+<div class="w-8 h-8 bg-white/20 rounded flex items-center justify-center">
+<svg class="h-5 w-5" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<span class="font-bold text-lg tracking-tight">Little Story</span>
+</div>
+<nav class="flex-1 px-4 py-2 space-y-1 overflow-y-auto">
+<a class="flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium text-white/70 hover:bg-white/5 hover:text-white transition-colors" href="manajer.html">
+<svg class="w-5 h-5" fill="currentColor" viewbox="0 0 20 20"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path></svg>
+<span>Dashboard</span>
+</a>
+<a class="flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium text-white/70 hover:bg-white/5 hover:text-white transition-colors" href="penjualan.html">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span>Penjualan</span>
+</a>
+<a class="flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium text-white/70 hover:bg-white/5 hover:text-white transition-colors" href="pro.html">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span>Produk</span>
+</a>
+<a class="flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium text-white/70 hover:bg-white/5 hover:text-white transition-colors" href="pembelian.html">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span>Pembelian</span>
+</a>
+<a class="flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium text-white/70 hover:bg-white/5 hover:text-white transition-colors" href="karyawan.html">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span>Karyawan</span>
+</a>
+<a class="flex items-center space-x-3 bg-sidebar-active px-4 py-3 rounded-lg text-sm font-medium" href="#">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span>Laporan</span>
+</a>
+<a class="flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium text-white/70 hover:bg-white/5 hover:text-white transition-colors" href="persetujuan.html">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span>Persetujuan</span>
+</a>
+<a class="flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium text-white/70 hover:bg-white/5 hover:text-white transition-colors" href="peng.html">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span>Pengaturan</span>
+</a>
+</nav>
+</aside>
+<!-- END: Sidebar -->
+
+<!-- BEGIN: Main Content -->
+<main class="flex-1 flex flex-col min-w-0 bg-dashboard-bg h-screen overflow-hidden">
+<!-- BEGIN: Top Header -->
+<header class="h-16 bg-white border-b border-gray-100 flex items-center justify-between px-8 flex-shrink-0">
+<div class="relative w-96">
+<span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400">
+<svg class="h-5 w-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</span>
+<input class="block w-full pl-10 pr-3 py-2 border-none bg-gray-100 rounded-lg text-sm focus:ring-brand-purple focus:ring-1" placeholder="Cari data, laporan, atau menu..." type="text"/>
+</div>
+<div class="flex items-center space-x-4">
+<div class="text-right">
+<p class="text-sm font-semibold text-gray-800" id="">Manajer</p>
+<p class="text-xs text-gray-400">Siri Rahayu</p>
+</div>
+<img alt="Admin Profile" class="w-10 h-10 rounded-full border-2 border-white custom-shadow" id="admin-avatar" src="https://ui-avatars.com/api/?name=Admin+Keuangan&background=6359E9&color=fff&size=128"/>
+</div>
+</header>
+<!-- END: Top Header -->
+
+<!-- BEGIN: Dashboard Body -->
+<div class="flex-1 overflow-y-auto dashboard-content">
+<div class="max-w-7xl mx-auto space-y-6">
+<!-- Page Title Row -->
+<div class="flex flex-wrap justify-between items-center gap-4 mb-2">
+<div>
+<h1 class="text-2xl font-bold text-gray-900">Laporan Keuangan</h1>
+<p class="text-sm text-gray-500 mt-1" id="current-date">Ringkasan laporan keuangan dan pengajuan ke owner</p>
+</div>
+<div class="flex gap-3">
+<button id="submit-report-btn" class="bg-green-600 text-white px-5 py-2.5 rounded-lg text-sm font-semibold flex items-center space-x-2 hover:bg-green-700 transition shadow-sm">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-width="2"/></svg>
+<span>Ajukan ke Owner</span>
+</button>
+<button id="export-pdf-btn" class="bg-brand-purple text-white px-5 py-2.5 rounded-lg text-sm font-semibold flex items-center space-x-2 hover:bg-brand-purple/90 transition shadow-sm">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+<span>Export PDF</span>
+</button>
+</div>
+</div>
+
+<!-- Navigation Tabs -->
+<div class="flex flex-wrap gap-2 border-b border-gray-200 pb-3">
+<button class="nav-tab active" data-tab="overview">Ringkasan</button>
+<button class="nav-tab" data-tab="sales">Penjualan</button>
+<button class="nav-tab" data-tab="purchases">Pembelian</button>
+<button class="nav-tab" data-tab="profit">Laba/Rugi</button>
+<button class="nav-tab" data-tab="submissions">Pengajuan</button>
+</div>
+
+<!-- Tab Content -->
+<div id="tab-content" class="space-y-4 pt-4">
+    <!-- OVERVIEW TAB -->
+    <div id="tab-overview" class="tab-panel">
+        <!-- Summary Cards -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="bg-white rounded-xl custom-shadow border border-gray-50 p-4 report-card">
+                <p class="text-xs text-gray-400 font-medium">Total Pendapatan</p>
+                <p class="text-2xl font-bold text-green-600" id="total-revenue">Rp 0</p>
+                <p class="text-[10px] text-gray-400 mt-1">Bulan ini</p>
+            </div>
+            <div class="bg-white rounded-xl custom-shadow border border-gray-50 p-4 report-card">
+                <p class="text-xs text-gray-400 font-medium">Total Pengeluaran</p>
+                <p class="text-2xl font-bold text-red-600" id="total-expenses">Rp 0</p>
+                <p class="text-[10px] text-gray-400 mt-1">Bulan ini</p>
+            </div>
+            <div class="bg-white rounded-xl custom-shadow border border-gray-50 p-4 report-card">
+                <p class="text-xs text-gray-400 font-medium">Laba Bersih</p>
+                <p class="text-2xl font-bold text-brand-purple" id="net-profit">Rp 0</p>
+                <p class="text-[10px] text-gray-400 mt-1">Bulan ini</p>
+            </div>
+            <div class="bg-white rounded-xl custom-shadow border border-gray-50 p-4 report-card">
+                <p class="text-xs text-gray-400 font-medium">Total Transaksi</p>
+                <p class="text-2xl font-bold text-gray-900" id="total-transactions">0</p>
+                <p class="text-[10px] text-gray-400 mt-1">Bulan ini</p>
+            </div>
+        </div>
+
+        <!-- Charts Row -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-5 mt-4">
+            <div class="bg-white rounded-2xl custom-shadow border border-gray-50 p-5">
+                <h3 class="font-bold text-gray-800 text-sm mb-3">Grafik Pendapatan & Pengeluaran</h3>
+                <div class="relative" style="height:250px;">
+                    <canvas id="revenueChart"></canvas>
+                </div>
+            </div>
+            <div class="bg-white rounded-2xl custom-shadow border border-gray-50 p-5">
+                <h3 class="font-bold text-gray-800 text-sm mb-3">Distribusi Kategori</h3>
+                <div class="relative" style="height:250px;">
+                    <canvas id="categoryChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SALES TAB -->
+    <div id="tab-sales" class="tab-panel" style="display:none;">
+        <div class="bg-white rounded-2xl custom-shadow border border-gray-50 overflow-hidden">
+            <div class="p-5 border-b border-gray-100 flex justify-between items-center">
+                <h3 class="font-bold text-gray-800">Detail Penjualan</h3>
+                <select id="sales-period" class="text-sm border border-gray-200 rounded-lg px-3 py-1.5 focus:ring-2 focus:ring-brand-purple">
+                    <option value="7">7 Hari Terakhir</option>
+                    <option value="14">14 Hari Terakhir</option>
+                    <option value="30" selected>30 Hari Terakhir</option>
+                    <option value="90">90 Hari Terakhir</option>
+                </select>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                    <thead>
+                        <tr class="border-b border-gray-100 bg-gray-50/50">
+                            <th class="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase">Tanggal</th>
+                            <th class="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase">Total Transaksi</th>
+                            <th class="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase">Pendapatan</th>
+                            <th class="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase">Rata-rata</th>
+                        </tr>
+                    </thead>
+                    <tbody id="sales-detail-body">
+                        <tr><td colspan="4" class="text-center py-8 text-gray-400">Belum ada data penjualan</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- PURCHASES TAB -->
+    <div id="tab-purchases" class="tab-panel" style="display:none;">
+        <div class="bg-white rounded-2xl custom-shadow border border-gray-50 overflow-hidden">
+            <div class="p-5 border-b border-gray-100">
+                <h3 class="font-bold text-gray-800">Detail Pembelian</h3>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                    <thead>
+                        <tr class="border-b border-gray-100 bg-gray-50/50">
+                            <th class="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase">Tanggal</th>
+                            <th class="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase">Supplier</th>
+                            <th class="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase">Item</th>
+                            <th class="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase">Jumlah</th>
+                            <th class="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase">Total</th>
+                            <th class="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="purchases-detail-body">
+                        <tr><td colspan="6" class="text-center py-8 text-gray-400">Belum ada data pembelian</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- PROFIT TAB -->
+    <div id="tab-profit" class="tab-panel" style="display:none;">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="bg-white rounded-2xl custom-shadow border border-gray-50 p-5 report-card">
+                <p class="text-sm text-gray-500">Total Pendapatan</p>
+                <p class="text-2xl font-bold text-green-600" id="profit-revenue">Rp 0</p>
+            </div>
+            <div class="bg-white rounded-2xl custom-shadow border border-gray-50 p-5 report-card">
+                <p class="text-sm text-gray-500">Total Pengeluaran</p>
+                <p class="text-2xl font-bold text-red-600" id="profit-expenses">Rp 0</p>
+            </div>
+            <div class="bg-white rounded-2xl custom-shadow border border-gray-50 p-5 report-card">
+                <p class="text-sm text-gray-500">Laba/Rugi</p>
+                <p class="text-2xl font-bold text-brand-purple" id="profit-result">Rp 0</p>
+                <p class="text-xs text-gray-400" id="profit-status">Menunggu data</p>
+            </div>
+        </div>
+        
+        <div class="bg-white rounded-2xl custom-shadow border border-gray-50 p-5 mt-4">
+            <h3 class="font-bold text-gray-800 mb-3">Perhitungan Laba/Rugi</h3>
+            <div class="space-y-3" id="profit-calculation">
+                <div class="flex justify-between py-2 border-b border-gray-100">
+                    <span class="text-gray-600">Total Pendapatan (Penjualan)</span>
+                    <span class="font-semibold text-green-600" id="calc-revenue">Rp 0</span>
+                </div>
+                <div class="flex justify-between py-2 border-b border-gray-100">
+                    <span class="text-gray-600">Total Pengeluaran (Pembelian)</span>
+                    <span class="font-semibold text-red-600" id="calc-expenses">Rp 0</span>
+                </div>
+                <div class="flex justify-between py-2 border-b border-gray-100">
+                    <span class="text-gray-600">Jumlah Transaksi</span>
+                    <span class="font-semibold" id="calc-transactions">0</span>
+                </div>
+                <div class="flex justify-between py-3 bg-gray-50 rounded-lg px-3">
+                    <span class="font-bold text-gray-800">Laba Bersih</span>
+                    <span class="font-bold text-brand-purple text-lg" id="calc-profit">Rp 0</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SUBMISSIONS TAB -->
+    <div id="tab-submissions" class="tab-panel" style="display:none;">
+        <div class="bg-white rounded-2xl custom-shadow border border-gray-50 overflow-hidden">
+            <div class="p-5 border-b border-gray-100 flex justify-between items-center">
+                <h3 class="font-bold text-gray-800">Riwayat Pengajuan Laporan</h3>
+                <span class="text-xs bg-gray-100 px-3 py-1 rounded-full text-gray-600" id="submission-count">0 pengajuan</span>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                    <thead>
+                        <tr class="border-b border-gray-100 bg-gray-50/50">
+                            <th class="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase">Tanggal</th>
+                            <th class="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase">Periode</th>
+                            <th class="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase">Total Pendapatan</th>
+                            <th class="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase">Total Pengeluaran</th>
+                            <th class="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase">Laba</th>
+                            <th class="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase">Status</th>
+                            <th class="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase">Diajukan</th>
+                        </tr>
+                    </thead>
+                    <tbody id="submissions-body">
+                        <tr><td colspan="7" class="text-center py-8 text-gray-400">Belum ada pengajuan laporan</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+</div>
+<!-- END: Dashboard Body -->
+</main>
+<!-- END: Main Content -->
+
+<!-- BEGIN: Modal Ajukan Laporan -->
+<div class="modal-overlay" id="submit-modal">
+<div class="modal-content">
+<div class="flex justify-between items-center mb-5">
+<h2 class="text-xl font-bold text-gray-900">Ajukan Laporan ke Owner</h2>
+<button class="text-gray-400 hover:text-gray-600 close-modal-btn">
+<svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12" stroke-width="2"/></svg>
+</button>
+</div>
+<form id="submit-report-form">
+<div class="space-y-4">
+<div>
+<label class="text-sm font-semibold text-gray-700 block mb-1">Periode Laporan</label>
+<select id="report-period" class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-brand-purple" required>
+<option value="this_month">Bulan Ini</option>
+<option value="last_month">Bulan Lalu</option>
+<option value="custom">Kustom</option>
+</select>
+</div>
+<div id="custom-date-range" style="display:none;">
+<div class="grid grid-cols-2 gap-3 mt-3">
+<div>
+<label class="text-xs font-semibold text-gray-600 block mb-1">Dari</label>
+<input type="date" id="report-start" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand-purple"/>
+</div>
+<div>
+<label class="text-xs font-semibold text-gray-600 block mb-1">Sampai</label>
+<input type="date" id="report-end" class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-brand-purple"/>
+</div>
+</div>
+</div>
+<div>
+<label class="text-sm font-semibold text-gray-700 block mb-1">Catatan untuk Owner</label>
+<textarea id="report-notes" rows="3" class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-brand-purple" placeholder="Tambahkan catatan penting untuk owner..."></textarea>
+</div>
+<div class="bg-blue-50 border border-blue-100 rounded-lg p-3">
+<div class="flex items-start gap-2">
+<svg class="w-5 h-5 text-blue-600 mt-0.5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+<div>
+<p class="text-sm text-blue-800">Ringkasan laporan akan dikirim ke owner untuk ditinjau.</p>
+<p class="text-xs text-blue-600 mt-1">Total Pendapatan: <span id="preview-revenue" class="font-bold">Rp 0</span> | Laba: <span id="preview-profit" class="font-bold">Rp 0</span></p>
+</div>
+</div>
+</div>
+<div class="flex gap-3 pt-3 border-t border-gray-100">
+<button type="submit" class="flex-1 bg-green-600 text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-green-700 transition">Kirim ke Owner</button>
+<button type="button" class="flex-1 bg-gray-200 text-gray-600 px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-gray-300 transition close-modal-btn">Batal</button>
+</div>
+</div>
+</form>
+</div>
+</div>
+<!-- END: Modal -->
+
+<!-- BEGIN: Modal Detail Pengajuan -->
+<div class="modal-overlay" id="detail-submission-modal">
+<div class="modal-content">
+<div class="flex justify-between items-center mb-5">
+<h2 class="text-xl font-bold text-gray-900" id="detail-submission-title">Detail Pengajuan</h2>
+<button class="text-gray-400 hover:text-gray-600 close-modal-btn">
+<svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12" stroke-width="2"/></svg>
+</button>
+</div>
+<div id="detail-submission-content" class="space-y-3">
+<div class="grid grid-cols-2 gap-3">
+<div><span class="text-gray-500 text-sm">Periode</span><p class="font-semibold" id="ds-period">-</p></div>
+<div><span class="text-gray-500 text-sm">Tanggal</span><p class="font-semibold" id="ds-date">-</p></div>
+</div>
+<div class="grid grid-cols-2 gap-3">
+<div><span class="text-gray-500 text-sm">Pendapatan</span><p class="font-semibold text-green-600" id="ds-revenue">-</p></div>
+<div><span class="text-gray-500 text-sm">Pengeluaran</span><p class="font-semibold text-red-600" id="ds-expenses">-</p></div>
+</div>
+<div><span class="text-gray-500 text-sm">Laba Bersih</span><p class="font-semibold text-xl text-brand-purple" id="ds-profit">-</p></div>
+<div><span class="text-gray-500 text-sm">Status</span><p id="ds-status">-</p></div>
+<div><span class="text-gray-500 text-sm">Catatan</span><p class="text-gray-700" id="ds-notes">-</p></div>
+<div><span class="text-gray-500 text-sm">Diajukan Oleh</span><p class="font-semibold" id="ds-submitted-by">-</p></div>
+</div>
+<div id="detail-submission-actions" class="flex gap-3 mt-5 pt-4 border-t border-gray-100"></div>
+</div>
+</div>
+<!-- END: Modal Detail -->
+
+<script>
+// ===================== ADMIN PROFILE =====================
+const ADMIN_PROFILE = {
+    name: 'Admin Keuangan',
+    avatar: 'https://ui-avatars.com/api/?name=Admin+Keuangan&background=6359E9&color=fff&size=128'
+};
+
+// ===================== DATA STORE =====================
+let transactions = [];
+let purchases = [];
+let submissions = [];
+let chartInstance = null;
+let categoryChartInstance = null;
+
+// ===================== LOAD DATA =====================
+function loadData() {
+    try {
+        const savedTransactions = localStorage.getItem('pos_transactions');
+        transactions = savedTransactions ? JSON.parse(savedTransactions) : generateSampleTransactions();
+        
+        const savedPurchases = localStorage.getItem('pos_purchases');
+        purchases = savedPurchases ? JSON.parse(savedPurchases) : [];
+        
+        const savedSubmissions = localStorage.getItem('pos_submissions');
+        submissions = savedSubmissions ? JSON.parse(savedSubmissions) : [];
+    } catch(e) {
+        transactions = generateSampleTransactions();
+        purchases = [];
+        submissions = [];
+    }
+}
+
+function generateSampleTransactions() {
+    const sample = [];
+    const now = new Date();
+    for (let i = 0; i < 30; i++) {
+        const date = new Date(now);
+        date.setDate(date.getDate() - i);
+        const total = Math.floor(Math.random() * 500000) + 50000;
+        sample.push({
+            id: i + 1,
+            timestamp: date.toISOString(),
+            total: total,
+            items: [
+                { name: 'Item ' + (i + 1), qty: Math.floor(Math.random() * 10) + 1, price: Math.floor(total / 3) }
+            ]
+        });
+    }
+    return sample;
+}
+
+// ===================== FORMAT HELPERS =====================
+function formatPrice(num) {
+    return 'Rp ' + (num || 0).toLocaleString('id-ID');
+}
+
+function formatDate(dateStr) {
+    if (!dateStr) return '-';
+    const d = new Date(dateStr);
+    return d.toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' });
+}
+
+function formatDateTime(dateStr) {
+    if (!dateStr) return '-';
+    const d = new Date(dateStr);
+    return d.toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+}
+
+function getStatusBadge(status) {
+    const map = {
+        'pending': '<span class="status-badge status-pending">Menunggu</span>',
+        'approved': '<span class="status-badge status-approved">Disetujui</span>',
+        'rejected': '<span class="status-badge status-rejected">Ditolak</span>'
+    };
+    return map[status] || '<span class="status-badge status-pending">' + status + '</span>';
+}
+
+// ===================== UPDATE DISPLAY =====================
+function updateAdminDisplay() {
+    const nameEl = document.getElementById('admin-name');
+    const avatarEl = document.getElementById('admin-avatar');
+    if (nameEl) nameEl.textContent = ADMIN_PROFILE.name;
+    if (avatarEl) avatarEl.src = ADMIN_PROFILE.avatar;
+}
+
+function updateDate() {
+    const now = new Date();
+    const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+    const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+    document.getElementById('current-date').textContent = `Ringkasan laporan keuangan dan pengajuan ke owner - ${days[now.getDay()]}, ${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
+}
+
+function updateDashboard() {
+    const now = new Date();
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    
+    // Filter this month's transactions
+    const monthlyTransactions = transactions.filter(t => {
+        const date = new Date(t.timestamp);
+        return date >= startOfMonth && date <= now;
+    });
+    
+    const totalRevenue = monthlyTransactions.reduce((sum, t) => sum + (t.total || 0), 0);
+    const totalExpenses = purchases.reduce((sum, p) => {
+        if (p.status === 'approved' || p.status === 'pending') {
+            return sum + (p.total || 0);
+        }
+        return sum;
+    }, 0);
+    const netProfit = totalRevenue - totalExpenses;
+    const totalTrans = monthlyTransactions.length;
+    
+    // Update summary cards
+    document.getElementById('total-revenue').textContent = formatPrice(totalRevenue);
+    document.getElementById('total-expenses').textContent = formatPrice(totalExpenses);
+    document.getElementById('net-profit').textContent = formatPrice(netProfit);
+    document.getElementById('total-transactions').textContent = totalTrans;
+    
+    // Update profit tab
+    document.getElementById('profit-revenue').textContent = formatPrice(totalRevenue);
+    document.getElementById('profit-expenses').textContent = formatPrice(totalExpenses);
+    document.getElementById('profit-result').textContent = formatPrice(netProfit);
+    document.getElementById('profit-status').textContent = netProfit >= 0 ? '✅ Menguntungkan' : '❌ Rugi';
+    document.getElementById('profit-status').className = 'text-xs ' + (netProfit >= 0 ? 'text-green-600' : 'text-red-600');
+    
+    document.getElementById('calc-revenue').textContent = formatPrice(totalRevenue);
+    document.getElementById('calc-expenses').textContent = formatPrice(totalExpenses);
+    document.getElementById('calc-transactions').textContent = totalTrans;
+    document.getElementById('calc-profit').textContent = formatPrice(netProfit);
+    
+    // Update preview
+    document.getElementById('preview-revenue').textContent = formatPrice(totalRevenue);
+    document.getElementById('preview-profit').textContent = formatPrice(netProfit);
+    
+    // Update charts
+    updateRevenueChart(monthlyTransactions);
+    updateCategoryChart(monthlyTransactions);
+    updateSalesDetail(monthlyTransactions);
+    updatePurchasesDetail();
+    updateSubmissions();
+}
+
+// ===================== REVENUE CHART =====================
+function updateRevenueChart(monthlyTransactions) {
+    const canvas = document.getElementById('revenueChart');
+    if (!canvas) return;
+    
+    const ctx = canvas.getContext('2d');
+    
+    // Get last 30 days
+    const now = new Date();
+    const days = [];
+    const revenueData = [];
+    const expenseData = [];
+    
+    for (let i = 29; i >= 0; i--) {
+        const date = new Date(now);
+        date.setDate(date.getDate() - i);
+        const dateStr = date.toLocaleDateString('id-ID', { day: '2-digit', month: 'short' });
+        days.push(dateStr);
+        
+        const dayRevenue = transactions.filter(t => {
+            const txDate = new Date(t.timestamp);
+            return txDate.toDateString() === date.toDateString();
+        }).reduce((sum, t) => sum + (t.total || 0), 0);
+        revenueData.push(dayRevenue);
+        
+        const dayExpense = purchases.filter(p => {
+            const pDate = new Date(p.date);
+            return pDate.toDateString() === date.toDateString() && (p.status === 'approved' || p.status === 'pending');
+        }).reduce((sum, p) => sum + (p.total || 0), 0);
+        expenseData.push(dayExpense);
+    }
+    
+    if (chartInstance) {
+        chartInstance.destroy();
+    }
+    
+    chartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: days,
+            datasets: [
+                {
+                    label: 'Pendapatan',
+                    data: revenueData,
+                    backgroundColor: 'rgba(99, 89, 233, 0.7)',
+                    borderColor: '#6359E9',
+                    borderWidth: 2,
+                    borderRadius: 4
+                },
+                {
+                    label: 'Pengeluaran',
+                    data: expenseData,
+                    backgroundColor: 'rgba(239, 68, 68, 0.7)',
+                    borderColor: '#EF4444',
+                    borderWidth: 2,
+                    borderRadius: 4
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'top',
+                    labels: {
+                        boxWidth: 12,
+                        padding: 15,
+                        font: { size: 11 }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return 'Rp ' + (value / 1000).toFixed(0) + 'k';
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
+// ===================== CATEGORY CHART =====================
+function updateCategoryChart(monthlyTransactions) {
+    const canvas = document.getElementById('categoryChart');
+    if (!canvas) return;
+    
+    const ctx = canvas.getContext('2d');
+    
+    // Get products from localStorage
+    let products = [];
+    try {
+        const saved = localStorage.getItem('pos_products');
+        if (saved) products = JSON.parse(saved);
+    } catch(e) {}
+    
+    const categoryMap = {};
+    monthlyTransactions.forEach(t => {
+        if (t.items) {
+            t.items.forEach(item => {
+                const product = products.find(p => p.name === item.name);
+                const category = product ? product.category || 'Lainnya' : 'Lainnya';
+                categoryMap[category] = (categoryMap[category] || 0) + (item.qty || 0);
+            });
+        }
+    });
+    
+    const categories = Object.keys(categoryMap);
+    const values = Object.values(categoryMap);
+    const colors = ['#6359E9', '#D97706', '#059669', '#DC2626', '#7C3AED', '#0891B2', '#BE185D', '#4F46E5'];
+    
+    if (categories.length === 0) {
+        categories.push('Belum ada data');
+        values.push(1);
+    }
+    
+    if (categoryChartInstance) {
+        categoryChartInstance.destroy();
+    }
+    
+    categoryChartInstance = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: categories,
+            datasets: [{
+                data: values,
+                backgroundColor: colors.slice(0, categories.length),
+                borderWidth: 2,
+                borderColor: '#fff'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        boxWidth: 12,
+                        padding: 10,
+                        font: { size: 11 }
+                    }
+                }
+            }
+        }
+    });
+}
+
+// ===================== SALES DETAIL =====================
+function updateSalesDetail(monthlyTransactions) {
+    const tbody = document.getElementById('sales-detail-body');
+    const period = parseInt(document.getElementById('sales-period').value) || 30;
+    
+    const now = new Date();
+    const filtered = monthlyTransactions.filter(t => {
+        const date = new Date(t.timestamp);
+        const diffDays = Math.floor((now - date) / (1000 * 60 * 60 * 24));
+        return diffDays <= period;
+    });
+    
+    // Group by date
+    const grouped = {};
+    filtered.forEach(t => {
+        const date = new Date(t.timestamp);
+        const key = date.toLocaleDateString('id-ID');
+        if (!grouped[key]) {
+            grouped[key] = { total: 0, count: 0, date: date };
+        }
+        grouped[key].total += t.total || 0;
+        grouped[key].count += 1;
+    });
+    
+    const sorted = Object.keys(grouped).sort((a, b) => {
+        return new Date(a) - new Date(b);
+    });
+    
+    if (sorted.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" class="text-center py-8 text-gray-400">Belum ada data penjualan</td></tr>';
+        return;
+    }
+    
+    tbody.innerHTML = sorted.map(key => {
+        const data = grouped[key];
+        const avg = data.count > 0 ? data.total / data.count : 0;
+        return `
+            <tr class="border-b border-gray-50 hover:bg-gray-50/50">
+                <td class="px-5 py-3 text-gray-700">${key}</td>
+                <td class="px-5 py-3 text-gray-700">${data.count}</td>
+                <td class="px-5 py-3 text-gray-700 font-semibold">${formatPrice(data.total)}</td>
+                <td class="px-5 py-3 text-gray-700">${formatPrice(avg)}</td>
+            </tr>
+        `;
+    }).join('');
+}
+
+// ===================== PURCHASES DETAIL =====================
+function updatePurchasesDetail() {
+    const tbody = document.getElementById('purchases-detail-body');
+    
+    if (purchases.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" class="text-center py-8 text-gray-400">Belum ada data pembelian</td></tr>';
+        return;
+    }
+    
+    const sorted = [...purchases].sort((a, b) => new Date(b.date) - new Date(a.date));
+    
+    tbody.innerHTML = sorted.slice(0, 50).map(p => `
+        <tr class="border-b border-gray-50 hover:bg-gray-50/50">
+            <td class="px-5 py-3 text-gray-700">${formatDate(p.date)}</td>
+            <td class="px-5 py-3 text-gray-700 font-medium">${p.supplier}</td>
+            <td class="px-5 py-3 text-gray-700">${p.itemName}</td>
+            <td class="px-5 py-3 text-gray-700">${p.qty} unit</td>
+            <td class="px-5 py-3 text-gray-700 font-semibold">${formatPrice(p.total)}</td>
+            <td class="px-5 py-3">${getStatusBadge(p.status)}</td>
+        </tr>
+    `).join('');
+}
+
+// ===================== SUBMISSIONS =====================
+function updateSubmissions() {
+    const tbody = document.getElementById('submissions-body');
+    document.getElementById('submission-count').textContent = submissions.length + ' pengajuan';
+    
+    if (submissions.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" class="text-center py-8 text-gray-400">Belum ada pengajuan laporan</td></tr>';
+        return;
+    }
+    
+    const sorted = [...submissions].sort((a, b) => new Date(b.date) - new Date(a.date));
+    
+    tbody.innerHTML = sorted.map((s, index) => `
+        <tr class="border-b border-gray-50 hover:bg-gray-50/50 transition cursor-pointer" onclick="openSubmissionDetail(${index})">
+            <td class="px-5 py-3 text-gray-700">${formatDate(s.date)}</td>
+            <td class="px-5 py-3 text-gray-700">${s.period}</td>
+            <td class="px-5 py-3 text-gray-700 font-semibold text-green-600">${formatPrice(s.revenue)}</td>
+            <td class="px-5 py-3 text-gray-700 font-semibold text-red-600">${formatPrice(s.expenses)}</td>
+            <td class="px-5 py-3 text-gray-700 font-semibold ${s.profit >= 0 ? 'text-brand-purple' : 'text-red-600'}">${formatPrice(s.profit)}</td>
+            <td class="px-5 py-3">${getStatusBadge(s.status)}</td>
+            <td class="px-5 py-3 text-gray-600 text-sm">${s.submittedBy}</td>
+        </tr>
+    `).join('');
+}
+
+// ===================== OPEN SUBMISSION DETAIL =====================
+function openSubmissionDetail(index) {
+    const s = submissions[index];
+    if (!s) return;
+    
+    document.getElementById('detail-submission-title').textContent = 'Detail Pengajuan #' + (index + 1);
+    document.getElementById('ds-period').textContent = s.period;
+    document.getElementById('ds-date').textContent = formatDateTime(s.date);
+    document.getElementById('ds-revenue').textContent = formatPrice(s.revenue);
+    document.getElementById('ds-expenses').textContent = formatPrice(s.expenses);
+    document.getElementById('ds-profit').textContent = formatPrice(s.profit);
+    document.getElementById('ds-status').innerHTML = getStatusBadge(s.status);
+    document.getElementById('ds-notes').textContent = s.notes || '-';
+    document.getElementById('ds-submitted-by').textContent = s.submittedBy;
+    
+    const actions = document.getElementById('detail-submission-actions');
+    actions.innerHTML = `
+        <button class="flex-1 bg-gray-200 text-gray-600 px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-gray-300 transition close-modal-btn">Tutup</button>
+    `;
+    actions.querySelector('.close-modal-btn').addEventListener('click', () => {
+        document.getElementById('detail-submission-modal').classList.remove('active');
+    });
+    
+    document.getElementById('detail-submission-modal').classList.add('active');
+}
+
+// ===================== SUBMIT REPORT TO OWNER =====================
+document.getElementById('submit-report-btn').addEventListener('click', function() {
+    document.getElementById('submit-modal').classList.add('active');
+    updateDashboard();
+});
+
+document.getElementById('submit-report-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const period = document.getElementById('report-period').value;
+    const notes = document.getElementById('report-notes').value.trim();
+    let startDate, endDate;
+    
+    const now = new Date();
+    if (period === 'this_month') {
+        startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+        endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+    } else if (period === 'last_month') {
+        startDate = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+        endDate = new Date(now.getFullYear(), now.getMonth(), 0);
+    } else {
+        startDate = new Date(document.getElementById('report-start').value);
+        endDate = new Date(document.getElementById('report-end').value);
+    }
+    
+    // Calculate revenue and expenses for period
+    const periodTransactions = transactions.filter(t => {
+        const date = new Date(t.timestamp);
+        return date >= startDate && date <= endDate;
+    });
+    
+    const revenue = periodTransactions.reduce((sum, t) => sum + (t.total || 0), 0);
+    const expenses = purchases.filter(p => {
+        const date = new Date(p.date);
+        return date >= startDate && date <= endDate && (p.status === 'approved' || p.status === 'pending');
+    }).reduce((sum, p) => sum + (p.total || 0), 0);
+    const profit = revenue - expenses;
+    
+    const submission = {
+        date: new Date().toISOString(),
+        period: period === 'this_month' ? 'Bulan Ini' : period === 'last_month' ? 'Bulan Lalu' : startDate.toLocaleDateString('id-ID') + ' - ' + endDate.toLocaleDateString('id-ID'),
+        revenue: revenue,
+        expenses: expenses,
+        profit: profit,
+        notes: notes || 'Tidak ada catatan',
+        status: 'pending',
+        submittedBy: ADMIN_PROFILE.name
+    };
+    
+    submissions.push(submission);
+    localStorage.setItem('pos_submissions', JSON.stringify(submissions));
+    
+    document.getElementById('submit-modal').classList.remove('active');
+    document.getElementById('submit-report-form').reset();
+    document.getElementById('custom-date-range').style.display = 'none';
+    
+    showNotification('Laporan berhasil diajukan ke owner!', 'success');
+    updateDashboard();
+});
+
+// ===================== EXPORT PDF (Simulasi) =====================
+document.getElementById('export-pdf-btn').addEventListener('click', function() {
+    showNotification('Fitur export PDF akan segera tersedia!', 'info');
+});
+
+// ===================== NOTIFICATION =====================
+function showNotification(message, type = 'success') {
+    const colors = {
+        success: 'bg-green-600',
+        error: 'bg-red-600',
+        warning: 'bg-amber-600',
+        info: 'bg-blue-600'
+    };
+    
+    const notification = document.createElement('div');
+    notification.className = `fixed top-4 right-4 ${colors[type] || 'bg-brand-purple'} text-white px-6 py-3 rounded-xl shadow-lg z-50 transform transition-all duration-500 translate-x-full`;
+    notification.style.transition = 'transform 0.5s ease-in-out';
+    notification.innerHTML = `
+        <div class="flex items-center gap-3">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+                <path d="${type === 'success' ? 'M5 13l4 4L19 7' : type === 'error' ? 'M6 18L18 6M6 6l12 12' : 'M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z'}" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+            </svg>
+            <span class="font-medium">${message}</span>
+        </div>
+    `;
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.style.transform = 'translateX(0)';
+    }, 100);
+    
+    setTimeout(() => {
+        notification.style.transform = 'translateX(100%)';
+        setTimeout(() => {
+            notification.remove();
+        }, 500);
+    }, 3000);
+}
+
+// ===================== TAB NAVIGATION =====================
+document.querySelectorAll('.nav-tab').forEach(tab => {
+    tab.addEventListener('click', function() {
+        document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+        this.classList.add('active');
+        document.querySelectorAll('.tab-panel').forEach(p => p.style.display = 'none');
+        document.getElementById('tab-' + this.dataset.tab).style.display = 'block';
+    });
+});
+
+// ===================== PERIOD SELECTOR =====================
+document.getElementById('report-period').addEventListener('change', function() {
+    const customRange = document.getElementById('custom-date-range');
+    if (this.value === 'custom') {
+        customRange.style.display = 'block';
+    } else {
+        customRange.style.display = 'none';
+    }
+});
+
+// ===================== SALES PERIOD CHANGE =====================
+document.getElementById('sales-period').addEventListener('change', function() {
+    updateDashboard();
+});
+
+// ===================== MODAL CONTROLS =====================
+document.querySelectorAll('.close-modal-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        document.getElementById('submit-modal').classList.remove('active');
+        document.getElementById('detail-submission-modal').classList.remove('active');
+    });
+});
+
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+    overlay.addEventListener('click', function(e) {
+        if (e.target === this) {
+            this.classList.remove('active');
+        }
+    });
+});
+
+// ===================== STORAGE LISTENER =====================
+window.addEventListener('storage', function(e) {
+    if (e.key === 'pos_transactions' || e.key === 'pos_purchases' || e.key === 'pos_submissions') {
+        loadData();
+        updateDashboard();
+    }
+});
+
+// ===================== INIT =====================
+document.addEventListener('DOMContentLoaded', function() {
+    updateAdminDisplay();
+    updateDate();
+    loadData();
+    updateDashboard();
+    
+    // Auto refresh setiap 30 detik
+    setInterval(() => {
+        loadData();
+        updateDashboard();
+    }, 30000);
+});
+</script>
+</body>
+</html>

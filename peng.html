@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Little Story - Pengaturan</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'sidebar-bg': '#432C0B',
+            'sidebar-active': '#5D4017',
+            'brand-purple': '#6359E9',
+            'brand-light-purple': '#F5F4FF',
+            'dashboard-bg': '#F8F9FA',
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          },
+        }
+      }
+    }
+  </script>
+<style>
+    body {
+      background-color: #F8F9FA;
+    }
+    .custom-shadow {
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+    }
+    aside::-webkit-scrollbar {
+      width: 4px;
+    }
+    aside::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 2px;
+    }
+    .dashboard-content {
+      padding: 24px 32px;
+    }
+    .setting-card {
+      transition: all 0.2s ease;
+    }
+    .setting-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
+    }
+    .toggle-switch {
+      position: relative;
+      width: 48px;
+      height: 26px;
+      background: #D1D5DB;
+      border-radius: 9999px;
+      transition: background 0.3s ease;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    .toggle-switch.active {
+      background: #6359E9;
+    }
+    .toggle-switch .toggle-dot {
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 20px;
+      height: 20px;
+      background: white;
+      border-radius: 9999px;
+      transition: transform 0.3s ease;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .toggle-switch.active .toggle-dot {
+      transform: translateX(22px);
+    }
+    .nav-tab {
+      transition: all 0.2s ease;
+      cursor: pointer;
+      padding: 10px 20px;
+      border-radius: 10px;
+      font-weight: 500;
+      font-size: 14px;
+      color: #6B7280;
+      border: 1px solid transparent;
+    }
+    .nav-tab:hover {
+      background: #F3F4F6;
+    }
+    .nav-tab.active {
+      background: #F5F4FF;
+      color: #6359E9;
+      border-color: #6359E9;
+    }
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-overlay.active {
+      display: flex;
+    }
+    .modal-content {
+      background: white;
+      border-radius: 16px;
+      max-width: 480px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 32px;
+      margin: 16px;
+    }
+    @media (max-width: 768px) {
+      .dashboard-content {
+        padding: 16px;
+      }
+      .modal-content {
+        padding: 20px;
+      }
+      .nav-tab {
+        padding: 8px 14px;
+        font-size: 12px;
+      }
+    }
+  </style>
+</head>
+<body class="flex min-h-screen text-slate-800">
+<!-- BEGIN: Sidebar -->
+<aside class="w-64 bg-sidebar-bg text-white flex-shrink-0 flex flex-col hidden lg:flex h-screen sticky top-0">
+<div class="p-6 flex items-center space-x-3">
+<div class="w-8 h-8 bg-white/20 rounded flex items-center justify-center">
+<svg class="h-5 w-5" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<span class="font-bold text-lg tracking-tight">Little Story</span>
+</div>
+<nav class="flex-1 px-4 py-2 space-y-1 overflow-y-auto">
+<a class="flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium text-white/70 hover:bg-white/5 hover:text-white transition-colors" href="manajer.html">
+<svg class="w-5 h-5" fill="currentColor" viewbox="0 0 20 20"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path></svg>
+<span>Dashboard</span>
+</a>
+<a class="flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium text-white/70 hover:bg-white/5 hover:text-white transition-colors" href="penjualan.html">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span>Penjualan</span>
+</a>
+<a class="flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium text-white/70 hover:bg-white/5 hover:text-white transition-colors" href="pro.html">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span>Produk</span>
+</a>
+<a class="flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium text-white/70 hover:bg-white/5 hover:text-white transition-colors" href="pembelian.html">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span>Pembelian</span>
+</a>
+<a class="flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium text-white/70 hover:bg-white/5 hover:text-white transition-colors" href="karyawan.html">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span>Karyawan</span>
+</a>
+<a class="flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium text-white/70 hover:bg-white/5 hover:text-white transition-colors" href="laporan.html">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span>Laporan</span>
+</a>
+<a class="flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium text-white/70 hover:bg-white/5 hover:text-white transition-colors" href="persetujuan.html">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span>Persetujuan</span>
+</a>
+<a class="flex items-center space-x-3 bg-sidebar-active px-4 py-3 rounded-lg text-sm font-medium" href="#">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span>Pengaturan</span>
+</a>
+</nav>
+<div class="mt-auto">
+    <a class="text-white/70 hover:bg-white/5 hover:text-white mx-2 flex items-center gap-3 p-3 transition-colors rounded-lg" href="login.html">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+        <span class="font-body-md text-body-md">Keluar</span>
+    </a>
+</div>
+</aside>
+<!-- END: Sidebar -->
+
+<!-- BEGIN: Main Content -->
+<main class="flex-1 flex flex-col min-w-0 bg-dashboard-bg h-screen overflow-hidden">
+<!-- BEGIN: Top Header -->
+<header class="h-16 bg-white border-b border-gray-100 flex items-center justify-between px-8 flex-shrink-0">
+<div class="relative w-96">
+<span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400">
+<svg class="h-5 w-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</span>
+<input class="block w-full pl-10 pr-3 py-2 border-none bg-gray-100 rounded-lg text-sm focus:ring-brand-purple focus:ring-1" placeholder="Cari data, laporan, atau menu..." type="text"/>
+</div>
+<div class="flex items-center space-x-4">
+<div class="text-right">
+<p class="text-sm font-semibold text-gray-800" id="admin-name">Siti Rahayu</p>
+<p class="text-xs text-gray-400">Manajer</p>
+</div>
+<img alt="Admin Profile" class="w-10 h-10 rounded-full border-2 border-white custom-shadow" id="admin-avatar" src="https://ui-avatars.com/api/?name=Siti+Rahayu&background=6359E9&color=fff&size=128"/>
+</div>
+</header>
+<!-- END: Top Header -->
+
+<!-- BEGIN: Dashboard Body -->
+<div class="flex-1 overflow-y-auto dashboard-content">
+<div class="max-w-5xl mx-auto space-y-6">
+<!-- Page Title Row -->
+<div class="flex flex-wrap justify-between items-center gap-4 mb-2">
+<div>
+<h1 class="text-2xl font-bold text-gray-900">Pengaturan</h1>
+<p class="text-sm text-gray-500 mt-1" id="current-date">Kelola konfigurasi sistem dan preferensi aplikasi</p>
+</div>
+</div>
+
+<!-- Navigation Tabs -->
+<div class="flex flex-wrap gap-2 border-b border-gray-200 pb-3">
+<button class="nav-tab active" data-tab="general">Umum</button>
+<button class="nav-tab" data-tab="profile">Profil</button>
+<button class="nav-tab" data-tab="notification">Notifikasi</button>
+<button class="nav-tab" data-tab="backup">Backup & Restore</button>
+</div>
+
+<!-- Tab Content -->
+<div id="tab-content" class="space-y-4 pt-4">
+    <!-- GENERAL SETTINGS -->
+    <div id="tab-general" class="tab-panel">
+        <div class="bg-white rounded-2xl custom-shadow border border-gray-50 p-6 setting-card">
+            <h3 class="text-lg font-bold text-gray-900 mb-4">Pengaturan Umum</h3>
+            <div class="space-y-4">
+                <div>
+                    <label class="text-sm font-semibold text-gray-700 block mb-1">Nama Toko</label>
+                    <input type="text" id="store-name" class="w-full max-w-md border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-brand-purple focus:border-transparent" value="Little Story" placeholder="Nama toko Anda"/>
+                </div>
+                <div>
+                    <label class="text-sm font-semibold text-gray-700 block mb-1">Alamat Toko</label>
+                    <input type="text" id="store-address" class="w-full max-w-md border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-brand-purple focus:border-transparent" value="Jl. Raya No. 123, Jakarta" placeholder="Alamat lengkap toko"/>
+                </div>
+                <div>
+                    <label class="text-sm font-semibold text-gray-700 block mb-1">Nomor Telepon</label>
+                    <input type="text" id="store-phone" class="w-full max-w-md border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-brand-purple focus:border-transparent" value="0812-3456-7890" placeholder="Nomor telepon toko"/>
+                </div>
+                <div>
+                    <label class="text-sm font-semibold text-gray-700 block mb-1">Email Toko</label>
+                    <input type="email" id="store-email" class="w-full max-w-md border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-brand-purple focus:border-transparent" value="info@littlestory.id" placeholder="Email toko"/>
+                </div>
+                <div>
+                    <label class="text-sm font-semibold text-gray-700 block mb-1">Mata Uang</label>
+                    <select id="store-currency" class="w-full max-w-md border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-brand-purple focus:border-transparent">
+                        <option value="IDR">Rupiah (IDR)</option>
+                        <option value="USD">Dollar (USD)</option>
+                        <option value="EUR">Euro (EUR)</option>
+                    </select>
+                </div>
+                <button id="save-general" class="bg-brand-purple text-white px-6 py-2.5 rounded-lg text-sm font-semibold hover:bg-brand-purple/90 transition">Simpan Pengaturan</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- PROFILE SETTINGS -->
+    <div id="tab-profile" class="tab-panel" style="display:none;">
+        <div class="bg-white rounded-2xl custom-shadow border border-gray-50 p-6 setting-card">
+            <h3 class="text-lg font-bold text-gray-900 mb-4">Profil Admin</h3>
+            <div class="flex items-center gap-6 mb-6">
+                <img id="profile-avatar" src="https://ui-avatars.com/api/?name=Siti+Rahayu&background=6359E9&color=fff&size=128" alt="Profile" class="w-24 h-24 rounded-full border-4 border-brand-light-purple"/>
+                <div>
+                    <button id="change-avatar-btn" class="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-200 transition">Ganti Avatar</button>
+                    <p class="text-xs text-gray-400 mt-1">Klik untuk mengubah foto profil</p>
+                </div>
+            </div>
+            <div class="space-y-4">
+                <div>
+                    <label class="text-sm font-semibold text-gray-700 block mb-1">Nama Lengkap</label>
+                    <input type="text" id="profile-name" class="w-full max-w-md border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-brand-purple focus:border-transparent" value="Siti Rahayu"/>
+                </div>
+                <div>
+                    <label class="text-sm font-semibold text-gray-700 block mb-1">Email</label>
+                    <input type="email" id="profile-email" class="w-full max-w-md border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-brand-purple focus:border-transparent" value="siti@littlestory.id"/>
+                </div>
+                <div>
+                    <label class="text-sm font-semibold text-gray-700 block mb-1">Role</label>
+                    <input type="text" class="w-full max-w-md border border-gray-200 rounded-lg px-4 py-2.5 text-sm bg-gray-50 text-gray-500" value="Manajer" disabled/>
+                </div>
+                <button id="save-profile" class="bg-brand-purple text-white px-6 py-2.5 rounded-lg text-sm font-semibold hover:bg-brand-purple/90 transition">Simpan Profil</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- NOTIFICATION SETTINGS -->
+    <div id="tab-notification" class="tab-panel" style="display:none;">
+        <div class="bg-white rounded-2xl custom-shadow border border-gray-50 p-6 setting-card">
+            <h3 class="text-lg font-bold text-gray-900 mb-4">Preferensi Notifikasi</h3>
+            <div class="space-y-4">
+                <div class="flex items-center justify-between py-3 border-b border-gray-100">
+                    <div>
+                        <p class="font-semibold text-gray-800">Notifikasi Email</p>
+                        <p class="text-sm text-gray-500">Terima notifikasi melalui email</p>
+                    </div>
+                    <div class="toggle-switch active" id="email-notif">
+                        <div class="toggle-dot"></div>
+                    </div>
+                </div>
+                <div class="flex items-center justify-between py-3 border-b border-gray-100">
+                    <div>
+                        <p class="font-semibold text-gray-800">Notifikasi Pembelian</p>
+                        <p class="text-sm text-gray-500">Notifikasi saat ada pengajuan pembelian baru</p>
+                    </div>
+                    <div class="toggle-switch active" id="purchase-notif">
+                        <div class="toggle-dot"></div>
+                    </div>
+                </div>
+                <div class="flex items-center justify-between py-3 border-b border-gray-100">
+                    <div>
+                        <p class="font-semibold text-gray-800">Notifikasi Persetujuan</p>
+                        <p class="text-sm text-gray-500">Notifikasi saat pengajuan disetujui/ditolak</p>
+                    </div>
+                    <div class="toggle-switch active" id="approval-notif">
+                        <div class="toggle-dot"></div>
+                    </div>
+                </div>
+                <div class="flex items-center justify-between py-3">
+                    <div>
+                        <p class="font-semibold text-gray-800">Notifikasi Stok</p>
+                        <p class="text-sm text-gray-500">Notifikasi saat stok barang menipis</p>
+                    </div>
+                    <div class="toggle-switch" id="stock-notif">
+                        <div class="toggle-dot"></div>
+                    </div>
+                </div>
+                <button id="save-notification" class="bg-brand-purple text-white px-6 py-2.5 rounded-lg text-sm font-semibold hover:bg-brand-purple/90 transition">Simpan Preferensi</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- BACKUP & RESTORE -->
+    <div id="tab-backup" class="tab-panel" style="display:none;">
+        <div class="bg-white rounded-2xl custom-shadow border border-gray-50 p-6 setting-card">
+            <h3 class="text-lg font-bold text-gray-900 mb-4">Backup & Restore Data</h3>
+            <div class="space-y-4">
+                <div class="bg-blue-50 border border-blue-100 rounded-xl p-4">
+                    <div class="flex items-center gap-3">
+                        <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+                        <div>
+                            <p class="font-semibold text-gray-800">Backup Data</p>
+                            <p class="text-sm text-gray-600">Unduh semua data sebagai file JSON untuk keamanan</p>
+                        </div>
+                    </div>
+                    <button id="backup-data" class="mt-3 bg-blue-600 text-white px-5 py-2 rounded-lg text-sm font-semibold hover:bg-blue-700 transition">Download Backup</button>
+                </div>
+
+                <div class="bg-amber-50 border border-amber-100 rounded-xl p-4">
+                    <div class="flex items-center gap-3">
+                        <svg class="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+                        <div>
+                            <p class="font-semibold text-gray-800">Restore Data</p>
+                            <p class="text-sm text-gray-600">Pulihkan data dari file backup JSON</p>
+                        </div>
+                    </div>
+                    <input type="file" id="restore-file" accept=".json" class="mt-3 text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-amber-100 file:text-amber-700 hover:file:bg-amber-200"/>
+                    <button id="restore-data" class="mt-3 bg-amber-600 text-white px-5 py-2 rounded-lg text-sm font-semibold hover:bg-amber-700 transition">Restore Data</button>
+                </div>
+
+                <div class="bg-red-50 border border-red-100 rounded-xl p-4">
+                    <div class="flex items-center gap-3">
+                        <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+                        <div>
+                            <p class="font-semibold text-gray-800">Hapus Semua Data</p>
+                            <p class="text-sm text-gray-600">Hapus semua data aplikasi (tidak dapat dikembalikan)</p>
+                        </div>
+                    </div>
+                    <button id="clear-data" class="mt-3 bg-red-600 text-white px-5 py-2 rounded-lg text-sm font-semibold hover:bg-red-700 transition">Hapus Semua Data</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+</div>
+<!-- END: Dashboard Body -->
+</main>
+<!-- END: Main Content -->
+
+<!-- BEGIN: Modal Konfirmasi -->
+<div class="modal-overlay" id="confirm-modal">
+<div class="modal-content">
+<div class="flex justify-between items-center mb-5">
+<h2 class="text-xl font-bold text-gray-900" id="confirm-title">Konfirmasi</h2>
+<button class="text-gray-400 hover:text-gray-600 close-modal-btn">
+<svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12" stroke-width="2"/></svg>
+</button>
+</div>
+<p class="text-gray-600 mb-6" id="confirm-message">Apakah Anda yakin ingin melanjutkan?</p>
+<div class="flex gap-3">
+<button id="confirm-yes" class="flex-1 bg-red-600 text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-red-700 transition">Ya, Lanjutkan</button>
+<button class="flex-1 bg-gray-200 text-gray-600 px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-gray-300 transition close-modal-btn">Batal</button>
+</div>
+</div>
+</div>
+<!-- END: Modal -->
+
+<script>
+// ===================== ADMIN PROFILE =====================
+const ADMIN_PROFILE = {
+    name: 'Siti Rahayu',
+    avatar: 'https://ui-avatars.com/api/?name=Siti+Rahayu&background=6359E9&color=fff&size=128'
+};
+
+// ===================== UPDATE ADMIN DISPLAY =====================
+function updateAdminDisplay() {
+    const nameEl = document.getElementById('admin-name');
+    const avatarEl = document.getElementById('admin-avatar');
+    if (nameEl) nameEl.textContent = ADMIN_PROFILE.name;
+    if (avatarEl) avatarEl.src = ADMIN_PROFILE.avatar;
+}
+
+// ===================== UPDATE DATE =====================
+function updateDate() {
+    const now = new Date();
+    const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+    const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+    document.getElementById('current-date').textContent = `Kelola konfigurasi sistem dan preferensi aplikasi - ${days[now.getDay()]}, ${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
+}
+
+// ===================== TAB NAVIGATION =====================
+document.querySelectorAll('.nav-tab').forEach(tab => {
+    tab.addEventListener('click', function() {
+        document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+        this.classList.add('active');
+        document.querySelectorAll('.tab-panel').forEach(p => p.style.display = 'none');
+        const tabId = this.dataset.tab;
+        document.getElementById('tab-' + tabId).style.display = 'block';
+    });
+});
+
+// ===================== TOGGLE SWITCH =====================
+document.querySelectorAll('.toggle-switch').forEach(toggle => {
+    toggle.addEventListener('click', function() {
+        this.classList.toggle('active');
+    });
+});
+
+// ===================== SAVE GENERAL SETTINGS =====================
+document.getElementById('save-general').addEventListener('click', function() {
+    const storeName = document.getElementById('store-name').value;
+    const storeAddress = document.getElementById('store-address').value;
+    const storePhone = document.getElementById('store-phone').value;
+    const storeEmail = document.getElementById('store-email').value;
+    const storeCurrency = document.getElementById('store-currency').value;
+    
+    if (!storeName || !storeAddress || !storePhone || !storeEmail) {
+        alert('Harap isi semua field!');
+        return;
+    }
+    
+    const settings = {
+        storeName,
+        storeAddress,
+        storePhone,
+        storeEmail,
+        storeCurrency
+    };
+    localStorage.setItem('pos_settings', JSON.stringify(settings));
+    showNotification('Pengaturan umum berhasil disimpan!', 'success');
+});
+
+// ===================== LOAD SETTINGS =====================
+function loadSettings() {
+    try {
+        const saved = localStorage.getItem('pos_settings');
+        if (saved) {
+            const settings = JSON.parse(saved);
+            document.getElementById('store-name').value = settings.storeName || 'Little Story';
+            document.getElementById('store-address').value = settings.storeAddress || 'Jl. Raya No. 123, Jakarta';
+            document.getElementById('store-phone').value = settings.storePhone || '0812-3456-7890';
+            document.getElementById('store-email').value = settings.storeEmail || 'info@littlestory.id';
+            document.getElementById('store-currency').value = settings.storeCurrency || 'IDR';
+        }
+    } catch(e) {}
+}
+
+// ===================== SAVE PROFILE =====================
+document.getElementById('save-profile').addEventListener('click', function() {
+    const name = document.getElementById('profile-name').value.trim();
+    const email = document.getElementById('profile-email').value.trim();
+    
+    if (!name || !email) {
+        alert('Harap isi semua field!');
+        return;
+    }
+    
+    ADMIN_PROFILE.name = name;
+    localStorage.setItem('pos_admin', JSON.stringify(ADMIN_PROFILE));
+    updateAdminDisplay();
+    
+    const avatarEl = document.getElementById('profile-avatar');
+    avatarEl.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=6359E9&color=fff&size=128`;
+    
+    showNotification('Profil berhasil diperbarui!', 'success');
+});
+
+// ===================== LOAD PROFILE =====================
+function loadProfile() {
+    try {
+        const saved = localStorage.getItem('pos_admin');
+        if (saved) {
+            const profile = JSON.parse(saved);
+            document.getElementById('profile-name').value = profile.name || 'Siti Rahayu';
+            document.getElementById('profile-email').value = profile.email || 'siti@littlestory.id';
+            document.getElementById('profile-avatar').src = `https://ui-avatars.com/api/?name=${encodeURIComponent(profile.name || 'Siti Rahayu')}&background=6359E9&color=fff&size=128`;
+        }
+    } catch(e) {}
+}
+
+// ===================== SAVE NOTIFICATION =====================
+document.getElementById('save-notification').addEventListener('click', function() {
+    const emailNotif = document.getElementById('email-notif').classList.contains('active');
+    const purchaseNotif = document.getElementById('purchase-notif').classList.contains('active');
+    const approvalNotif = document.getElementById('approval-notif').classList.contains('active');
+    const stockNotif = document.getElementById('stock-notif').classList.contains('active');
+    
+    const notifSettings = { emailNotif, purchaseNotif, approvalNotif, stockNotif };
+    localStorage.setItem('pos_notifications', JSON.stringify(notifSettings));
+    showNotification('Preferensi notifikasi berhasil disimpan!', 'success');
+});
+
+// ===================== LOAD NOTIFICATION =====================
+function loadNotifications() {
+    try {
+        const saved = localStorage.getItem('pos_notifications');
+        if (saved) {
+            const notif = JSON.parse(saved);
+            document.getElementById('email-notif').classList.toggle('active', notif.emailNotif);
+            document.getElementById('purchase-notif').classList.toggle('active', notif.purchaseNotif);
+            document.getElementById('approval-notif').classList.toggle('active', notif.approvalNotif);
+            document.getElementById('stock-notif').classList.toggle('active', notif.stockNotif);
+        }
+    } catch(e) {}
+}
+
+// ===================== BACKUP DATA =====================
+document.getElementById('backup-data').addEventListener('click', function() {
+    const data = {
+        timestamp: new Date().toISOString(),
+        version: '1.0',
+        purchases: JSON.parse(localStorage.getItem('pos_purchases') || '[]'),
+        employees: JSON.parse(localStorage.getItem('pos_employees') || '[]'),
+        products: JSON.parse(localStorage.getItem('pos_products') || '[]'),
+        transactions: JSON.parse(localStorage.getItem('pos_transactions') || '[]'),
+        settings: JSON.parse(localStorage.getItem('pos_settings') || '{}'),
+        notifications: JSON.parse(localStorage.getItem('pos_notifications') || '{}')
+    };
+    
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `little-story-backup-${new Date().toISOString().split('T')[0]}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    showNotification('Backup data berhasil diunduh!', 'success');
+});
+
+// ===================== RESTORE DATA =====================
+document.getElementById('restore-data').addEventListener('click', function() {
+    const fileInput = document.getElementById('restore-file');
+    const file = fileInput.files[0];
+    
+    if (!file) {
+        alert('Pilih file backup terlebih dahulu!');
+        return;
+    }
+    
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const data = JSON.parse(e.target.result);
+            
+            if (!data.purchases || !data.employees) {
+                alert('File backup tidak valid!');
+                return;
+            }
+            
+            if (!confirm('Restore data akan mengganti semua data saat ini. Lanjutkan?')) return;
+            
+            if (data.purchases) localStorage.setItem('pos_purchases', JSON.stringify(data.purchases));
+            if (data.employees) localStorage.setItem('pos_employees', JSON.stringify(data.employees));
+            if (data.products) localStorage.setItem('pos_products', JSON.stringify(data.products));
+            if (data.transactions) localStorage.setItem('pos_transactions', JSON.stringify(data.transactions));
+            if (data.settings) localStorage.setItem('pos_settings', JSON.stringify(data.settings));
+            if (data.notifications) localStorage.setItem('pos_notifications', JSON.stringify(data.notifications));
+            
+            showNotification('Data berhasil direstore!', 'success');
+            fileInput.value = '';
+            loadSettings();
+            loadProfile();
+            loadNotifications();
+        } catch(err) {
+            alert('Gagal membaca file backup: ' + err.message);
+        }
+    };
+    reader.readAsText(file);
+});
+
+// ===================== CLEAR DATA =====================
+document.getElementById('clear-data').addEventListener('click', function() {
+    document.getElementById('confirm-title').textContent = 'Hapus Semua Data';
+    document.getElementById('confirm-message').textContent = 'Anda yakin ingin menghapus semua data aplikasi? Tindakan ini TIDAK DAPAT DIKEMBALIKAN!';
+    document.getElementById('confirm-modal').classList.add('active');
+    
+    document.getElementById('confirm-yes').onclick = function() {
+        const keys = ['pos_purchases', 'pos_employees', 'pos_products', 'pos_transactions', 'pos_settings', 'pos_notifications', 'pos_admin'];
+        keys.forEach(key => localStorage.removeItem(key));
+        document.getElementById('confirm-modal').classList.remove('active');
+        showNotification('Semua data berhasil dihapus!', 'error');
+        loadSettings();
+        loadProfile();
+        loadNotifications();
+        updateAdminDisplay();
+    };
+});
+
+// ===================== NOTIFICATION =====================
+function showNotification(message, type = 'success') {
+    const colors = {
+        success: 'bg-green-600',
+        error: 'bg-red-600',
+        warning: 'bg-amber-600',
+        info: 'bg-blue-600'
+    };
+    
+    const notification = document.createElement('div');
+    notification.className = `fixed top-4 right-4 ${colors[type] || 'bg-brand-purple'} text-white px-6 py-3 rounded-xl shadow-lg z-50 transform transition-all duration-500 translate-x-full`;
+    notification.style.transition = 'transform 0.5s ease-in-out';
+    notification.innerHTML = `
+        <div class="flex items-center gap-3">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+                <path d="${type === 'success' ? 'M5 13l4 4L19 7' : type === 'error' ? 'M6 18L18 6M6 6l12 12' : 'M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z'}" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+            </svg>
+            <span class="font-medium">${message}</span>
+        </div>
+    `;
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.style.transform = 'translateX(0)';
+    }, 100);
+    
+    setTimeout(() => {
+        notification.style.transform = 'translateX(100%)';
+        setTimeout(() => {
+            notification.remove();
+        }, 500);
+    }, 3000);
+}
+
+// ===================== MODAL CONTROLS =====================
+document.querySelectorAll('.close-modal-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        document.getElementById('confirm-modal').classList.remove('active');
+    });
+});
+
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+    overlay.addEventListener('click', function(e) {
+        if (e.target === this) {
+            this.classList.remove('active');
+        }
+    });
+});
+
+// ===================== CHANGE AVATAR =====================
+document.getElementById('change-avatar-btn').addEventListener('click', function() {
+    const name = document.getElementById('profile-name').value || 'Siti Rahayu';
+    const avatarEl = document.getElementById('profile-avatar');
+    avatarEl.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=6359E9&color=fff&size=128&random=${Math.random()}`;
+    showNotification('Avatar berhasil diperbarui!', 'success');
+});
+
+// ===================== INIT =====================
+document.addEventListener('DOMContentLoaded', function() {
+    updateAdminDisplay();
+    updateDate();
+    loadSettings();
+    loadProfile();
+    loadNotifications();
+});
+</script>
+</body>
+</html>

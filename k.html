@@ -1,0 +1,374 @@
+<!DOCTYPE html><html class="dark" lang="id" style="width: 1280px; height: 1024px; overflow: hidden; position: relative;"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Little Story POS - Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@100..900&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-primary-container": "#d6ad6e",
+                        "on-primary-fixed-variant": "#5e410c",
+                        "primary-container": "#5d400b",
+                        "surface-variant": "#353535",
+                        "on-surface-variant": "#d2c4b5",
+                        "on-error-container": "#ffdad6",
+                        "secondary": "#634eba", // Adjusting secondary to match purple button in UI
+                        "surface": "#131313",
+                        "primary-fixed-dim": "#ebc080",
+                        "on-primary": "#432c00",
+                        "surface-container-high": "#2a2a2a",
+                        "on-error": "#690005",
+                        "on-secondary-fixed-variant": "#483890",
+                        "surface-container": "#1f1f1f",
+                        "secondary-container": "#4b3a93",
+                        "inverse-on-surface": "#303030",
+                        "inverse-surface": "#e2e2e2",
+                        "inverse-primary": "#795923",
+                        "on-background": "#e2e2e2",
+                        "surface-container-low": "#1b1b1b",
+                        "on-secondary-container": "#bcaeff",
+                        "tertiary-fixed": "#e2e2e2",
+                        "tertiary-container": "#444646",
+                        "primary-fixed": "#ffddaf",
+                        "on-tertiary-fixed-variant": "#454747",
+                        "tertiary-fixed-dim": "#c6c6c7",
+                        "on-secondary": "#321e79",
+                        "background": "#000000", // Strictly dark background as requested
+                        "surface-bright": "#393939",
+                        "on-tertiary-container": "#b3b4b4",
+                        "surface-tint": "#ebc080",
+                        "on-tertiary": "#2f3131",
+                        "on-secondary-fixed": "#1c0062",
+                        "outline-variant": "#4e453a",
+                        "secondary-fixed": "#e6deff",
+                        "primary": "#ebc080",
+                        "error": "#ffb4ab",
+                        "on-surface": "#e2e2e2",
+                        "surface-container-lowest": "#0e0e0e",
+                        "on-primary-fixed": "#281800",
+                        "error-container": "#93000a",
+                        "surface-container-highest": "#353535",
+                        "secondary-fixed-dim": "#cabeff",
+                        "tertiary": "#c6c6c7",
+                        "on-tertiary-fixed": "#1a1c1c",
+                        "surface-dim": "#131313",
+                        "outline": "#9b8f81"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "8px",
+                        "xl": "12px",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "grid-gutter": "24px",
+                        "card-padding": "16px",
+                        "sidebar-width": "240px",
+                        "section-margin": "32px",
+                        "element-gap": "12px"
+                    },
+                    "fontFamily": {
+                        "headline-lg": ["Plus Jakarta Sans"],
+                        "price-display": ["Plus Jakarta Sans"],
+                        "body-md": ["Plus Jakarta Sans"],
+                        "headline-md": ["Plus Jakarta Sans"],
+                        "label-caps": ["Plus Jakarta Sans"],
+                        "body-lg": ["Plus Jakarta Sans"]
+                    },
+                    "fontSize": {
+                        "headline-lg": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
+                        "price-display": ["18px", {"lineHeight": "24px", "fontWeight": "800"}],
+                        "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "500"}],
+                        "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "700"}],
+                        "label-caps": ["10px", {"lineHeight": "14px", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                        "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "600"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #000000;
+        }
+        /* Custom scrollbar for content area */
+        .content-scroll::-webkit-scrollbar { width: 6px; }
+        .content-scroll::-webkit-scrollbar-track { background: #000000; }
+        .content-scroll::-webkit-scrollbar-thumb { background: #333333; border-radius: 3px; }
+    </style>
+</head>
+<body class="bg-background text-on-background">
+<!-- Sidebar (Shared Component: SideNavBar) -->
+<aside class="w-sidebar-width h-full fixed left-0 top-0 bg-primary-container flex flex-col py-6 z-50">
+<div class="px-6 mb-10 flex items-center gap-3">
+<div class="w-10 h-10 bg-on-primary-fixed-variant rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: &quot;FILL&quot; 1;">coffee</span>
+</div>
+<div>
+<h1 class="font-headline-md text-headline-md font-bold text-on-primary-container leading-none">Little Story</h1>
+<span class="font-label-caps text-label-caps text-on-primary-container/60 uppercase tracking-widest">ENTERPRISE ERP</span>
+</div>
+</div>
+<nav class="flex-1 space-y-1">
+<!-- Dashboard (Active) -->
+<a class="bg-white/10 text-on-primary-container rounded-lg mx-2 flex items-center gap-element-gap p-3 transition-colors active:scale-95 duration-150" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: &quot;FILL&quot; 1;">dashboard</span>
+<span class="font-body-md text-body-md">Dashboard</span>
+</a>
+<!-- Transaksi -->
+<a class="text-on-primary-container/70 hover:bg-white/5 hover:text-on-primary-container mx-2 flex items-center gap-element-gap p-3 transition-colors active:scale-95 duration-150" href="transaksi.html">
+<span class="material-symbols-outlined">point_of_sale</span>
+<span class="font-body-md text-body-md">Transaksi</span>
+</a>
+<!-- Produk -->
+<a class="text-on-primary-container/70 hover:bg-white/5 hover:text-on-primary-container mx-2 flex items-center gap-element-gap p-3 transition-colors active:scale-95 duration-150" href="p.html">
+<span class="material-symbols-outlined">inventory_2</span>
+<span class="font-body-md text-body-md">Produk</span>
+</a>
+<!-- Riwayat Transaksi -->
+<a class="text-on-primary-container/70 hover:bg-white/5 hover:text-on-primary-container mx-2 flex items-center gap-element-gap p-3 transition-colors active:scale-95 duration-150" href="riwayat.html">
+<span class="material-symbols-outlined">history</span>
+<span class="font-body-md text-body-md">Riwayat Transaksi</span>
+</a>
+<!-- Shift Kasir -->
+<a class="text-on-primary-container/70 hover:bg-white/5 hover:text-on-primary-container mx-2 flex items-center gap-element-gap p-3 transition-colors active:scale-95 duration-150" href="sift.html">
+<span class="material-symbols-outlined">schedule</span>
+<span class="font-body-md text-body-md">Shift Kasir</span>
+</a>
+<!-- Pengaturan -->
+<a class="text-on-primary-container/70 hover:bg-white/5 hover:text-on-primary-container mx-2 flex items-center gap-element-gap p-3 transition-colors active:scale-95 duration-150" href="pengaturan.html">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-body-md text-body-md">Pengaturan</span>
+</a>
+</nav>
+
+</aside>
+<!-- Main Content Canvas -->
+<main class="ml-sidebar-width min-h-screen flex flex-col">
+<!-- Top Bar (Shared Component: TopAppBar) -->
+<header class="h-20 w-full sticky top-0 z-40 bg-background flex justify-between items-center px-grid-gutter border-b border-white/5">
+<div class="flex-1 max-w-md">
+<div class="relative group">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant group-focus-within:text-primary transition-colors">search</span>
+<input class="w-full bg-surface-container-high border-none rounded-full py-2.5 pl-12 pr-4 text-on-surface font-body-md focus:ring-2 focus:ring-primary/50 transition-all" placeholder="Cari produk..." type="text">
+</div>
+</div>
+<div class="flex items-center gap-6">
+
+<div class="flex items-center gap-4 border-l border-white/10 pl-6">
+<div class="text-right">
+<p class="font-label-caps text-on-surface-variant uppercase tracking-tighter">Kasir</p>
+<p class="font-body-lg text-on-surface">Sarah Wijaya</p>
+</div>
+<img class="w-10 h-10 rounded-full object-cover border border-primary/20" data-alt="A professional headshot of a female cashier named Sarah Wijaya, featuring a warm and welcoming expression. She has sleek black hair and is dressed in a minimalist, modern corporate uniform that complements the warm minimalist aesthetic of the high-end coffee shop environment. The lighting is soft and flattering, highlighting her friendly features against a subtly blurred cafe background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAYTZwsiM_474tkqVJwk7LI3d_fa4RfQ6jOu2AvL5GcMV-Bqg823Y7Vg_iqC4ol8PiPr1liLPCA0FsntKwylC0mE0eIw6ecFBSYwRztKsiSQkajYOlPVataAMp9qGmTAoYeeON0qiBJ9CruYwcwMEO8E7ayGcReE18EJjgAzUUEaWf3SjsSi1BH-Ybsha2ed21I9T4pkLM65TJSOikrYFLH56NluOJqYUMs91nJnVwlaHVkg72HO2FERzYIoTC4y75pSTy1QHyspX-Q">
+<button class="text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+</div>
+</div>
+</header>
+<!-- Categories and Main Area -->
+<div class="flex-1 p-grid-gutter overflow-y-auto content-scroll">
+<!-- Pill Filters -->
+<div class="flex gap-3 mb-8">
+    <a href="s.html">
+<button class="bg-white text-surface px-6 py-2 rounded-full font-body-md hover:bg-opacity-90 transition-all">Semua</button></a>
+<button class="bg-secondary text-white px-6 py-2 rounded-full font-body-md transition-all ring-2 ring-secondary/20">Minuman</button>
+<a href="m.html">
+<button class="bg-white text-surface px-6 py-2 rounded-full font-body-md hover:bg-opacity-90 transition-all" >Makanan</button></a>
+</div>
+<!-- Product Grid -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+<!-- Thai Tea -->
+<div class="bg-white rounded-xl overflow-hidden shadow-xl hover:translate-y-[-4px] transition-transform cursor-pointer">
+<img class="w-full aspect-[4/3] object-cover" data-alt="A glass of Thai Iced Tea with its signature bright orange color, layered beautifully with creamy evaporated milk on top. The glass is sweat-beaded with condensation, sitting on a warm wooden coaster. The scene is shot with high-end food photography lighting, emphasizing the vibrant colors and refreshing texture, perfectly matching the Little Story cafe aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAeeRksBGrTSnK_AP-ZhB3KKB9wtsY5mPBePQ2fG0gDuSSLwgdWR8N7Ks-3mXsdMmCALE91KvHzqRmRzU_k1_BWZofFLalnPeb4PpcP4CqvosdwAAym19AaYwD9f-FXEO1gY44si-ULmG7Zzv9kbhol4KSr0EgIYy07Q_hs4d53_6BJidVcYmWeKvWDea4nheraEodIIadH8nSdkbI8r6GO_4-aDARzf2nlPUFDPaut9RII7Lkb0pSQ9VvIwrTPU-GTYCrgZZb2pxx3">
+<div class="p-card-padding">
+<h3 class="font-headline-md text-headline-md text-surface mb-2">Thai tea</h3>
+<p class="font-price-display text-price-display text-secondary">Rp 15.000</p>
+</div>
+</div>
+<!-- Cappuccino -->
+<div class="bg-white rounded-xl overflow-hidden shadow-xl hover:translate-y-[-4px] transition-transform cursor-pointer">
+<img class="w-full aspect-[4/3] object-cover" data-alt="A classic cappuccino served in a minimalist white ceramic cup, featuring perfect latte art with a heart shape in the foam. The background is a soft-focus warm minimalist coffee shop interior. The image captures the artisanal quality and warmth of the drink, highlighted by natural sunlight streaming through a window." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD-yA0jGVbaV2URE3bTc6RPKh41RhP5OAPrSjJfYz_qYQvCP6rpEG4PnhhiXr47x9RBV-u0RkcQIjECRZo-pHF1Fo7RmlFgSgNd05UepbuNiR25fDl6R_uWvEtROZ1p3HVkvQqH4T86rp9RQZZB4xPJd7pU234f6Pa8kKtF4_3VfQeWKoBXzPEH9zk9qF-rTbQUjVPhUqB1lO4GhRlpIehReFkAVpzOJaIPiIrDYAKOrieqqE9-CwJqtlXw-aNhhMbSMb4J29Ep_2TD">
+<div class="p-card-padding">
+<h3 class="font-headline-md text-headline-md text-surface mb-2">Cappuccino</h3>
+<p class="font-price-display text-price-display text-secondary">Rp 15.000</p>
+</div>
+</div>
+<!-- Latte -->
+
+<!-- Gula Aren -->
+<div class="bg-white rounded-xl overflow-hidden shadow-xl hover:translate-y-[-4px] transition-transform cursor-pointer">
+<img class="w-full aspect-[4/3] object-cover" data-alt="A trendy Indonesian Gula Aren latte in a tall glass, showing the distinct marble-like layers of dark palm sugar at the bottom, creamy milk in the middle, and espresso on top. Ice cubes are visible throughout. The background is dark and moody, punctuated by coffee beans scattered on the table, reflecting a premium retail vibe." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDLpA_xLSOMopD_9XGlO-zQWD47U-S9yKechHxEJ50i8bnqDyUIfbY8wXgNbV1uYiLuulVsb0tHX9zunTZZ-6G6alWZcvqr5GI7eVASYcgzl5tIqLjQoRkSshpgsWRD1LopHwd7QUBpqc-GwwvsPYHi-PHOXt0C1aZ8rfVnE4GHZE0PA6syJ_HKjO5f-6PWyZiH6NbaiuYbHjcbGGXy4b_8epq0-tT2QFefcNnWvOj13mKapNnOS5O413mr0-kZx_uez2BfmB4bDhQs">
+<div class="p-card-padding">
+<h3 class="font-headline-md text-headline-md text-surface mb-2">Gula Aren</h3>
+<p class="font-price-display text-price-display text-secondary">Rp 20.000</p>
+</div>
+</div>
+<!-- Matcha Latte -->
+<div class="bg-white rounded-xl overflow-hidden shadow-xl hover:translate-y-[-4px] transition-transform cursor-pointer">
+<img class="w-full aspect-[4/3] object-cover" data-alt="A vibrant green iced matcha latte in a glass with a clean minimalist design. The drink is garnished with a light dusting of matcha powder on the thick white foam. The image uses a clean, high-key lighting style to showcase the freshness of the green tea against the crisp white foam and clear glass." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBs_4iDhOispOAIY4veLDTJCzHm2fChrHjyuQbocTSeY111ZWJo9A2B0I9902fMkjBXd6_YX2_TvK4AidLBwW47XiWFst1_4fAEnZHP8T6xk3rD9LVqW7fQ2lfZ2-vnN4C1gNZhHBbzDNuDeX4tieh7hNYzHvAbr4irh2kDzQCHEvebrXrzYNj4NEkNb9eh6BdWcLw0iQXuiTmKgx1bT5u4fwRLkSl8LaooCPYbD-5e5_8d06fmoPq7ShzXYr4YLQRh5LJmh5ngPIG2">
+<div class="p-card-padding">
+<h3 class="font-headline-md text-headline-md text-surface mb-2">Matcha latte</h3>
+<p class="font-price-display text-price-display text-secondary">Rp 17.000</p>
+</div>
+</div>
+<!-- Signature Coffee -->
+<div class="bg-white rounded-xl overflow-hidden shadow-xl hover:translate-y-[-4px] transition-transform cursor-pointer">
+
+
+</div>
+<!-- Americano -->
+<div class="bg-white rounded-xl overflow-hidden shadow-xl hover:translate-y-[-4px] transition-transform cursor-pointer">
+
+
+</div>
+</div>
+</div>
+<!-- Bottom Summary Cards -->
+<footer class="p-grid-gutter border-t border-white/5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+<!-- Total Transaksi -->
+<div class="bg-white p-card-padding rounded-xl flex flex-col justify-between h-32 shadow-lg">
+<div>
+<p class="font-label-caps text-label-caps text-surface-variant uppercase tracking-widest leading-tight">TOTAL TRANSAKSI</p>
+<p class="font-label-caps text-[8px] text-surface-variant/70 uppercase">HARI INI</p>
+</div>
+<p class="font-headline-lg text-headline-lg text-surface font-extrabold">Rp 2.750.000</p>
+</div>
+<!-- Jumlah Transaksi -->
+<div class="bg-white p-card-padding rounded-xl flex flex-col justify-between h-32 shadow-lg">
+<div>
+<p class="font-label-caps text-label-caps text-surface-variant uppercase tracking-widest leading-tight">JUMLAH TRANSAKSI</p>
+</div>
+<p class="font-headline-lg text-headline-lg text-surface font-extrabold">122</p>
+</div>
+<!-- Rata-rata Transaksi -->
+<div class="bg-white p-card-padding rounded-xl flex flex-col justify-between h-32 shadow-lg">
+<div>
+<p class="font-label-caps text-label-caps text-surface-variant uppercase tracking-widest leading-tight">RATA-RATA</p>
+<p class="font-label-caps text-[8px] text-surface-variant/70 uppercase">TRANSAKSI</p>
+</div>
+<p class="font-headline-lg text-headline-lg text-surface font-extrabold">Rp 22.541</p>
+</div>
+<!-- Uang di Laci -->
+<div class="bg-white p-card-padding rounded-xl flex flex-col justify-between h-32 shadow-lg">
+<div>
+<p class="font-label-caps text-label-caps text-surface-variant uppercase tracking-widest leading-tight">UANG DI LACI</p>
+</div>
+<p class="font-headline-lg text-headline-lg text-surface font-extrabold">Rp 1.250.000</p>
+</div>
+</footer>
+</main>
+<script>
+        // Micro-interactions
+        document.querySelectorAll('a, button').forEach(el => {
+            el.addEventListener('mousedown', () => {
+                el.classList.add('scale-95');
+            });
+            el.addEventListener('mouseup', () => {
+                el.classList.remove('scale-95');
+            });
+            el.addEventListener('mouseleave', () => {
+                el.classList.remove('scale-95');
+            });
+        });
+
+        // Search bar focus effect
+        const searchInput = document.querySelector('input[type="text"]');
+        searchInput.addEventListener('focus', () => {
+            searchInput.parentElement.classList.add('ring-2', 'ring-primary/50');
+        });
+        searchInput.addEventListener('blur', () => {
+            searchInput.parentElement.classList.remove('ring-2', 'ring-primary/50');
+        });
+    </script>
+
+
+
+
+<script>
+(function() {
+    const searchInput = document.querySelector('input[placeholder="Cari produk..."]');
+    const productGrid = document.querySelector('.grid.grid-cols-1.sm\\:grid-cols-2.lg\\:grid-cols-4');
+    
+    if (!searchInput || !productGrid) return;
+
+    searchInput.addEventListener('input', (e) => {
+        const searchTerm = e.target.value.toLowerCase().trim();
+        const productCards = productGrid.children;
+
+        Array.from(productCards).forEach(card => {
+            const productName = card.querySelector('h3')?.textContent.toLowerCase() || '';
+            if (productName.includes(searchTerm)) {
+                card.style.display = '';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    });
+})();
+</script>
+
+
+
+
+
+<script>
+(function() {
+    const filterButtons = {
+        semua: document.getElementById('filter-semua'),
+        minuman: document.getElementById('filter-minuman'),
+        makanan: document.getElementById('filter-makanan')
+    };
+    const productCards = document.querySelectorAll('.grid.grid-cols-1.sm\\:grid-cols-2.lg\\:grid-cols-4 > div[data-category]');
+
+    const activeClasses = ['bg-secondary', 'text-white', 'ring-2', 'ring-secondary/20'];
+    const inactiveClasses = ['bg-white', 'text-surface', 'hover:bg-opacity-90'];
+
+    function updateFilter(category) {
+        // Update Button Styles
+        Object.entries(filterButtons).forEach(([key, btn]) => {
+            if (key === category) {
+                btn.classList.add(...activeClasses);
+                btn.classList.remove(...inactiveClasses);
+            } else {
+                btn.classList.remove(...activeClasses);
+                btn.classList.add(...inactiveClasses);
+            }
+        });
+
+        // Filter Products
+        productCards.forEach(card => {
+            if (category === 'semua' || card.getAttribute('data-category') === category) {
+                card.style.display = 'block';
+                setTimeout(() => { card.style.opacity = '1'; card.style.transform = 'scale(1)'; }, 10);
+            } else {
+                card.style.opacity = '0';
+                card.style.transform = 'scale(0.95)';
+                setTimeout(() => { card.style.display = 'none'; }, 150);
+            }
+        });
+    }
+
+    filterButtons.semua?.addEventListener('click', () => updateFilter('semua'));
+    filterButtons.minuman?.addEventListener('click', () => updateFilter('minuman'));
+    filterButtons.makanan?.addEventListener('click', () => updateFilter('makanan'));
+
+    // Initialize transition styles for cards
+    productCards.forEach(card => {
+        card.style.transition = 'opacity 150ms ease-in-out, transform 150ms ease-in-out';
+    });
+})();
+</script></body></html>

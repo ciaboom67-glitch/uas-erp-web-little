@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Little Story - Persetujuan Pembelian</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'sidebar-bg': '#432C0B',
+            'sidebar-active': '#5D4017',
+            'brand-purple': '#6359E9',
+            'brand-light-purple': '#F5F4FF',
+            'dashboard-bg': '#F8F9FA',
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          },
+        }
+      }
+    }
+  </script>
+<style>
+    body {
+      background-color: #F8F9FA;
+    }
+    .custom-shadow {
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+    }
+    aside::-webkit-scrollbar {
+      width: 4px;
+    }
+    aside::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 2px;
+    }
+    .dashboard-content {
+      padding: 24px 32px;
+    }
+    .status-badge {
+      padding: 4px 12px;
+      border-radius: 9999px;
+      font-size: 11px;
+      font-weight: 600;
+      display: inline-block;
+    }
+    .status-pending {
+      background: #FEF3C7;
+      color: #D97706;
+    }
+    .status-approved {
+      background: #D1FAE5;
+      color: #059669;
+    }
+    .status-rejected {
+      background: #FEE2E2;
+      color: #DC2626;
+    }
+    .status-draft {
+      background: #E5E7EB;
+      color: #6B7280;
+    }
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-overlay.active {
+      display: flex;
+    }
+    .modal-content {
+      background: white;
+      border-radius: 16px;
+      max-width: 640px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 32px;
+      margin: 16px;
+    }
+    .role-badge {
+      padding: 2px 10px;
+      border-radius: 9999px;
+      font-size: 10px;
+      font-weight: 600;
+      display: inline-block;
+    }
+    .role-admin {
+      background: #E0E7FF;
+      color: #4338CA;
+    }
+    .role-manager {
+      background: #FEF3C7;
+      color: #D97706;
+    }
+    .approve-btn {
+      transition: all 0.2s;
+    }
+    .approve-btn:hover {
+      transform: scale(1.02);
+    }
+    .reject-btn {
+      transition: all 0.2s;
+    }
+    .reject-btn:hover {
+      transform: scale(1.02);
+    }
+    /* Table styling with better spacing */
+    .table-container {
+      padding: 8px 0;
+    }
+    .table-container table {
+      border-collapse: separate;
+      border-spacing: 0;
+      width: 100%;
+    }
+    .table-container th,
+    .table-container td {
+      padding: 14px 16px;
+      vertical-align: middle;
+    }
+    .table-container thead th {
+      padding: 14px 16px;
+      font-weight: 600;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #6B7280;
+      background: #F9FAFB;
+      border-bottom: 2px solid #E5E7EB;
+    }
+    .table-container tbody tr {
+      border-bottom: 1px solid #F3F4F6;
+      transition: background-color 0.15s ease;
+    }
+    .table-container tbody tr:last-child {
+      border-bottom: none;
+    }
+    .table-container tbody tr:hover {
+      background-color: #FAFBFC;
+    }
+    .table-container tbody td {
+      padding: 14px 16px;
+      font-size: 13px;
+    }
+    .action-buttons {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .action-buttons .btn {
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      transition: all 0.15s ease;
+      cursor: pointer;
+      border: none;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .action-buttons .btn-detail {
+      color: #6359E9;
+      background: #F5F4FF;
+    }
+    .action-buttons .btn-detail:hover {
+      background: #E8E6FF;
+    }
+    .action-buttons .btn-approve {
+      color: white;
+      background: #059669;
+    }
+    .action-buttons .btn-approve:hover {
+      background: #047857;
+    }
+    .action-buttons .btn-reject {
+      color: white;
+      background: #DC2626;
+    }
+    .action-buttons .btn-reject:hover {
+      background: #B91C1C;
+    }
+    @media (max-width: 768px) {
+      .dashboard-content {
+        padding: 16px;
+      }
+      .modal-content {
+        padding: 20px;
+      }
+      .table-container th,
+      .table-container td {
+        padding: 10px 12px;
+      }
+      .table-container tbody td {
+        font-size: 12px;
+      }
+      .action-buttons {
+        flex-direction: column;
+        gap: 4px;
+      }
+      .action-buttons .btn {
+        font-size: 10px;
+        padding: 3px 8px;
+      }
+    }
+  </style>
+</head>
+<body class="flex min-h-screen text-slate-800">
+<!-- BEGIN: Sidebar -->
+<aside class="w-64 bg-sidebar-bg text-white flex-shrink-0 flex flex-col hidden lg:flex h-screen sticky top-0">
+<div class="p-6 flex items-center space-x-3">
+<div class="w-8 h-8 bg-white/20 rounded flex items-center justify-center">
+<svg class="h-5 w-5" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+<span class="font-bold text-lg tracking-tight">Little Story</span>
+</div>
+<nav class="flex-1 px-4 py-2 space-y-1 overflow-y-auto">
+<a class="flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium text-white/70 hover:bg-white/5 hover:text-white transition-colors" href="manajer.html">
+<svg class="w-5 h-5" fill="currentColor" viewbox="0 0 20 20"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path></svg>
+<span>Dashboard</span>
+</a>
+<a class="flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium text-white/70 hover:bg-white/5 hover:text-white transition-colors" href="penjualan.html">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span>Penjualan</span>
+</a>
+<a class="flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium text-white/70 hover:bg-white/5 hover:text-white transition-colors" href="pro.html">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span>Produk</span>
+</a>
+<a class="flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium text-white/70 hover:bg-white/5 hover:text-white transition-colors" href="pembelian.html">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span>Pembelian</span>
+</a>
+<a class="flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium text-white/70 hover:bg-white/5 hover:text-white transition-colors" href="karyawan.html">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span>Karyawan</span>
+</a>
+<a class="flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium text-white/70 hover:bg-white/5 hover:text-white transition-colors" href="laporan.html">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span>Laporan</span>
+</a>
+<a class="flex items-center space-x-3 bg-sidebar-active px-4 py-3 rounded-lg text-sm font-medium" href="#">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span>Persetujuan</span>
+</a>
+<a class="flex items-center space-x-3 px-4 py-3 rounded-lg text-sm font-medium text-white/70 hover:bg-white/5 hover:text-white transition-colors" href="peng.html">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span>Pengaturan</span>
+</a>
+</nav>
+</aside>
+<!-- END: Sidebar -->
+
+<!-- BEGIN: Main Content -->
+<main class="flex-1 flex flex-col min-w-0 bg-dashboard-bg h-screen overflow-hidden">
+<!-- BEGIN: Top Header -->
+<header class="h-16 bg-white border-b border-gray-100 flex items-center justify-between px-8 flex-shrink-0">
+<div class="relative w-96">
+<span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400">
+<svg class="h-5 w-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</span>
+<input class="block w-full pl-10 pr-3 py-2 border-none bg-gray-100 rounded-lg text-sm focus:ring-brand-purple focus:ring-1" placeholder="Cari data, laporan, atau menu..." type="text"/>
+</div>
+<div class="flex items-center space-x-4">
+<div class="text-right">
+<p class="text-sm font-semibold text-gray-800" id="">Manager</p>
+<p class="text-xs text-gray-400">Siti Rahayu</p>
+</div>
+<img alt="Admin Profile" class="w-10 h-10 rounded-full border-2 border-white custom-shadow" id="admin-avatar" src="https://ui-avatars.com/api/?name=Admin+Manager&background=6359E9&color=fff&size=128"/>
+</div>
+</header>
+<!-- END: Top Header -->
+
+<!-- BEGIN: Dashboard Body -->
+<div class="flex-1 overflow-y-auto dashboard-content">
+<div class="max-w-7xl mx-auto space-y-6">
+<!-- Page Title Row -->
+<div class="flex flex-wrap justify-between items-center gap-4 mb-2">
+<div>
+<h1 class="text-2xl font-bold text-gray-900">Persetujuan Pembelian</h1>
+<p class="text-sm text-gray-500 mt-1" id="current-date">Setujui atau tolak pengajuan pembelian dari bagian gudang</p>
+</div>
+<div class="flex gap-3">
+<button id="filter-btn" class="border border-gray-200 bg-white px-4 py-2.5 rounded-lg text-sm font-medium flex items-center space-x-2 hover:bg-gray-50 transition">
+<svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+<span>Filter</span>
+</button>
+</div>
+</div>
+
+<!-- Summary Cards -->
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+<div class="bg-white rounded-xl custom-shadow border border-gray-50 p-4">
+<p class="text-xs text-gray-400 font-medium">Total Pengajuan</p>
+<p class="text-2xl font-bold text-gray-900" id="total-purchases">0</p>
+</div>
+<div class="bg-white rounded-xl custom-shadow border border-gray-50 p-4">
+<p class="text-xs text-gray-400 font-medium">Menunggu Persetujuan</p>
+<p class="text-2xl font-bold text-amber-600" id="pending-count">0</p>
+</div>
+<div class="bg-white rounded-xl custom-shadow border border-gray-50 p-4">
+<p class="text-xs text-gray-400 font-medium">Disetujui</p>
+<p class="text-2xl font-bold text-green-600" id="approved-count">0</p>
+</div>
+<div class="bg-white rounded-xl custom-shadow border border-gray-50 p-4">
+<p class="text-xs text-gray-400 font-medium">Ditolak</p>
+<p class="text-2xl font-bold text-red-600" id="rejected-count">0</p>
+</div>
+</div>
+
+<!-- Purchase List with Improved Spacing -->
+<div class="bg-white rounded-2xl custom-shadow border border-gray-50 overflow-hidden table-container">
+<div class="overflow-x-auto">
+<table>
+<thead>
+<tr>
+<th>No.</th>
+<th>Tanggal</th>
+<th>Supplier</th>
+<th>Item</th>
+<th>Jumlah</th>
+<th>Total</th>
+<th>Status</th>
+<th>Diajukan Oleh</th>
+<th class="text-center">Aksi</th>
+</tr>
+</thead>
+<tbody id="purchase-table-body">
+<tr>
+<td colspan="9" class="text-center py-8 text-gray-400">Belum ada pengajuan pembelian</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+<!-- END: Dashboard Body -->
+</main>
+<!-- END: Main Content -->
+
+<!-- BEGIN: Modal Detail Persetujuan -->
+<div class="modal-overlay" id="detail-modal">
+<div class="modal-content">
+<div class="flex justify-between items-center mb-5">
+<h2 class="text-xl font-bold text-gray-900" id="detail-title">Detail Pengajuan</h2>
+<button class="text-gray-400 hover:text-gray-600 close-modal-btn">
+<svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12" stroke-width="2"/></svg>
+</button>
+</div>
+<div id="detail-content" class="space-y-3">
+<div class="grid grid-cols-2 gap-3">
+<div><span class="text-gray-500 text-sm">Supplier</span><p class="font-semibold" id="d-supplier">-</p></div>
+<div><span class="text-gray-500 text-sm">Tanggal</span><p class="font-semibold" id="d-date">-</p></div>
+</div>
+<div class="grid grid-cols-2 gap-3">
+<div><span class="text-gray-500 text-sm">Item</span><p class="font-semibold" id="d-item">-</p></div>
+<div><span class="text-gray-500 text-sm">Jumlah</span><p class="font-semibold" id="d-qty">-</p></div>
+</div>
+<div><span class="text-gray-500 text-sm">Total Harga</span><p class="font-semibold text-xl text-brand-purple" id="d-total">-</p></div>
+<div><span class="text-gray-500 text-sm">Status</span><p id="d-status">-</p></div>
+<div><span class="text-gray-500 text-sm">Catatan</span><p class="text-gray-700" id="d-notes">-</p></div>
+<div><span class="text-gray-500 text-sm">Diajukan Oleh</span><p class="font-semibold" id="d-submitted-by">-</p></div>
+</div>
+<div id="detail-actions" class="flex gap-3 mt-5 pt-4 border-t border-gray-100"></div>
+</div>
+</div>
+<!-- END: Modal Detail -->
+
+<script>
+// ===================== ADMIN PROFILE =====================
+const ADMIN_PROFILE = {
+    name: 'Admin Manager',
+    avatar: 'https://ui-avatars.com/api/?name=Admin+Manager&background=6359E9&color=fff&size=128'
+};
+
+// ===================== DATA STORE =====================
+let purchases = [];
+let currentFilter = 'pending';
+
+// Load data from localStorage
+function loadPurchases() {
+    try {
+        const saved = localStorage.getItem('pos_purchases');
+        if (saved) {
+            purchases = JSON.parse(saved);
+        } else {
+            // Sample data - same as pembelian page but with more pending items
+            purchases = [
+                {
+                    id: 1,
+                    date: new Date(Date.now() - 86400000 * 2).toISOString(),
+                    supplier: 'PT Sumber Makmur',
+                    itemName: 'Tepung Terigu 25kg',
+                    qty: 50,
+                    price: 12000,
+                    total: 600000,
+                    status: 'approved',
+                    notes: 'Untuk produksi roti bulan ini',
+                    submittedBy: 'Budi Santoso',
+                    approvedBy: 'Manager',
+                    approvedAt: new Date(Date.now() - 86400000).toISOString()
+                },
+                {
+                    id: 2,
+                    date: new Date(Date.now() - 86400000 * 3).toISOString(),
+                    supplier: 'CV Berkah Abadi',
+                    itemName: 'Gula Pasir 50kg',
+                    qty: 30,
+                    price: 15000,
+                    total: 450000,
+                    status: 'pending',
+                    notes: 'Stok gula menipis, perlu segera diisi',
+                    submittedBy: 'Budi Santoso'
+                },
+                {
+                    id: 3,
+                    date: new Date(Date.now() - 86400000 * 4).toISOString(),
+                    supplier: 'UD Jaya Sentosa',
+                    itemName: 'Minyak Goreng 20L',
+                    qty: 20,
+                    price: 25000,
+                    total: 500000,
+                    status: 'rejected',
+                    notes: 'Harga terlalu tinggi',
+                    submittedBy: 'Siti Rahayu',
+                    rejectedBy: 'Manager',
+                    rejectedAt: new Date(Date.now() - 86400000 * 2).toISOString(),
+                    reason: 'Budget tidak mencukupi'
+                },
+                {
+                    id: 4,
+                    date: new Date(Date.now() - 86400000 * 1).toISOString(),
+                    supplier: 'Toko Maju Jaya',
+                    itemName: 'Telur Ayam 30kg',
+                    qty: 100,
+                    price: 5000,
+                    total: 500000,
+                    status: 'pending',
+                    notes: 'Permintaan mendesak untuk produksi kue',
+                    submittedBy: 'Siti Rahayu'
+                },
+                {
+                    id: 5,
+                    date: new Date(Date.now() - 86400000 * 5).toISOString(),
+                    supplier: 'PT Indo Food',
+                    itemName: 'Mentega 10kg',
+                    qty: 40,
+                    price: 18000,
+                    total: 720000,
+                    status: 'pending',
+                    notes: 'Stok hampir habis',
+                    submittedBy: 'Budi Santoso'
+                },
+                {
+                    id: 6,
+                    date: new Date(Date.now() - 86400000 * 6).toISOString(),
+                    supplier: 'CV Berkah Abadi',
+                    itemName: 'Susu Bubuk 25kg',
+                    qty: 20,
+                    price: 35000,
+                    total: 700000,
+                    status: 'pending',
+                    notes: 'Untuk produksi minuman',
+                    submittedBy: 'Siti Rahayu'
+                }
+            ];
+            savePurchases();
+        }
+    } catch(e) {
+        purchases = [];
+    }
+}
+
+function savePurchases() {
+    try {
+        localStorage.setItem('pos_purchases', JSON.stringify(purchases));
+    } catch(e) {}
+}
+
+// ===================== FORMAT HELPERS =====================
+function formatPrice(num) {
+    return 'Rp ' + (num || 0).toLocaleString('id-ID');
+}
+
+function formatDate(dateStr) {
+    if (!dateStr) return '-';
+    const d = new Date(dateStr);
+    return d.toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' });
+}
+
+function formatDateTime(dateStr) {
+    if (!dateStr) return '-';
+    const d = new Date(dateStr);
+    return d.toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+}
+
+function getStatusBadge(status) {
+    const map = {
+        'draft': '<span class="status-badge status-draft">Draft</span>',
+        'pending': '<span class="status-badge status-pending">Menunggu</span>',
+        'approved': '<span class="status-badge status-approved">Disetujui</span>',
+        'rejected': '<span class="status-badge status-rejected">Ditolak</span>'
+    };
+    return map[status] || '<span class="status-badge status-draft">' + status + '</span>';
+}
+
+// ===================== UPDATE DISPLAY =====================
+function updateAdminDisplay() {
+    const nameEl = document.getElementById('admin-name');
+    const avatarEl = document.getElementById('admin-avatar');
+    if (nameEl) nameEl.textContent = ADMIN_PROFILE.name;
+    if (avatarEl) avatarEl.src = ADMIN_PROFILE.avatar;
+}
+
+function updateDashboard() {
+    // Update date
+    const now = new Date();
+    const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+    const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+    document.getElementById('current-date').textContent = `Setujui atau tolak pengajuan pembelian dari bagian gudang - ${days[now.getDay()]}, ${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
+
+    // Filter purchases - only show pending by default
+    let filtered = purchases;
+    if (currentFilter === 'pending') {
+        filtered = purchases.filter(p => p.status === 'pending');
+    } else if (currentFilter === 'all') {
+        filtered = purchases;
+    } else {
+        filtered = purchases.filter(p => p.status === currentFilter);
+    }
+
+    // Update summary
+    document.getElementById('total-purchases').textContent = purchases.length;
+    document.getElementById('pending-count').textContent = purchases.filter(p => p.status === 'pending').length;
+    document.getElementById('approved-count').textContent = purchases.filter(p => p.status === 'approved').length;
+    document.getElementById('rejected-count').textContent = purchases.filter(p => p.status === 'rejected').length;
+
+    // Render table
+    const tbody = document.getElementById('purchase-table-body');
+    if (filtered.length === 0) {
+        const msg = currentFilter === 'pending' ? 'Tidak ada pengajuan yang menunggu persetujuan' : 'Tidak ada data dengan status ini';
+        tbody.innerHTML = `<tr><td colspan="9" class="text-center py-8 text-gray-400">${msg}</td></tr>`;
+        return;
+    }
+
+    tbody.innerHTML = filtered.map((p, index) => `
+        <tr>
+            <td class="font-medium text-gray-500">${index + 1}</td>
+            <td class="text-gray-700">${formatDate(p.date)}</td>
+            <td class="font-medium text-gray-700">${p.supplier}</td>
+            <td class="text-gray-700">${p.itemName}</td>
+            <td class="text-gray-700">${p.qty} unit</td>
+            <td class="font-semibold text-gray-700">${formatPrice(p.total)}</td>
+            <td>${getStatusBadge(p.status)}</td>
+            <td class="text-gray-600 text-sm">${p.submittedBy}</td>
+            <td>
+                <div class="action-buttons">
+                    <button class="btn btn-detail detail-btn" data-id="${p.id}">
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/><path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+                        Detail
+                    </button>
+                    ${p.status === 'pending' ? `
+                        <button class="btn btn-approve approve-btn" data-id="${p.id}">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+                            Setujui
+                        </button>
+                        <button class="btn btn-reject reject-btn" data-id="${p.id}">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+                            Tolak
+                        </button>
+                    ` : ''}
+                </div>
+            </td>
+        </tr>
+    `).join('');
+
+    // Attach event listeners for buttons
+    document.querySelectorAll('.detail-btn').forEach(btn => {
+        btn.addEventListener('click', () => openDetail(parseInt(btn.dataset.id)));
+    });
+    document.querySelectorAll('.approve-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            approvePurchase(parseInt(btn.dataset.id));
+        });
+    });
+    document.querySelectorAll('.reject-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            rejectPurchase(parseInt(btn.dataset.id));
+        });
+    });
+}
+
+// ===================== OPEN DETAIL =====================
+function openDetail(id) {
+    const p = purchases.find(item => item.id === id);
+    if (!p) return;
+
+    document.getElementById('detail-title').textContent = `Detail Pengajuan #${p.id}`;
+    document.getElementById('d-supplier').textContent = p.supplier;
+    document.getElementById('d-date').textContent = formatDateTime(p.date);
+    document.getElementById('d-item').textContent = p.itemName;
+    document.getElementById('d-qty').textContent = p.qty + ' unit';
+    document.getElementById('d-total').textContent = formatPrice(p.total);
+    document.getElementById('d-status').innerHTML = getStatusBadge(p.status);
+    document.getElementById('d-notes').textContent = p.notes || '-';
+    document.getElementById('d-submitted-by').textContent = p.submittedBy;
+
+    const actions = document.getElementById('detail-actions');
+    if (p.status === 'pending') {
+        actions.innerHTML = `
+            <button class="flex-1 bg-green-600 text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-green-700 transition approve-btn" data-id="${p.id}">
+                <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+                Setujui
+            </button>
+            <button class="flex-1 bg-red-600 text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-red-700 transition reject-btn" data-id="${p.id}">
+                <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+                Tolak
+            </button>
+            <button class="flex-1 bg-gray-200 text-gray-600 px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-gray-300 transition close-modal-btn">Tutup</button>
+        `;
+        actions.querySelector('.approve-btn').addEventListener('click', () => {
+            approvePurchase(p.id);
+            document.getElementById('detail-modal').classList.remove('active');
+        });
+        actions.querySelector('.reject-btn').addEventListener('click', () => {
+            rejectPurchase(p.id);
+            document.getElementById('detail-modal').classList.remove('active');
+        });
+        actions.querySelector('.close-modal-btn').addEventListener('click', () => {
+            document.getElementById('detail-modal').classList.remove('active');
+        });
+    } else {
+        actions.innerHTML = `
+            <button class="flex-1 bg-gray-200 text-gray-600 px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-gray-300 transition close-modal-btn">Tutup</button>
+        `;
+        actions.querySelector('.close-modal-btn').addEventListener('click', () => {
+            document.getElementById('detail-modal').classList.remove('active');
+        });
+    }
+
+    document.getElementById('detail-modal').classList.add('active');
+}
+
+// ===================== APPROVE PURCHASE =====================
+function approvePurchase(id) {
+    const p = purchases.find(item => item.id === id);
+    if (!p) return;
+    if (!confirm(`Setujui pembelian "${p.itemName}" dari ${p.supplier}?`)) return;
+    
+    p.status = 'approved';
+    p.approvedBy = ADMIN_PROFILE.name;
+    p.approvedAt = new Date().toISOString();
+    savePurchases();
+    updateDashboard();
+    
+    // Show success notification
+    showNotification('Pembelian berhasil disetujui!', 'success');
+}
+
+// ===================== REJECT PURCHASE =====================
+function rejectPurchase(id) {
+    const p = purchases.find(item => item.id === id);
+    if (!p) return;
+    const reason = prompt('Masukkan alasan penolakan:');
+    if (reason === null) return;
+    if (reason.trim() === '') {
+        alert('Alasan penolakan harus diisi!');
+        return;
+    }
+    
+    p.status = 'rejected';
+    p.rejectedBy = ADMIN_PROFILE.name;
+    p.rejectedAt = new Date().toISOString();
+    p.reason = reason.trim();
+    savePurchases();
+    updateDashboard();
+    
+    // Show notification
+    showNotification('Pembelian ditolak!', 'error');
+}
+
+// ===================== NOTIFICATION =====================
+function showNotification(message, type = 'success') {
+    // Create notification element
+    const colors = {
+        success: 'bg-green-600',
+        error: 'bg-red-600',
+        warning: 'bg-amber-600',
+        info: 'bg-blue-600'
+    };
+    
+    const notification = document.createElement('div');
+    notification.className = `fixed top-4 right-4 ${colors[type] || 'bg-brand-purple'} text-white px-6 py-3 rounded-xl shadow-lg z-50 transform transition-all duration-500 translate-x-full`;
+    notification.style.transition = 'transform 0.5s ease-in-out';
+    notification.innerHTML = `
+        <div class="flex items-center gap-3">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+                <path d="${type === 'success' ? 'M5 13l4 4L19 7' : 'M6 18L18 6M6 6l12 12'}" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+            </svg>
+            <span class="font-medium">${message}</span>
+        </div>
+    `;
+    document.body.appendChild(notification);
+    
+    // Animate in
+    setTimeout(() => {
+        notification.style.transform = 'translateX(0)';
+    }, 100);
+    
+    // Remove after 3 seconds
+    setTimeout(() => {
+        notification.style.transform = 'translateX(100%)';
+        setTimeout(() => {
+            notification.remove();
+        }, 500);
+    }, 3000);
+}
+
+// ===================== FILTER CONTROLS =====================
+// Simple filter toggle between 'pending' and 'all'
+document.getElementById('filter-btn').addEventListener('click', function() {
+    if (currentFilter === 'pending') {
+        currentFilter = 'all';
+        this.innerHTML = `
+            <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+            <span>Lihat Semua</span>
+        `;
+        // Update page title
+        document.querySelector('h1').textContent = 'Semua Pengajuan';
+    } else {
+        currentFilter = 'pending';
+        this.innerHTML = `
+            <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+            <span>Filter</span>
+        `;
+        document.querySelector('h1').textContent = 'Persetujuan Pembelian';
+    }
+    updateDashboard();
+});
+
+// ===================== MODAL CONTROLS =====================
+document.querySelectorAll('.close-modal-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        document.getElementById('detail-modal').classList.remove('active');
+    });
+});
+
+// Close modal on overlay click
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+    overlay.addEventListener('click', function(e) {
+        if (e.target === this) {
+            this.classList.remove('active');
+        }
+    });
+});
+
+// ===================== AUTO REFRESH =====================
+// Check for updates from other tabs
+window.addEventListener('storage', function(e) {
+    if (e.key === 'pos_purchases') {
+        loadPurchases();
+        updateDashboard();
+    }
+});
+
+// ===================== INIT =====================
+document.addEventListener('DOMContentLoaded', function() {
+    updateAdminDisplay();
+    loadPurchases();
+    updateDashboard();
+    
+    // Auto refresh every 10 seconds
+    setInterval(() => {
+        loadPurchases();
+        updateDashboard();
+    }, 10000);
+});
+</script>
+</body>
+</html>

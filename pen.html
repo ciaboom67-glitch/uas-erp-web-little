@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Little Story - Pengaturan</title>
+<!-- Tailwind CSS v3 CDN -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Google Fonts: Inter -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            earthy: {
+              DEFAULT: '#4d3310',
+              sidebar: '#4d3310',
+              surface: '#f8f9fa',
+              'surface-dim': '#d9dadb',
+              'surface-container': '#ffffff',
+            },
+            status: {
+              kritis: '#fee2e2',
+              'kritis-text': '#dc2626',
+              rendah: '#ffedd5',
+              'rendah-text': '#ea580c',
+              aman: '#dcfce7',
+              'aman-text': '#16a34a',
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          },
+        }
+      }
+    }
+  </script>
+<style>
+    * { box-sizing: border-box; }
+    body { background-color: #F8F9FA; }
+    .custom-shadow { box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03); }
+    aside::-webkit-scrollbar { width: 4px; }
+    aside::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 2px; }
+    .dashboard-content { padding: 24px 32px; }
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 100; align-items: center; justify-content: center; }
+    .modal-overlay.active { display: flex; }
+    .modal-content { background: white; border-radius: 16px; max-width: 480px; width: 100%; max-height: 90vh; overflow-y: auto; padding: 32px; margin: 16px; }
+    @media (max-width: 768px) {
+      .dashboard-content { padding: 16px; }
+      .modal-content { padding: 20px; }
+    }
+    .setting-card {
+      transition: all 0.2s ease;
+    }
+    .setting-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.05);
+    }
+    .toggle-checkbox:checked {
+      background-color: #4d3310;
+      border-color: #4d3310;
+    }
+    .toggle-checkbox:checked + .toggle-label {
+      background-color: #4d3310;
+    }
+    .toggle-checkbox:focus + .toggle-label {
+      box-shadow: 0 0 0 3px rgba(77, 51, 16, 0.3);
+    }
+  </style>
+</head>
+<body class="flex min-h-screen text-slate-800 bg-earthy-surface">
+<!-- BEGIN: Sidebar -->
+<aside class="w-64 bg-earthy-sidebar text-white flex-shrink-0 flex flex-col hidden lg:flex h-screen sticky top-0">
+<div class="p-5 flex items-center gap-3">
+<div class="w-8 h-8 bg-white rounded-md flex items-center justify-center flex-shrink-0">
+<div class="w-5 h-5 bg-earthy-sidebar rounded-sm"></div>
+</div>
+<div class="min-w-0">
+<h1 class="text-sm font-bold leading-none">Little Story</h1>
+<span class="text-[10px] opacity-70 tracking-wider">ENTERPRISE ERP</span>
+</div>
+</div>
+<nav class="flex-1 px-3 space-y-1 mt-4 overflow-y-auto">
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-white/60 hover:text-white hover:bg-white/5 transition-colors" href="gudang.html">
+<svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+          Dashboard
+        </a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-white/60 hover:text-white hover:bg-white/5 transition-colors" href="st.html">
+<svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+          Stok
+        </a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-white/60 hover:text-white hover:bg-white/5 transition-colors" href="bm.html">
+<svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M7 16l-4-4m0 0l4-4m-4 4h18" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+          Barang Masuk
+        </a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-white/60 hover:text-white hover:bg-white/5 transition-colors" href="bk.html">
+<svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M17 8l4 4m0 0l-4 4m4-4H3" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+          Barang Keluar
+        </a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-white/60 hover:text-white hover:bg-white/5 transition-colors" href="pengajuan.html">
+<svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+          Pengajuan
+        </a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-white/10 text-white font-medium" href="#">
+<svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+          Pengaturan
+        </a>
+</nav><div class="mt-auto">
+            <a class="text-on-primary-container/70 hover:bg-white/5 hover:text-on-primary-container mx-2 flex items-center gap-element-gap p-3 transition-colors" href="login.html">
+             
+                <span class="font-body-md text-body-md">Keluar</span>
+            </a>
+        </div>
+</aside>
+<!-- END: Sidebar -->
+
+<!-- BEGIN: Main Content -->
+<main class="flex-1 flex flex-col min-w-0 bg-earthy-surface h-screen overflow-hidden">
+<!-- BEGIN: Top Header -->
+<header class="h-16 bg-white border-b border-earthy-surface-dim flex items-center justify-between px-6 lg:px-8 flex-shrink-0">
+<div class="relative w-64 lg:w-96">
+<span class="absolute inset-y-0 left-0 flex items-center pl-3">
+<svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</span>
+<input class="w-full pl-10 pr-4 py-2 bg-slate-100 border-none rounded-lg text-xs focus:ring-1 focus:ring-earthy placeholder:text-slate-400" placeholder="Cari pengaturan..." type="text" id="search-settings"/>
+</div>
+<div class="flex items-center gap-4 lg:gap-6 flex-shrink-0">
+<div class="relative">
+<svg class="w-6 h-6 text-slate-500" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span class="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-white">3</span>
+</div>
+<div class="flex items-center gap-3">
+<div class="text-right hidden sm:block">
+<p class="text-sm font-semibold text-slate-800" id="admin-name">Budi Sentoso</p>
+<p class="text-xs text-slate-400 font-medium">KEPALA GUDANG</p>
+</div>
+<img alt="Admin Profile" class="w-10 h-10 rounded-full border-2 border-white custom-shadow object-cover flex-shrink-0" id="admin-avatar" src="https://ui-avatars.com/api/?name=Budi+Sentoso&background=4d3310&color=fff&size=128"/>
+<svg class="w-4 h-4 text-slate-400 hidden sm:block" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+</div>
+</header>
+<!-- END: Top Header -->
+
+<!-- BEGIN: Dashboard Body -->
+<div class="flex-1 overflow-y-auto dashboard-content">
+<div class="dashboard-container max-w-5xl mx-auto space-y-6">
+<!-- Page Title Row -->
+<div class="flex flex-wrap justify-between items-start gap-4 mb-2">
+<div class="min-w-0">
+<h2 class="text-2xl font-bold text-slate-800">Pengaturan</h2>
+<p class="text-sm text-slate-500 mt-1" id="current-date">Kelola pengaturan dan preferensi sistem</p>
+</div>
+</div>
+
+<!-- Settings Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="settings-grid">
+    <!-- Card 1: Profil -->
+    <div class="setting-card bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
+        <div class="p-5 border-b border-slate-50 flex items-center gap-3">
+            <div class="p-2 bg-blue-50 text-blue-600 rounded-lg">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+            </div>
+            <div>
+                <h3 class="font-semibold text-slate-800">Profil</h3>
+                <p class="text-xs text-slate-400">Kelola informasi akun dan profil</p>
+            </div>
+        </div>
+        <div class="p-5 space-y-3">
+            <div class="flex justify-between items-center">
+                <span class="text-sm text-slate-600">Nama</span>
+                <span class="text-sm font-semibold text-slate-800" id="profile-name">Budi Sentoso</span>
+            </div>
+            <div class="flex justify-between items-center">
+                <span class="text-sm text-slate-600">Email</span>
+                <span class="text-sm font-semibold text-slate-800">budi@littlestory.id</span>
+            </div>
+            <div class="flex justify-between items-center">
+                <span class="text-sm text-slate-600">Role</span>
+                <span class="text-sm font-semibold text-slate-800 bg-earthy/10 px-3 py-1 rounded">Kepala Gudang</span>
+            </div>
+            <button onclick="openEditProfile()" class="w-full mt-2 bg-earthy text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-earthy/90 transition">Edit Profil</button>
+        </div>
+    </div>
+
+    <!-- Card 2: Stok Minimum -->
+    <div class="setting-card bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
+        <div class="p-5 border-b border-slate-50 flex items-center gap-3">
+            <div class="p-2 bg-amber-50 text-amber-600 rounded-lg">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+            </div>
+            <div>
+                <h3 class="font-semibold text-slate-800">Stok Minimum</h3>
+                <p class="text-xs text-slate-400">Atur batas minimum stok per kategori</p>
+            </div>
+        </div>
+        <div class="p-5 space-y-3" id="min-stock-settings">
+            <!-- Akan diisi oleh JavaScript -->
+        </div>
+    </div>
+
+    <!-- Card 3: Notifikasi -->
+    <div class="setting-card bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
+        <div class="p-5 border-b border-slate-50 flex items-center gap-3">
+            <div class="p-2 bg-purple-50 text-purple-600 rounded-lg">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+            </div>
+            <div>
+                <h3 class="font-semibold text-slate-800">Notifikasi</h3>
+                <p class="text-xs text-slate-400">Atur preferensi notifikasi</p>
+            </div>
+        </div>
+        <div class="p-5 space-y-4">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-slate-700">Stok Kritis</p>
+                    <p class="text-xs text-slate-400">Notifikasi saat stok mencapai batas kritis</p>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" class="sr-only peer toggle-checkbox" checked>
+                    <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:bg-earthy transition-all duration-200"></div>
+                    <span class="ml-3 text-sm font-medium text-gray-900 peer-checked:text-earthy">Aktif</span>
+                </label>
+            </div>
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-slate-700">Stok Menipis</p>
+                    <p class="text-xs text-slate-400">Notifikasi saat stok di bawah minimum</p>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" class="sr-only peer toggle-checkbox" checked>
+                    <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:bg-earthy transition-all duration-200"></div>
+                    <span class="ml-3 text-sm font-medium text-gray-900 peer-checked:text-earthy">Aktif</span>
+                </label>
+            </div>
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-slate-700">Pengajuan Baru</p>
+                    <p class="text-xs text-slate-400">Notifikasi saat ada pengajuan baru</p>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" class="sr-only peer toggle-checkbox">
+                    <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:bg-earthy transition-all duration-200"></div>
+                    <span class="ml-3 text-sm font-medium text-gray-900 peer-checked:text-earthy">Nonaktif</span>
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <!-- Card 4: Tampilan -->
+    <div class="setting-card bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
+        <div class="p-5 border-b border-slate-50 flex items-center gap-3">
+            <div class="p-2 bg-indigo-50 text-indigo-600 rounded-lg">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/><path d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+            </div>
+            <div>
+                <h3 class="font-semibold text-slate-800">Tampilan</h3>
+                <p class="text-xs text-slate-400">Atur tema dan preferensi tampilan</p>
+            </div>
+        </div>
+        <div class="p-5 space-y-4">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-slate-700">Mode Gelap</p>
+                    <p class="text-xs text-slate-400">Gunakan tema gelap</p>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" class="sr-only peer toggle-checkbox">
+                    <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:bg-earthy transition-all duration-200"></div>
+                    <span class="ml-3 text-sm font-medium text-gray-900 peer-checked:text-earthy">Nonaktif</span>
+                </label>
+            </div>
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm font-medium text-slate-700">Animasi</p>
+                    <p class="text-xs text-slate-400">Aktifkan animasi halus</p>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" class="sr-only peer toggle-checkbox" checked>
+                    <div class="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:bg-earthy transition-all duration-200"></div>
+                    <span class="ml-3 text-sm font-medium text-gray-900 peer-checked:text-earthy">Aktif</span>
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <!-- Card 5: Sistem -->
+    <div class="setting-card bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
+        <div class="p-5 border-b border-slate-50 flex items-center gap-3">
+            <div class="p-2 bg-rose-50 text-rose-600 rounded-lg">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+            </div>
+            <div>
+                <h3 class="font-semibold text-slate-800">Sistem</h3>
+                <p class="text-xs text-slate-400">Informasi dan pengaturan sistem</p>
+            </div>
+        </div>
+        <div class="p-5 space-y-3">
+            <div class="flex justify-between items-center">
+                <span class="text-sm text-slate-600">Versi</span>
+                <span class="text-sm font-semibold text-slate-800">v2.0.0</span>
+            </div>
+            <div class="flex justify-between items-center">
+                <span class="text-sm text-slate-600">Terakhir Update</span>
+                <span class="text-sm font-semibold text-slate-800" id="last-update">-</span>
+            </div>
+            <div class="flex justify-between items-center">
+                <span class="text-sm text-slate-600">Jumlah Data</span>
+                <span class="text-sm font-semibold text-slate-800" id="total-data">0</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Footer Info -->
+<div class="mt-6 text-center text-xs text-slate-400 border-t border-slate-200 pt-4">
+    <p>Little Story ERP v2.0.0 &copy; 2025 - Semua hak dilindungi</p>
+</div>
+</div>
+</div>
+<!-- END: Dashboard Body -->
+</main>
+<!-- END: Main Content -->
+
+<!-- BEGIN: Modal Edit Profil -->
+<div class="modal-overlay" id="profile-modal">
+<div class="modal-content">
+<div class="flex justify-between items-center mb-5">
+<h2 class="text-xl font-bold text-gray-900">Edit Profil</h2>
+<button class="text-gray-400 hover:text-gray-600 close-modal-btn">
+<svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12" stroke-width="2"/></svg>
+</button>
+</div>
+<form id="profile-form">
+<div class="space-y-4">
+<div>
+<label class="text-sm font-semibold text-gray-700 block mb-1">Nama Lengkap</label>
+<input type="text" id="edit-name" class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-earthy focus:border-transparent" value="Budi Sentoso" required/>
+</div>
+<div>
+<label class="text-sm font-semibold text-gray-700 block mb-1">Email</label>
+<input type="email" id="edit-email" class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-earthy focus:border-transparent" value="budi@littlestory.id" required/>
+</div>
+<div>
+<label class="text-sm font-semibold text-gray-700 block mb-1">Role</label>
+<select id="edit-role" class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-earthy focus:border-transparent">
+<option value="Kepala Gudang" selected>Kepala Gudang</option>
+<option value="Admin Gudang">Admin Gudang</option>
+<option value="Staff Gudang">Staff Gudang</option>
+<option value="Manager">Manager</option>
+</select>
+</div>
+<div class="flex gap-3 pt-3 border-t border-gray-100">
+<button type="submit" class="flex-1 bg-earthy text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-earthy/90 transition">Simpan</button>
+<button type="button" class="flex-1 bg-gray-200 text-gray-600 px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-gray-300 transition close-modal-btn">Batal</button>
+</div>
+</div>
+</form>
+</div>
+</div>
+<!-- END: Modal Edit Profil -->
+
+<script>
+// ===================== ADMIN PROFILE =====================
+const ADMIN_PROFILE = {
+    name: 'Budi Sentoso',
+    avatar: 'https://ui-avatars.com/api/?name=Budi+Sentoso&background=4d3310&color=fff&size=128'
+};
+
+// ===================== LOAD DATA =====================
+function loadSettings() {
+    // Update admin profile
+    document.getElementById('admin-name').textContent = ADMIN_PROFILE.name;
+    document.getElementById('admin-avatar').src = ADMIN_PROFILE.avatar;
+    
+    // Update date
+    const now = new Date();
+    const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+    const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+    document.getElementById('current-date').textContent = `Kelola pengaturan dan preferensi sistem - ${days[now.getDay()]}, ${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
+    
+    // Update last update
+    document.getElementById('last-update').textContent = new Date().toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+    
+    // Count total data
+    let total = 0;
+    try {
+        const stocks = JSON.parse(localStorage.getItem('pos_stocks') || '[]');
+        const inTrans = JSON.parse(localStorage.getItem('pos_in_transactions') || '[]');
+        const outTrans = JSON.parse(localStorage.getItem('pos_out_transactions') || '[]');
+        const purchases = JSON.parse(localStorage.getItem('pos_purchases') || '[]');
+        total = stocks.length + inTrans.length + outTrans.length + purchases.length;
+    } catch(e) {}
+    document.getElementById('total-data').textContent = total;
+    
+    // Load min stock settings
+    loadMinStockSettings();
+}
+
+function loadMinStockSettings() {
+    const container = document.getElementById('min-stock-settings');
+    try {
+        const stocks = JSON.parse(localStorage.getItem('pos_stocks') || '[]');
+        const categories = [...new Set(stocks.map(p => p.category).filter(Boolean))];
+        
+        if (categories.length === 0) {
+            container.innerHTML = `
+                <div class="text-center py-4 text-slate-400 text-sm">
+                    <p>Belum ada kategori</p>
+                    <p class="text-xs mt-1">Tambahkan produk terlebih dahulu</p>
+                </div>
+            `;
+            return;
+        }
+        
+        container.innerHTML = categories.map(cat => {
+            const items = stocks.filter(p => p.category === cat);
+            const avgMin = Math.round(items.reduce((sum, p) => sum + (p.min || 0), 0) / items.length);
+            return `
+            <div class="flex items-center justify-between py-2 border-b border-slate-50 last:border-0">
+                <div>
+                    <p class="text-sm font-medium text-slate-700">${cat}</p>
+                    <p class="text-xs text-slate-400">${items.length} produk</p>
+                </div>
+                <div class="flex items-center gap-2">
+                    <input type="number" class="w-20 px-2 py-1 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-earthy focus:border-transparent" value="${avgMin || 5}" min="1" data-category="${cat}"/>
+                    <span class="text-xs text-slate-500">unit</span>
+                </div>
+            </div>
+        `}).join('');
+    } catch(e) {
+        container.innerHTML = '<p class="text-sm text-slate-400">Gagal memuat data</p>';
+    }
+}
+
+// ===================== SEARCH =====================
+document.getElementById('search-settings').addEventListener('input', function() {
+    const query = this.value.toLowerCase();
+    const cards = document.querySelectorAll('.setting-card');
+    cards.forEach(card => {
+        const text = card.textContent.toLowerCase();
+        card.style.display = text.includes(query) ? 'block' : 'none';
+    });
+});
+
+// ===================== EDIT PROFILE =====================
+function openEditProfile() {
+    document.getElementById('edit-name').value = document.getElementById('profile-name').textContent;
+    document.getElementById('profile-modal').classList.add('active');
+}
+
+document.getElementById('profile-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const name = document.getElementById('edit-name').value.trim();
+    if (!name) {
+        alert('Nama tidak boleh kosong!');
+        return;
+    }
+    document.getElementById('profile-name').textContent = name;
+    document.getElementById('admin-name').textContent = name;
+    document.getElementById('profile-modal').classList.remove('active');
+    showNotification('Profil berhasil diperbarui!', 'success');
+});
+
+// ===================== MODAL CONTROLS =====================
+document.querySelectorAll('.close-modal-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        document.getElementById('profile-modal').classList.remove('active');
+    });
+});
+
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+    overlay.addEventListener('click', function(e) {
+        if (e.target === this) {
+            this.classList.remove('active');
+        }
+    });
+});
+
+// ===================== NOTIFICATION =====================
+function showNotification(message, type = 'success') {
+    const colors = {
+        success: 'bg-green-600',
+        error: 'bg-red-600',
+        warning: 'bg-amber-600',
+        info: 'bg-blue-600'
+    };
+    
+    const notification = document.createElement('div');
+    notification.className = `fixed top-4 right-4 ${colors[type] || 'bg-earthy'} text-white px-6 py-3 rounded-xl shadow-lg z-50 transform transition-all duration-500 translate-x-full`;
+    notification.style.transition = 'transform 0.5s ease-in-out';
+    notification.innerHTML = `
+        <div class="flex items-center gap-3">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+                <path d="${type === 'success' ? 'M5 13l4 4L19 7' : type === 'error' ? 'M6 18L18 6M6 6l12 12' : 'M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z'}" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+            </svg>
+            <span class="font-medium">${message}</span>
+        </div>
+    `;
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.style.transform = 'translateX(0)';
+    }, 100);
+    
+    setTimeout(() => {
+        notification.style.transform = 'translateX(100%)';
+        setTimeout(() => {
+            notification.remove();
+        }, 500);
+    }, 3000);
+}
+
+// ===================== STORAGE LISTENER =====================
+window.addEventListener('storage', function(e) {
+    loadSettings();
+});
+
+// ===================== INIT =====================
+document.addEventListener('DOMContentLoaded', function() {
+    loadSettings();
+});
+</script>
+</body>
+</html>

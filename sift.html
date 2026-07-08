@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html class="dark" lang="id">
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Little Story POS - Shift Kasir</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries">
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@100..900&amp;display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "on-primary-container": "#d6ad6e",
+                        "on-primary-fixed-variant": "#5e410c",
+                        "primary-container": "#5d400b",
+                        "surface-variant": "#353535",
+                        "on-surface-variant": "#d2c4b5",
+                        "on-error-container": "#ffdad6",
+                        "secondary": "#634eba",
+                        "surface": "#131313",
+                        "primary-fixed-dim": "#ebc080",
+                        "on-primary": "#432c00",
+                        "surface-container-high": "#2a2a2a",
+                        "on-error": "#690005",
+                        "on-secondary-fixed-variant": "#483890",
+                        "surface-container": "#1f1f1f",
+                        "secondary-container": "#4b3a93",
+                        "inverse-on-surface": "#303030",
+                        "inverse-surface": "#e2e2e2",
+                        "inverse-primary": "#795923",
+                        "on-background": "#e2e2e2",
+                        "surface-container-low": "#1b1b1b",
+                        "on-secondary-container": "#bcaeff",
+                        "tertiary-fixed": "#e2e2e2",
+                        "tertiary-container": "#444646",
+                        "primary-fixed": "#ffddaf",
+                        "on-tertiary-fixed-variant": "#454747",
+                        "tertiary-fixed-dim": "#c6c6c7",
+                        "on-secondary": "#321e79",
+                        "background": "#000000",
+                        "surface-bright": "#393939",
+                        "on-tertiary-container": "#b3b4b4",
+                        "surface-tint": "#ebc080",
+                        "on-tertiary": "#2f3131",
+                        "on-secondary-fixed": "#1c0062",
+                        "outline-variant": "#4e453a",
+                        "secondary-fixed": "#e6deff",
+                        "primary": "#ebc080",
+                        "error": "#ffb4ab",
+                        "on-surface": "#e2e2e2",
+                        "surface-container-lowest": "#0e0e0e",
+                        "on-primary-fixed": "#281800",
+                        "error-container": "#93000a",
+                        "surface-container-highest": "#353535",
+                        "secondary-fixed-dim": "#cabeff",
+                        "tertiary": "#c6c6c7",
+                        "on-tertiary-fixed": "#1a1c1c",
+                        "surface-dim": "#131313",
+                        "outline": "#9b8f81"
+                    },
+                    borderRadius: {
+                        DEFAULT: "0.25rem",
+                        lg: "8px",
+                        xl: "12px",
+                        full: "9999px"
+                    },
+                    spacing: {
+                        "grid-gutter": "24px",
+                        "card-padding": "16px",
+                        "sidebar-width": "240px",
+                        "section-margin": "32px",
+                        "element-gap": "12px"
+                    },
+                    fontFamily: {
+                        "headline-lg": ["Plus Jakarta Sans"],
+                        "price-display": ["Plus Jakarta Sans"],
+                        "body-md": ["Plus Jakarta Sans"],
+                        "headline-md": ["Plus Jakarta Sans"],
+                        "label-caps": ["Plus Jakarta Sans"],
+                        "body-lg": ["Plus Jakarta Sans"]
+                    },
+                    fontSize: {
+                        "headline-lg": ["24px", { lineHeight: "32px", fontWeight: "700" }],
+                        "price-display": ["18px", { lineHeight: "24px", fontWeight: "800" }],
+                        "body-md": ["14px", { lineHeight: "20px", fontWeight: "500" }],
+                        "headline-md": ["20px", { lineHeight: "28px", fontWeight: "700" }],
+                        "label-caps": ["10px", { lineHeight: "14px", letterSpacing: "0.05em", fontWeight: "700" }],
+                        "body-lg": ["16px", { lineHeight: "24px", fontWeight: "600" }]
+                    }
+                },
+            },
+        }
+    </script>
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #000000;
+        }
+        .content-scroll::-webkit-scrollbar {
+            width: 6px;
+        }
+        .content-scroll::-webkit-scrollbar-track {
+            background: #000000;
+        }
+        .content-scroll::-webkit-scrollbar-thumb {
+            background: #333333;
+            border-radius: 3px;
+        }
+        .sidebar-active {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: #d6ad6e;
+        }
+        .sidebar-active .material-symbols-outlined {
+            font-variation-settings: 'FILL' 1;
+        }
+        /* Modal overlay */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-overlay.active {
+            display: flex;
+        }
+        .modal-box {
+            background: #1f1f1f;
+            border-radius: 16px;
+            padding: 32px;
+            max-width: 480px;
+            width: 90%;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .shift-status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            border-radius: 9999px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .shift-status-badge.active {
+            background: rgba(34, 197, 94, 0.2);
+            color: #4ade80;
+        }
+        .shift-status-badge.closed {
+            background: rgba(239, 68, 68, 0.2);
+            color: #f87171;
+        }
+        .notification-toast {
+            animation: slideIn 0.5s ease-out;
+        }
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background">
+    <!-- Sidebar -->
+    <aside class="w-sidebar-width h-full fixed left-0 top-0 bg-primary-container flex flex-col py-6 z-50">
+        <div class="px-6 mb-10 flex items-center gap-3">
+            <div class="w-10 h-10 bg-on-primary-fixed-variant rounded-lg flex items-center justify-center">
+                <span class="material-symbols-outlined text-primary" style="font-variation-settings: &quot;FILL&quot; 1;">coffee</span>
+            </div>
+            <div>
+                <h1 class="font-headline-md text-headline-md font-bold text-on-primary-container leading-none">Little Story</h1>
+                <span class="font-label-caps text-label-caps text-on-primary-container/60 uppercase tracking-widest">ENTERPRISE ERP</span>
+            </div>
+        </div>
+        <nav class="flex-1 space-y-1">
+            <a class="text-on-primary-container/70 hover:bg-white/5 hover:text-on-primary-container mx-2 flex items-center gap-element-gap p-3 transition-colors active:scale-95 duration-150" href="k.html">
+                <span class="material-symbols-outlined">dashboard</span>
+                <span class="font-body-md text-body-md">Dashboard</span>
+            </a>
+
+            <a class="text-on-primary-container/70 hover:bg-white/5 hover:text-on-primary-container mx-2 flex items-center gap-element-gap p-3 transition-colors active:scale-95 duration-150" href="transaksi.html">
+                <span class="material-symbols-outlined">point_of_sale</span>
+                <span class="font-body-md text-body-md">Transaksi</span>
+            </a>
+            <a class="text-on-primary-container/70 hover:bg-white/5 hover:text-on-primary-container mx-2 flex items-center gap-element-gap p-3 transition-colors active:scale-95 duration-150" href="p.html">
+                <span class="material-symbols-outlined">inventory_2</span>
+                <span class="font-body-md text-body-md">Produk</span>
+            </a>
+            <a class="text-on-primary-container/70 hover:bg-white/5 hover:text-on-primary-container mx-2 flex items-center gap-element-gap p-3 transition-colors active:scale-95 duration-150" href="riwayat.html">
+                <span class="material-symbols-outlined">history</span>
+                <span class="font-body-md text-body-md">Riwayat Transaksi</span>
+            </a>
+            <!-- Shift Kasir (Active) -->
+            <a class="sidebar-active mx-2 flex items-center gap-element-gap p-3 transition-colors active:scale-95 duration-150" href="sift.html">
+                <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">schedule</span>
+                <span class="font-body-md text-body-md">Shift Kasir</span>
+            </a>
+            <a class="text-on-primary-container/70 hover:bg-white/5 hover:text-on-primary-container mx-2 flex items-center gap-element-gap p-3 transition-colors active:scale-95 duration-150" href="pengaturan.html">
+                <span class="material-symbols-outlined">settings</span>
+                <span class="font-body-md text-body-md">Pengaturan</span>
+            </a>
+        </nav>
+        
+    </aside>
+
+    <!-- Main Content -->
+    <main class="ml-sidebar-width min-h-screen flex flex-col">
+        <!-- Top Bar -->
+        <header class="h-20 w-full sticky top-0 z-40 bg-background flex justify-between items-center px-grid-gutter border-b border-white/5">
+            <div class="flex-1 max-w-md">
+                <div class="relative group">
+                    <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant group-focus-within:text-primary transition-colors">search</span>
+                    <input class="w-full bg-surface-container-high border-none rounded-full py-2.5 pl-12 pr-4 text-on-surface font-body-md focus:ring-2 focus:ring-primary/50 transition-all" placeholder="Cari produk..." type="text" id="search-shift">
+                </div>
+            </div>
+            <div class="flex items-center gap-6">
+                <div class="flex items-center gap-4 border-l border-white/10 pl-6">
+                    <div class="text-right">
+                        <p class="font-label-caps text-on-surface-variant uppercase tracking-tighter">Kasir</p>
+                        <p class="font-body-lg text-on-surface" id="topbar-cashier-name">Sarah Wijaya</p>
+                    </div>
+                    <img class="w-10 h-10 rounded-full object-cover border border-primary/20" id="topbar-cashier-avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAYTZwsiM_474tkqVJwk7LI3d_fa4RfQ6jOu2AvL5GcMV-Bqg823Y7Vg_iqC4ol8PiPr1liLPCA0FsntKwylC0mE0eIw6ecFBSYwRztKsiSQkajYOlPVataAMp9qGmTAoYeeON0qiBJ9CruYwcwMEO8E7ayGcReE18EJjgAzUUEaWf3SjsSi1BH-Ybsha2ed21I9T4pkLM65TJSOikrYFLH56NluOJqYUMs91nJnVwlaHVkg72HO2FERzYIoTC4y75pSTy1QHyspX-Q">
+                    <button class="text-on-surface-variant hover:text-primary transition-colors">
+                        <span class="material-symbols-outlined">notifications</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content Area -->
+        <div class="flex-1 p-grid-gutter overflow-y-auto content-scroll">
+            <div class="max-w-7xl mx-auto space-y-8">
+                <!-- Grid: Dashboard Content -->
+                <div class="grid grid-cols-12 gap-8">
+                    <!-- LEFT COLUMN: Shift Management -->
+                    <div class="col-span-8 space-y-6">
+                        <!-- Cashier Active Card -->
+                        <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100" data-purpose="current-shift-card">
+                            <div class="flex items-start justify-between">
+                                <div class="flex items-center space-x-4">
+                                    <div class="w-14 h-14 rounded-lg flex items-center justify-center text-white overflow-hidden bg-primary-container">
+                                        <img class="w-full h-full object-cover" id="shift-cashier-avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAYTZwsiM_474tkqVJwk7LI3d_fa4RfQ6jOu2AvL5GcMV-Bqg823Y7Vg_iqC4ol8PiPr1liLPCA0FsntKwylC0mE0eIw6ecFBSYwRztKsiSQkajYOlPVataAMp9qGmTAoYeeON0qiBJ9CruYwcwMEO8E7ayGcReE18EJjgAzUUEaWf3SjsSi1BH-Ybsha2ed21I9T4pkLM65TJSOikrYFLH56NluOJqYUMs91nJnVwlaHVkg72HO2FERzYIoTC4y75pSTy1QHyspX-Q">
+                                    </div>
+                                    <div>
+                                        <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Kasir Bertugas</p>
+                                        <h3 class="text-xl font-bold text-gray-900" id="shift-cashier-name">Ahmad Fauzi</h3>
+                                        <div class="flex items-center mt-1 text-xs text-gray-400">
+                                            <span class="material-symbols-outlined text-sm mr-1">schedule</span>
+                                            <span id="shift-duration">Mulai Sejak 08:00 WIB</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Total Penjualan</p>
+                                    <p class="text-2xl font-black text-gray-900" id="shift-total-sales">Rp 0</p>
+                                </div>
+                            </div>
+                            <!-- Mini Stat Grid -->
+                            <div class="grid grid-cols-3 gap-4 mt-8">
+                                <div class="bg-surface text-white p-4 rounded-lg">
+                                    <p class="text-[10px] uppercase text-white/50 font-bold">Modal Awal</p>
+                                    <p class="text-lg font-bold mt-1" id="shift-modal-awal">Rp 500.000</p>
+                                </div>
+                                <div class="bg-surface text-white p-4 rounded-lg">
+                                    <p class="text-[10px] uppercase text-white/50 font-bold">Pemasukan Kas (Tunai)</p>
+                                    <p class="text-lg font-bold mt-1" id="shift-cash-income">Rp 0</p>
+                                </div>
+                                <div class="bg-surface text-white p-4 rounded-lg">
+                                    <p class="text-[10px] uppercase text-white/50 font-bold">Non-Tunai (QRIS/Debit)</p>
+                                    <p class="text-lg font-bold mt-1" id="shift-non-cash-income">Rp 0</p>
+                                </div>
+                            </div>
+                            <!-- Estimated Balance Banner -->
+                            <div class="mt-6 bg-primary-container rounded-xl p-6 flex items-center justify-between text-white border border-white/5">
+                                <div>
+                                    <p class="text-xs font-medium text-white/60">Estimasi Saldo Akhir (Di Laci)</p>
+                                    <p class="text-3xl font-black mt-1" id="shift-estimated-balance">Rp 500.000</p>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <span class="shift-status-badge active" id="shift-status-badge">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-green-400"></span>
+                                        Aktif
+                                    </span>
+                                    <button class="bg-white/10 hover:bg-white/20 px-6 py-2.5 rounded-lg font-bold border border-white/20 transition-all" id="close-shift-btn">
+                                        Tutup Shift
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- History Table -->
+                        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden" data-purpose="history-section">
+                            <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
+                                <h3 class="font-bold text-gray-900">Riwayat Shift</h3>
+                                <span class="text-xs font-medium text-gray-400" id="shift-history-count">0 shift</span>
+                            </div>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left">
+                                    <thead class="bg-surface text-white text-[10px] uppercase tracking-widest font-semibold">
+                                        <tr>
+                                            <th class="px-6 py-3">Tanggal &amp; Waktu</th>
+                                            <th class="px-6 py-3">Kasir</th>
+                                            <th class="px-6 py-3 text-right">Modal</th>
+                                            <th class="px-6 py-3 text-right">Pemasukan Tunai</th>
+                                            <th class="px-6 py-3 text-right">Total Akhir</th>
+                                            <th class="px-6 py-3 text-center">Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-gray-100 text-sm" id="shift-history-body">
+                                        <!-- History rows rendered by JS -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Action Button -->
+                        <button class="w-64 bg-primary hover:bg-primary-fixed-dim text-on-primary font-black py-4 rounded-xl shadow-lg transform transition-transform active:scale-95 flex items-center justify-center" id="open-shift-btn">
+                            <span class="material-symbols-outlined mr-2">add</span>
+                            Buka Shift Baru
+                        </button>
+                    </div>
+
+                    <!-- RIGHT COLUMN: Side Info -->
+                    <div class="col-span-4 space-y-6">
+                        <!-- Product Summary -->
+                        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6" data-purpose="product-summary">
+                            <h3 class="font-bold text-gray-900 mb-6">Ringkasan Produk</h3>
+                            <div class="space-y-4" id="product-summary-list">
+                                <!-- Product items rendered by JS -->
+                            </div>
+                            <div class="mt-8 pt-6 border-t border-gray-100 flex justify-between items-center">
+                                <span class="text-xs uppercase font-bold text-gray-400 tracking-widest">Total Pesanan</span>
+                                <span class="text-3xl font-black text-gray-900" id="total-orders-shift">0</span>
+                            </div>
+                        </div>
+
+                        <!-- Shift Notes -->
+                        <div class="bg-primary/30 border border-primary/40 rounded-xl p-6" data-purpose="shift-notes">
+                            <div class="flex items-start space-x-3">
+                                <div class="mt-0.5 p-1.5 bg-primary rounded-full">
+                                    <span class="material-symbols-outlined text-surface">info</span>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-on-surface">Catatan Shift</h4>
+                                    <p class="text-sm text-on-surface/80 mt-2 leading-relaxed" id="shift-notes-text">
+                                        Belum ada catatan untuk shift ini.
+                                    </p>
+                                    <button class="mt-4 text-xs font-bold text-primary underline decoration-2 underline-offset-2" id="add-note-btn">
+                                        Tambah Catatan
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal for Closing Shift -->
+    <div class="modal-overlay" id="close-shift-modal">
+        <div class="modal-box">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-bold text-on-surface">Konfirmasi Tutup Shift</h2>
+                <button class="text-on-surface-variant hover:text-on-surface" id="close-modal-btn">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            <div class="space-y-4 text-on-surface/80">
+                <p class="text-sm">Apakah Anda yakin ingin menutup shift ini?</p>
+                <div class="bg-surface-container-low p-4 rounded-lg space-y-2 text-sm">
+                    <div class="flex justify-between">
+                        <span>Total Penjualan</span>
+                        <span class="font-bold text-on-surface" id="modal-total-sales">Rp 0</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Pemasukan Tunai</span>
+                        <span class="font-bold text-on-surface" id="modal-cash-income">Rp 0</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Non-Tunai</span>
+                        <span class="font-bold text-on-surface" id="modal-non-cash-income">Rp 0</span>
+                    </div>
+                    <div class="flex justify-between border-t border-white/10 pt-2">
+                        <span class="font-bold">Saldo Akhir</span>
+                        <span class="font-bold text-primary" id="modal-final-balance">Rp 0</span>
+                    </div>
+                </div>
+                <div class="flex gap-3 mt-4">
+                    <button class="flex-1 bg-white/10 hover:bg-white/20 text-on-surface py-2.5 rounded-lg font-bold transition" id="cancel-close-btn">Batal</button>
+                    <button class="flex-1 bg-error hover:bg-opacity-80 text-white py-2.5 rounded-lg font-bold transition" id="confirm-close-btn">
+                        <span class="material-symbols-outlined text-sm mr-1">check</span>
+                        Tutup Shift
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for Opening Shift -->
+    <div class="modal-overlay" id="open-shift-modal">
+        <div class="modal-box">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-bold text-on-surface">Buka Shift Baru</h2>
+                <button class="text-on-surface-variant hover:text-on-surface" id="close-open-modal-btn">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            <div class="space-y-4">
+                <p class="text-sm text-on-surface/80">Mulai shift baru dengan modal awal:</p>
+                <div class="flex items-center gap-4">
+                    <label class="text-on-surface-variant text-sm font-medium">Modal Awal</label>
+                    <input type="number" id="modal-input" class="flex-1 bg-surface-container-high border border-white/10 rounded-lg px-4 py-2.5 text-on-surface font-body-md focus:ring-2 focus:ring-primary/50 transition" value="500000" step="10000">
+                </div>
+                <div class="flex gap-3 mt-4">
+                    <button class="flex-1 bg-white/10 hover:bg-white/20 text-on-surface py-2.5 rounded-lg font-bold transition" id="cancel-open-btn">Batal</button>
+                    <button class="flex-1 bg-primary hover:bg-primary-fixed-dim text-on-primary py-2.5 rounded-lg font-bold transition" id="confirm-open-btn">
+                        <span class="material-symbols-outlined text-sm mr-1">play_arrow</span>
+                        Mulai Shift
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ===================== GET CASHIER PROFILE =====================
+        function getCashierProfile() {
+            try {
+                // Coba ambil dari cashier_profile di localStorage
+                const saved = localStorage.getItem('cashier_profile');
+                if (saved) {
+                    const profile = JSON.parse(saved);
+                    if (profile && profile.name) {
+                        return profile;
+                    }
+                }
+                // Coba ambil dari pengaturan kasir
+                const settings = localStorage.getItem('pos_settings');
+                if (settings) {
+                    const data = JSON.parse(settings);
+                    if (data['cashier-name']) {
+                        return {
+                            name: data['cashier-name'],
+                            avatar: data['cashier-avatar'] || 'https://lh3.googleusercontent.com/aida-public/AB6AXuAYTZwsiM_474tkqVJwk7LI3d_fa4RfQ6jOu2AvL5GcMV-Bqg823Y7Vg_iqC4ol8PiPr1liLPCA0FsntKwylC0mE0eIw6ecFBSYwRztKsiSQkajYOlPVataAMp9qGmTAoYeeON0qiBJ9CruYwcwMEO8E7ayGcReE18EJjgAzUUEaWf3SjsSi1BH-Ybsha2ed21I9T4pkLM65TJSOikrYFLH56NluOJqYUMs91nJnVwlaHVkg72HO2FERzYIoTC4y75pSTy1QHyspX-Q'
+                        };
+                    }
+                }
+            } catch(e) {}
+            // Default profile
+            return {
+                name: 'Sarah Wijaya',
+                avatar: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAYTZwsiM_474tkqVJwk7LI3d_fa4RfQ6jOu2AvL5GcMV-Bqg823Y7Vg_iqC4ol8PiPr1liLPCA0FsntKwylC0mE0eIw6ecFBSYwRztKsiSQkajYOlPVataAMp9qGmTAoYeeON0qiBJ9CruYwcwMEO8E7ayGcReE18EJjgAzUUEaWf3SjsSi1BH-Ybsha2ed21I9T4pkLM65TJSOikrYFLH56NluOJqYUMs91nJnVwlaHVkg72HO2FERzYIoTC4y75pSTy1QHyspX-Q'
+            };
+        }
+
+        // ===================== UPDATE CASHIER DISPLAY =====================
+        function updateCashierDisplay() {
+            const profile = getCashierProfile();
+            
+            // Update top bar
+            const topbarName = document.getElementById('topbar-cashier-name');
+            const topbarAvatar = document.getElementById('topbar-cashier-avatar');
+            if (topbarName) topbarName.textContent = profile.name;
+            if (topbarAvatar) topbarAvatar.src = profile.avatar;
+            
+            // Update shift card
+            const shiftName = document.getElementById('shift-cashier-name');
+            const shiftAvatar = document.getElementById('shift-cashier-avatar');
+            if (shiftName) shiftName.textContent = profile.name;
+            if (shiftAvatar) shiftAvatar.src = profile.avatar;
+            
+            // Update shift state
+            shiftState.cashierName = profile.name;
+            shiftState.cashierAvatar = profile.avatar;
+            
+            // Update history table rows
+            document.querySelectorAll('#shift-history-body .cashier-name-cell').forEach(el => {
+                el.textContent = profile.name;
+            });
+        }
+
+        // ===================== SHIFT STATE MANAGEMENT =====================
+        let shiftState = {
+            isActive: true,
+            startTime: new Date(),
+            modalAwal: 500000,
+            cashIncome: 0,
+            nonCashIncome: 0,
+            totalSales: 0,
+            transactions: [],
+            notes: 'Belum ada catatan untuk shift ini.',
+            cashierName: 'Sarah Wijaya',
+            cashierAvatar: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAYTZwsiM_474tkqVJwk7LI3d_fa4RfQ6jOu2AvL5GcMV-Bqg823Y7Vg_iqC4ol8PiPr1liLPCA0FsntKwylC0mE0eIw6ecFBSYwRztKsiSQkajYOlPVataAMp9qGmTAoYeeON0qiBJ9CruYwcwMEO8E7ayGcReE18EJjgAzUUEaWf3SjsSi1BH-Ybsha2ed21I9T4pkLM65TJSOikrYFLH56NluOJqYUMs91nJnVwlaHVkg72HO2FERzYIoTC4y75pSTy1QHyspX-Q'
+        };
+
+        // ===================== LOAD SAVED SHIFT STATE =====================
+        function loadShiftState() {
+            try {
+                const saved = localStorage.getItem('shift_state');
+                if (saved) {
+                    const parsed = JSON.parse(saved);
+                    shiftState = parsed;
+                    shiftState.startTime = new Date(parsed.startTime);
+                    return true;
+                }
+            } catch (e) {}
+            return false;
+        }
+
+        function saveShiftState() {
+            try {
+                const toSave = {
+                    ...shiftState,
+                    startTime: shiftState.startTime.toISOString()
+                };
+                localStorage.setItem('shift_state', JSON.stringify(toSave));
+            } catch (e) {}
+        }
+
+        // ===================== DATA INTEGRATION =====================
+        function getTransactionData() {
+            try {
+                const transactions = JSON.parse(localStorage.getItem('pos_transactions') || '[]');
+                const stats = JSON.parse(localStorage.getItem('pos_stats') || '{"count":0,"sales":0}');
+                return { transactions, stats };
+            } catch (e) {
+                return { transactions: [], stats: { count: 0, sales: 0 } };
+            }
+        }
+
+        function getProducts() {
+            try {
+                return JSON.parse(localStorage.getItem('pos_products') || '[]');
+            } catch (e) {
+                return [];
+            }
+        }
+
+        function formatPrice(num) {
+            return 'Rp ' + num.toLocaleString('id-ID');
+        }
+
+        // ===================== RENDER FUNCTIONS =====================
+        function renderShiftData() {
+            const data = getTransactionData();
+            const transactions = data.transactions;
+            const stats = data.stats;
+            const profile = getCashierProfile();
+
+            // Update cashier profile in UI
+            updateCashierDisplay();
+
+            // Update shift state from transactions
+            let cashTotal = 0;
+            let nonCashTotal = 0;
+            let productSales = {};
+
+            transactions.forEach(trx => {
+                if (trx.paymentMethod && trx.paymentMethod.toLowerCase().includes('cash')) {
+                    cashTotal += trx.total || 0;
+                } else if (trx.paymentMethod) {
+                    nonCashTotal += trx.total || 0;
+                } else {
+                    cashTotal += trx.total || 0;
+                }
+
+                if (trx.items) {
+                    trx.items.forEach(item => {
+                        const name = item.name || 'Unknown';
+                        const qty = item.qty || 0;
+                        if (productSales[name]) {
+                            productSales[name] += qty;
+                        } else {
+                            productSales[name] = qty;
+                        }
+                    });
+                }
+            });
+
+            shiftState.cashIncome = cashTotal;
+            shiftState.nonCashIncome = nonCashTotal;
+            shiftState.totalSales = stats.sales || 0;
+            shiftState.transactions = transactions;
+
+            // Update UI
+            document.getElementById('shift-total-sales').textContent = formatPrice(shiftState.totalSales);
+            document.getElementById('shift-cash-income').textContent = formatPrice(shiftState.cashIncome);
+            document.getElementById('shift-non-cash-income').textContent = formatPrice(shiftState.nonCashIncome);
+            document.getElementById('shift-modal-awal').textContent = formatPrice(shiftState.modalAwal);
+
+            const estimatedBalance = shiftState.modalAwal + shiftState.cashIncome;
+            document.getElementById('shift-estimated-balance').textContent = formatPrice(estimatedBalance);
+
+            // Update duration
+            if (shiftState.isActive) {
+                const now = new Date();
+                const diff = Math.floor((now - shiftState.startTime) / 1000);
+                const hours = Math.floor(diff / 3600);
+                const minutes = Math.floor((diff % 3600) / 60);
+                document.getElementById('shift-duration').textContent = 
+                    `Mulai Sejak ${shiftState.startTime.toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'})} (${hours}j ${minutes}m)`;
+            } else {
+                document.getElementById('shift-duration').textContent = 'Shift tidak aktif';
+            }
+
+            // Update status badge
+            const badge = document.getElementById('shift-status-badge');
+            if (shiftState.isActive) {
+                badge.className = 'shift-status-badge active';
+                badge.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-green-400"></span> Aktif';
+            } else {
+                badge.className = 'shift-status-badge closed';
+                badge.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-red-400"></span> Tutup';
+            }
+
+            // Product Summary
+            const productList = document.getElementById('product-summary-list');
+            const sortedProducts = Object.entries(productSales)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 5);
+
+            if (sortedProducts.length === 0 && transactions.length === 0) {
+                productList.innerHTML = `
+                    <div class="text-center py-4 text-gray-500 text-sm">
+                        <span class="material-symbols-outlined text-2xl block mx-auto">inventory_2</span>
+                        Belum ada produk terjual
+                    </div>
+                `;
+            } else if (sortedProducts.length === 0 && transactions.length > 0) {
+                productList.innerHTML = `
+                    <div class="text-center py-4 text-gray-500 text-sm">
+                        <span class="material-symbols-outlined text-2xl block mx-auto">inventory_2</span>
+                        Data produk tidak tersedia
+                    </div>
+                `;
+            } else {
+                productList.innerHTML = sortedProducts.map(([name, qty]) => {
+                    const unit = name.toLowerCase().includes('cup') ? 'Cup' : 
+                                 name.toLowerCase().includes('pcs') ? 'Pcs' : 'Item';
+                    return `
+                        <div class="flex items-center justify-between group">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-10 h-10 bg-primary-container rounded flex items-center justify-center text-white">
+                                    <span class="material-symbols-outlined">local_cafe</span>
+                                </div>
+                                <span class="text-sm font-semibold text-gray-700">${name}</span>
+                            </div>
+                            <span class="text-sm font-bold text-gray-900">${qty} ${unit}</span>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            document.getElementById('total-orders-shift').textContent = transactions.length > 0 ? transactions.length : 0;
+            document.getElementById('shift-history-count').textContent = transactions.length > 0 ? transactions.length + ' transaksi' : '0 transaksi';
+            document.getElementById('shift-notes-text').textContent = shiftState.notes || 'Belum ada catatan untuk shift ini.';
+
+            // History Table
+            const historyBody = document.getElementById('shift-history-body');
+            if (transactions.length > 0) {
+                const historyData = transactions.slice(-5).reverse();
+                historyBody.innerHTML = historyData.map(trx => {
+                    const total = trx.total || 0;
+                    const cashAmount = trx.paymentMethod && trx.paymentMethod.toLowerCase().includes('cash') ? total : Math.round(total * 0.7);
+                    const status = trx.status || 'Selesai';
+                    const statusColor = status === 'Selesai' ? 'bg-green-100 text-green-700' : 'bg-orange-100 text-orange-700';
+                    const cashierName = trx.cashier || profile.name;
+                    return `
+                        <tr class="hover:bg-gray-50 transition-colors">
+                            <td class="px-6 py-4">
+                                <p class="font-bold text-gray-800">${trx.timestamp || '24 Mei 2024'}</p>
+                                <p class="text-[10px] text-gray-400 italic">${trx.id || 'TRX-' + Date.now()}</p>
+                            </td>
+                            <td class="px-6 py-4 font-medium text-gray-700 cashier-name-cell">${cashierName}</td>
+                            <td class="px-6 py-4 text-right text-gray-600">${formatPrice(shiftState.modalAwal)}</td>
+                            <td class="px-6 py-4 text-right text-gray-600">${formatPrice(cashAmount)}</td>
+                            <td class="px-6 py-4 text-right font-bold text-gray-800">${formatPrice(total)}</td>
+                            <td class="px-6 py-4 text-center">
+                                <span class="px-3 py-1 ${statusColor} rounded-full text-[10px] font-bold">${status}</span>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+            } else {
+                historyBody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="px-6 py-8 text-center text-gray-500 text-sm">
+                            <span class="material-symbols-outlined text-2xl block mx-auto mb-2">history</span>
+                            Belum ada transaksi pada shift ini
+                        </td>
+                    </tr>
+                `;
+            }
+
+            saveShiftState();
+        }
+
+        // ===================== SHIFT OPERATIONS =====================
+        function closeShift() {
+            if (!shiftState.isActive) return;
+
+            // Update modal with data
+            document.getElementById('modal-total-sales').textContent = formatPrice(shiftState.totalSales);
+            document.getElementById('modal-cash-income').textContent = formatPrice(shiftState.cashIncome);
+            document.getElementById('modal-non-cash-income').textContent = formatPrice(shiftState.nonCashIncome);
+            const finalBalance = shiftState.modalAwal + shiftState.cashIncome;
+            document.getElementById('modal-final-balance').textContent = formatPrice(finalBalance);
+
+            document.getElementById('close-shift-modal').classList.add('active');
+        }
+
+        function confirmCloseShift() {
+            const profile = getCashierProfile();
+            shiftState.isActive = false;
+            // Save to history
+            const history = JSON.parse(localStorage.getItem('shift_history') || '[]');
+            history.push({
+                date: new Date().toISOString(),
+                cashier: profile.name,
+                modal: shiftState.modalAwal,
+                cashIncome: shiftState.cashIncome,
+                nonCashIncome: shiftState.nonCashIncome,
+                totalSales: shiftState.totalSales,
+                finalBalance: shiftState.modalAwal + shiftState.cashIncome,
+                status: 'Selesai',
+                transactions: shiftState.transactions.length
+            });
+            localStorage.setItem('shift_history', JSON.stringify(history));
+
+            document.getElementById('close-shift-modal').classList.remove('active');
+            renderShiftData();
+            
+            // Show notification
+            showNotification('✅ Shift berhasil ditutup!', 'success');
+        }
+
+        function openNewShift() {
+            document.getElementById('open-shift-modal').classList.add('active');
+            document.getElementById('modal-input').value = shiftState.modalAwal || 500000;
+        }
+
+        function confirmOpenShift() {
+            const profile = getCashierProfile();
+            const modalInput = parseInt(document.getElementById('modal-input').value) || 500000;
+            
+            // Reset data
+            shiftState.isActive = true;
+            shiftState.startTime = new Date();
+            shiftState.modalAwal = modalInput;
+            shiftState.cashIncome = 0;
+            shiftState.nonCashIncome = 0;
+            shiftState.totalSales = 0;
+            shiftState.transactions = [];
+            shiftState.notes = 'Shift baru dimulai.';
+            shiftState.cashierName = profile.name;
+            shiftState.cashierAvatar = profile.avatar;
+
+            // Reset localStorage transactions
+            localStorage.setItem('pos_transactions', '[]');
+            localStorage.setItem('pos_stats', '{"count":0,"sales":0}');
+
+            document.getElementById('open-shift-modal').classList.remove('active');
+            renderShiftData();
+            showNotification('✅ Shift baru dimulai! Modal: ' + formatPrice(modalInput), 'success');
+        }
+
+        // ===================== NOTIFICATION =====================
+        function showNotification(message, type = 'success') {
+            const existing = document.querySelector('.notification-toast');
+            if (existing) existing.remove();
+            const colors = { 
+                success: 'bg-green-500', 
+                error: 'bg-red-500', 
+                warning: 'bg-yellow-500', 
+                info: 'bg-blue-500' 
+            };
+            const notification = document.createElement('div');
+            notification.className = `notification-toast fixed top-24 right-4 ${colors[type] || colors.success} text-white px-4 py-2 rounded-lg shadow-lg z-50`;
+            notification.innerHTML = `
+                <div class="flex items-center gap-2">
+                    <span class="material-symbols-outlined">${type === 'error' ? 'error' : 'check_circle'}</span>
+                    <span class="text-sm font-medium">${message}</span>
+                </div>
+            `;
+            document.body.appendChild(notification);
+            setTimeout(() => notification.remove(), 3000);
+        }
+
+        // ===================== EVENT LISTENERS =====================
+        document.addEventListener('DOMContentLoaded', () => {
+            // Load saved shift state or initialize
+            if (!loadShiftState()) {
+                const profile = getCashierProfile();
+                shiftState.isActive = true;
+                shiftState.startTime = new Date();
+                shiftState.modalAwal = 500000;
+                shiftState.notes = 'Shift dimulai pada ' + new Date().toLocaleString('id-ID');
+                shiftState.cashierName = profile.name;
+                shiftState.cashierAvatar = profile.avatar;
+                saveShiftState();
+            }
+            renderShiftData();
+        });
+
+        // ===================== LISTEN FOR STORAGE CHANGES =====================
+        window.addEventListener('storage', function(e) {
+            if (e.key === 'cashier_profile' || e.key === 'pos_settings') {
+                updateCashierDisplay();
+                renderShiftData();
+            }
+            if (e.key === 'pos_transactions' || e.key === 'pos_stats') {
+                renderShiftData();
+            }
+        });
+
+        // Close shift button
+        document.getElementById('close-shift-btn').addEventListener('click', closeShift);
+
+        // Modal close buttons
+        document.getElementById('close-modal-btn').addEventListener('click', () => {
+            document.getElementById('close-shift-modal').classList.remove('active');
+        });
+        document.getElementById('cancel-close-btn').addEventListener('click', () => {
+            document.getElementById('close-shift-modal').classList.remove('active');
+        });
+        document.getElementById('confirm-close-btn').addEventListener('click', confirmCloseShift);
+
+        // Open shift button
+        document.getElementById('open-shift-btn').addEventListener('click', openNewShift);
+        document.getElementById('close-open-modal-btn').addEventListener('click', () => {
+            document.getElementById('open-shift-modal').classList.remove('active');
+        });
+        document.getElementById('cancel-open-btn').addEventListener('click', () => {
+            document.getElementById('open-shift-modal').classList.remove('active');
+        });
+        document.getElementById('confirm-open-btn').addEventListener('click', confirmOpenShift);
+
+        // Close modals on outside click
+        document.querySelectorAll('.modal-overlay').forEach(modal => {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.classList.remove('active');
+                }
+            });
+        });
+
+        // Add note
+        document.getElementById('add-note-btn').addEventListener('click', () => {
+            const note = prompt('Masukkan catatan untuk shift ini:', shiftState.notes || '');
+            if (note !== null && note.trim() !== '') {
+                shiftState.notes = note.trim();
+                saveShiftState();
+                renderShiftData();
+                showNotification('📝 Catatan shift diperbarui', 'info');
+            }
+        });
+
+        // Search
+        document.getElementById('search-shift').addEventListener('input', function() {
+            const term = this.value.toLowerCase().trim();
+            const items = document.querySelectorAll('#product-summary-list .flex');
+            items.forEach(item => {
+                const name = item.querySelector('span.text-gray-700')?.textContent?.toLowerCase() || '';
+                if (name.includes(term)) {
+                    item.style.display = 'flex';
+                    item.style.backgroundColor = 'rgba(235, 192, 128, 0.1)';
+                } else if (term === '') {
+                    item.style.display = 'flex';
+                    item.style.backgroundColor = '';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        });
+
+        // ===================== AUTO REFRESH =====================
+        setInterval(() => {
+            renderShiftData();
+            updateCashierDisplay();
+        }, 5000);
+
+        // ===================== MICRO-INTERACTIONS =====================
+        document.querySelectorAll('a, button').forEach(el => {
+            el.addEventListener('mousedown', () => {
+                el.classList.add('scale-95');
+            });
+            el.addEventListener('mouseup', () => {
+                el.classList.remove('scale-95');
+            });
+            el.addEventListener('mouseleave', () => {
+                el.classList.remove('scale-95');
+            });
+        });
+    </script>
+</body>
+</html>

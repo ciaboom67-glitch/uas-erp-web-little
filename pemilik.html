@@ -1,0 +1,918 @@
+<!DOCTYPE html>
+<html class="dark" lang="id">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Little Story - Dashboard Pemilik</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-surface-variant": "#cac4d2",
+                        "on-tertiary-fixed-variant": "#47464b",
+                        "surface-bright": "#37393a",
+                        "on-primary": "#371e73",
+                        "background": "#121414",
+                        "on-tertiary-container": "#bcb9bf",
+                        "primary": "#cebdff",
+                        "surface-variant": "#333535",
+                        "on-error": "#690005",
+                        "secondary-container": "#715900",
+                        "surface-container-lowest": "#0c0f0f",
+                        "surface-container-highest": "#333535",
+                        "primary-fixed": "#e8ddff",
+                        "tertiary": "#c8c5cb",
+                        "primary-fixed-dim": "#cebdff",
+                        "surface-container": "#1e2020",
+                        "surface-container-high": "#282a2b",
+                        "primary-container": "#513b8f",
+                        "inverse-primary": "#6650a5",
+                        "error-container": "#93000a",
+                        "surface-container-low": "#1a1c1c",
+                        "outline": "#948e9c",
+                        "error": "#ffb4ab",
+                        "on-primary-fixed": "#21005e",
+                        "secondary-fixed-dim": "#e5c367",
+                        "on-background": "#e2e2e2",
+                        "on-secondary-fixed-variant": "#584400",
+                        "tertiary-fixed-dim": "#c8c5cb",
+                        "inverse-surface": "#e2e2e2",
+                        "surface": "#121414",
+                        "secondary": "#e5c367",
+                        "tertiary-container": "#4b4a4f",
+                        "outline-variant": "#494551",
+                        "on-primary-fixed-variant": "#4d378b",
+                        "on-error-container": "#ffdad6",
+                        "on-secondary-container": "#f4d174",
+                        "inverse-on-surface": "#2f3131",
+                        "tertiary-fixed": "#e4e1e7",
+                        "on-surface": "#e2e2e2",
+                        "on-primary-container": "#c3aeff",
+                        "surface-tint": "#cebdff",
+                        "on-tertiary-fixed": "#1b1b1f",
+                        "on-secondary": "#3d2f00",
+                        "secondary-fixed": "#ffe08d",
+                        "surface-dim": "#121414",
+                        "on-tertiary": "#303034",
+                        "on-secondary-fixed": "#241a00"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "gutter-md": "16px",
+                        "container-padding": "24px",
+                        "sidebar-width": "240px",
+                        "inner-padding": "24px",
+                        "card-gap": "20px"
+                    },
+                    "fontFamily": {
+                        "headline-lg": ["Plus Jakarta Sans"],
+                        "body-lg": ["Plus Jakarta Sans"],
+                        "stat-value": ["Plus Jakarta Sans"],
+                        "headline-md": ["Plus Jakarta Sans"],
+                        "body-md": ["Plus Jakarta Sans"],
+                        "label-sm": ["Plus Jakarta Sans"]
+                    },
+                    "fontSize": {
+                        "headline-lg": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
+                        "body-lg": ["18px", {"lineHeight": "26px", "fontWeight": "600"}],
+                        "stat-value": ["28px", {"lineHeight": "34px", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                        "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "700"}],
+                        "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            background-color: #121216;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            color: #e2e2e2;
+        }
+        .sidebar-gold {
+            background-color: #584400;
+        }
+        .glass-card {
+            background-color: #1e2020;
+            border-radius: 16px;
+            padding: 24px;
+            color: #e2e2e2;
+            border: 1px solid #333535;
+            transition: all 0.2s ease;
+        }
+        .glass-card:hover {
+            border-color: #6359E9;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .nav-link {
+            transition: all 0.2s ease;
+        }
+        .nav-link:hover {
+            transform: translateX(8px);
+        }
+        .nav-link.active {
+            background: white;
+            color: #584400;
+        }
+        .nav-link.active .material-symbols-outlined {
+            font-variation-settings: 'FILL' 1;
+        }
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 9999px;
+            font-size: 11px;
+            font-weight: 600;
+            display: inline-block;
+        }
+        .status-pending {
+            background: #FEF3C7;
+            color: #D97706;
+        }
+        .status-approved {
+            background: #D1FAE5;
+            color: #059669;
+        }
+        .status-rejected {
+            background: #FEE2E2;
+            color: #DC2626;
+        }
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 100;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-overlay.active {
+            display: flex;
+        }
+        .modal-content {
+            background: #1e2020;
+            border-radius: 16px;
+            max-width: 640px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 32px;
+            margin: 16px;
+            border: 1px solid #333535;
+        }
+        .modal-content .close-btn {
+            color: #cac4d2;
+            transition: color 0.2s;
+        }
+        .modal-content .close-btn:hover {
+            color: #e2e2e2;
+        }
+        .modal-content input,
+        .modal-content select,
+        .modal-content textarea {
+            background: #282a2b;
+            border: 1px solid #333535;
+            color: #e2e2e2;
+            border-radius: 8px;
+            padding: 10px 14px;
+            width: 100%;
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+        .modal-content input:focus,
+        .modal-content select:focus,
+        .modal-content textarea:focus {
+            outline: none;
+            border-color: #6359E9;
+        }
+        .modal-content label {
+            color: #cac4d2;
+            font-weight: 600;
+            font-size: 13px;
+            display: block;
+            margin-bottom: 4px;
+        }
+        @media (max-width: 768px) {
+            .modal-content {
+                padding: 20px;
+                margin: 10px;
+            }
+        }
+    </style>
+</head>
+<body class="bg-surface overflow-x-hidden">
+<!-- Sidebar Navigation -->
+<aside class="fixed h-full w-[240px] left-0 top-0 sidebar-gold flex flex-col py-inner-padding z-50">
+<div class="px-6 mb-10 flex items-center gap-3">
+<div class="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
+<span class="material-symbols-outlined text-white">coffee</span>
+</div>
+<div>
+<h1 class="font-headline-md text-headline-md text-white leading-none">Little Story</h1>
+<p class="text-[10px] text-white/60 uppercase tracking-widest mt-1">Business Suite</p>
+</div>
+</div>
+<nav class="flex-1 flex flex-col px-4 gap-2">
+<a class="nav-link active rounded-full px-4 py-2 flex items-center gap-3 transition-all duration-200" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">dashboard</span>
+<span class="font-body-md text-body-md">Dashboard</span>
+</a>
+<a class="nav-link text-white/70 hover:text-white flex items-center gap-3 px-4 py-2 hover:bg-white/10 transition-colors rounded-full" href="laporan-keuangan.html">
+<span class="material-symbols-outlined">payments</span>
+<span class="font-body-md text-body-md">Laporan Keuangan</span>
+</a>
+<a class="nav-link text-white/70 hover:text-white flex items-center gap-3 px-4 py-2 hover:bg-white/10 transition-colors rounded-full" href="penju.html">
+<span class="material-symbols-outlined">trending_up</span>
+<span class="font-body-md text-body-md">Penjualan</span>
+</a>
+<a class="nav-link text-white/70 hover:text-white flex items-center gap-3 px-4 py-2 hover:bg-white/10 transition-colors rounded-full" href="pk.html">
+<span class="material-symbols-outlined">inventory_2</span>
+<span class="font-body-md text-body-md">Produk</span>
+</a>
+<a class="nav-link text-white/70 hover:text-white flex items-center gap-3 px-4 py-2 hover:bg-white/10 transition-colors rounded-full" href="karya.html">
+<span class="material-symbols-outlined">badge</span>
+<span class="font-body-md text-body-md">Karyawan</span>
+</a>
+<a class="nav-link text-white/70 hover:text-white flex items-center gap-3 px-4 py-2 hover:bg-white/10 transition-colors rounded-full" href="pengaturan-pemilik.html">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-body-md text-body-md">Pengaturan</span>
+</a>
+</nav>
+</aside>
+<!-- Main Content Area -->
+<main class="ml-[240px] min-h-screen">
+<!-- TopAppBar -->
+<header class="fixed top-0 right-0 w-[calc(100%-240px)] h-16 bg-surface flex justify-between items-center px-container-padding z-40">
+<h2 class="font-headline-md text-headline-md text-on-surface">Dashboard Pemilik</h2>
+<div class="flex items-center gap-6">
+<button class="relative text-on-surface-variant hover:text-on-surface transition-colors" onclick="showNotification('Tidak ada notifikasi baru', 'info')">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-0 right-0 w-2 h-2 bg-error rounded-full border-2 border-surface"></span>
+</button>
+<div class="flex items-center gap-3 pl-4 border-l border-outline-variant">
+<div class="text-right">
+<p class="font-body-md text-body-md text-on-surface leading-none" id="owner-name">Pak Budi</p>
+<p class="text-[11px] text-on-surface-variant">Pemilik (Owner)</p>
+</div>
+<div class="w-10 h-10 rounded-full overflow-hidden bg-surface-container-high border-2 border-secondary">
+<img class="w-full h-full object-cover" alt="Owner Profile" src="https://ui-avatars.com/api/?name=Pak+Budi&background=6359E9&color=fff&size=128"/>
+</div>
+</div>
+</div>
+</header>
+<!-- Page Canvas -->
+<div class="pt-24 pb-12 px-container-padding grid grid-cols-12 gap-gutter-md max-w-[1600px]">
+<!-- Stat Cards Row -->
+<div class="col-span-12 md:col-span-3">
+<div class="glass-card flex flex-col justify-between h-full min-h-[160px]">
+<p class="font-label-sm text-label-sm text-on-surface-variant">Pendapatan Bulan Ini</p>
+<div class="mt-2">
+<span class="text-label-sm font-bold opacity-50 block">Rp</span>
+<h3 class="font-stat-value text-stat-value" id="total-revenue">0</h3>
+</div>
+<div class="mt-4 inline-flex items-center gap-1 bg-green-500/10 text-green-600 px-2 py-1 rounded-full w-fit">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'wght' 700;">trending_up</span>
+<span class="text-[11px] font-bold" id="revenue-change">0%</span>
+<span class="text-[10px] text-on-surface-variant/70 ml-1">dari bulan lalu</span>
+</div>
+</div>
+</div>
+<div class="col-span-12 md:col-span-3">
+<div class="glass-card flex flex-col justify-between h-full min-h-[160px]">
+<p class="font-label-sm text-label-sm text-on-surface-variant">Laba Bersih</p>
+<div class="mt-2">
+<span class="text-label-sm font-bold opacity-50 block">Rp</span>
+<h3 class="font-stat-value text-stat-value" id="net-profit">0</h3>
+</div>
+<div class="mt-4 inline-flex items-center gap-1 bg-red-500/10 text-red-600 px-2 py-1 rounded-full w-fit">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'wght' 700;" id="profit-icon">trending_up</span>
+<span class="text-[11px] font-bold" id="profit-change">0%</span>
+<span class="text-[10px] text-on-surface-variant/70 ml-1">dari bulan lalu</span>
+</div>
+</div>
+</div>
+<div class="col-span-12 md:col-span-3">
+<div class="glass-card flex flex-col justify-between h-full min-h-[160px]">
+<p class="font-label-sm text-label-sm text-on-surface-variant">Margin Laba</p>
+<div class="mt-2">
+<h3 class="font-stat-value text-stat-value" id="profit-margin">0%</h3>
+</div>
+<div class="mt-4 inline-flex items-center gap-1 bg-green-500/10 text-green-600 px-2 py-1 rounded-full w-fit">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'wght' 700;">trending_up</span>
+<span class="text-[11px] font-bold" id="margin-change">0%</span>
+<span class="text-[10px] text-on-surface-variant/70 ml-1">dari bulan lalu</span>
+</div>
+</div>
+</div>
+<div class="col-span-12 md:col-span-3">
+<div class="glass-card flex flex-col justify-between h-full min-h-[160px]">
+<p class="font-label-sm text-label-sm text-on-surface-variant">Transaksi Bulan Ini</p>
+<div class="mt-2">
+<h3 class="font-stat-value text-stat-value" id="total-transactions">0</h3>
+</div>
+<div class="mt-4 inline-flex items-center gap-1 bg-green-500/10 text-green-600 px-2 py-1 rounded-full w-fit">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'wght' 700;">trending_up</span>
+<span class="text-[11px] font-bold" id="trans-change">0%</span>
+<span class="text-[10px] text-on-surface-variant/70 ml-1">dari bulan lalu</span>
+</div>
+</div>
+</div>
+<!-- Revenue Trend Chart -->
+<div class="col-span-12 lg:col-span-8">
+<div class="glass-card h-full">
+<div class="flex justify-between items-center mb-6">
+<h4 class="font-headline-md text-on-surface">Tren Pendapatan <span class="text-on-surface-variant font-normal">(6 Bulan Terakhir)</span></h4>
+<div class="bg-surface-container text-on-surface-variant px-3 py-1 rounded text-xs" id="chart-period-label">
+                            Jan – Jun 2025
+                        </div>
+</div>
+<div class="relative" style="height:250px;">
+<canvas id="revenueChart"></canvas>
+</div>
+</div>
+</div>
+<!-- Sales Category Donut -->
+<div class="col-span-12 lg:col-span-4">
+<div class="glass-card h-full flex flex-col">
+<h4 class="font-headline-md text-on-surface mb-6">Penjualan per Kategori</h4>
+<div class="flex-1 flex flex-col items-center justify-center">
+<div class="relative w-48 h-48 mb-6">
+<canvas id="categoryChart"></canvas>
+<div class="absolute inset-0 flex flex-col items-center justify-center">
+<span class="text-2xl font-extrabold" id="category-total">0</span>
+<span class="text-[10px] text-on-surface-variant uppercase">Total Item</span>
+</div>
+</div>
+<div class="w-full space-y-3" id="category-list">
+<div class="flex items-center justify-between text-body-md">
+<div class="flex items-center gap-2">
+<span class="w-3 h-3 rounded-full bg-primary-container"></span>
+<span>Makanan</span>
+</div>
+<span class="font-bold" id="food-percent">0%</span>
+</div>
+<div class="flex items-center justify-between text-body-md">
+<div class="flex items-center gap-2">
+<span class="w-3 h-3 rounded-full bg-secondary"></span>
+<span>Minuman</span>
+</div>
+<span class="font-bold" id="drink-percent">0%</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Bottom Row Bento Grid -->
+<!-- Top Products -->
+<div class="col-span-12 lg:col-span-4">
+<div class="glass-card h-full">
+<div class="flex justify-between items-center mb-6">
+<h4 class="font-headline-md">Top Produk Terlaris</h4>
+<button class="text-primary-container font-bold text-xs hover:underline" onclick="showNotification('Melihat semua produk', 'info')">Lihat Semua</button>
+</div>
+<div class="space-y-3" id="top-products-list">
+<div class="text-center py-4 text-on-surface-variant text-sm">Belum ada data</div>
+</div>
+</div>
+</div>
+<!-- Pending Approvals -->
+<div class="col-span-12 lg:col-span-4">
+<div class="glass-card h-full">
+<div class="flex justify-between items-center mb-6">
+<h4 class="font-headline-md">Menunggu Persetujuan</h4>
+<button class="text-primary-container font-bold text-xs hover:underline" onclick="window.location.href='persetujuan.html'">Lihat Semua</button>
+</div>
+<div class="space-y-3" id="pending-approvals">
+<div class="text-center py-4 text-on-surface-variant text-sm">Tidak ada pengajuan</div>
+</div>
+</div>
+</div>
+<!-- Financial Summary -->
+<div class="col-span-12 lg:col-span-4">
+<div class="glass-card h-full">
+<h4 class="font-headline-md mb-6">Ringkasan Keuangan</h4>
+<div class="space-y-3" id="financial-summary">
+<div class="flex justify-between items-center text-body-md">
+<span class="text-on-surface-variant">Total Pendapatan</span>
+<span class="font-bold" id="fin-revenue">Rp 0</span>
+</div>
+<div class="flex justify-between items-center text-body-md">
+<span class="text-on-surface-variant">Total Pengeluaran</span>
+<span class="font-bold text-primary-container" id="fin-expenses">Rp 0</span>
+</div>
+<div class="pt-2 border-t border-dashed border-gray-700">
+<div class="flex justify-between items-center text-body-md">
+<span class="text-error font-medium">Laba Kotor</span>
+<span class="font-bold text-error" id="fin-gross-profit">Rp 0</span>
+</div>
+</div>
+<div class="pt-2 border-t border-gray-700">
+<div class="flex justify-between items-center">
+<span class="text-green-600 font-bold">Laba Bersih</span>
+<span class="text-xl font-extrabold text-green-600" id="fin-net-profit">Rp 0</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+
+<!-- BEGIN: Modal Detail Pengajuan -->
+<div class="modal-overlay" id="detail-modal">
+<div class="modal-content">
+<div class="flex justify-between items-center mb-5">
+<h2 class="text-xl font-bold text-on-surface" id="detail-title">Detail Pengajuan</h2>
+<button class="close-btn" onclick="closeModal('detail-modal')">
+<span class="material-symbols-outlined">close</span>
+</button>
+</div>
+<div id="detail-content" class="space-y-3">
+<div class="grid grid-cols-2 gap-3">
+<div><span class="text-on-surface-variant text-sm">Supplier</span><p class="font-semibold text-on-surface" id="d-supplier">-</p></div>
+<div><span class="text-on-surface-variant text-sm">Tanggal</span><p class="font-semibold text-on-surface" id="d-date">-</p></div>
+</div>
+<div class="grid grid-cols-2 gap-3">
+<div><span class="text-on-surface-variant text-sm">Item</span><p class="font-semibold text-on-surface" id="d-item">-</p></div>
+<div><span class="text-on-surface-variant text-sm">Jumlah</span><p class="font-semibold text-on-surface" id="d-qty">-</p></div>
+</div>
+<div><span class="text-on-surface-variant text-sm">Total Harga</span><p class="font-semibold text-xl text-primary" id="d-total">-</p></div>
+<div><span class="text-on-surface-variant text-sm">Status</span><p id="d-status">-</p></div>
+<div><span class="text-on-surface-variant text-sm">Catatan</span><p class="text-on-surface" id="d-notes">-</p></div>
+<div><span class="text-on-surface-variant text-sm">Diajukan Oleh</span><p class="font-semibold text-on-surface" id="d-submitted-by">-</p></div>
+</div>
+<div id="detail-actions" class="flex gap-3 mt-5 pt-4 border-t border-gray-700"></div>
+</div>
+</div>
+<!-- END: Modal Detail -->
+
+<script>
+// ===================== ADMIN PROFILE =====================
+const ADMIN_PROFILE = {
+    name: 'Pak Budi',
+    avatar: 'https://ui-avatars.com/api/?name=Pak+Budi&background=6359E9&color=fff&size=128'
+};
+
+// ===================== DATA STORE =====================
+let transactions = [];
+let purchases = [];
+let products = [];
+let chartInstance = null;
+let categoryChartInstance = null;
+
+// ===================== LOAD DATA =====================
+function loadData() {
+    try {
+        const savedTransactions = localStorage.getItem('pos_transactions');
+        transactions = savedTransactions ? JSON.parse(savedTransactions) : generateSampleTransactions();
+        
+        const savedPurchases = localStorage.getItem('pos_purchases');
+        purchases = savedPurchases ? JSON.parse(savedPurchases) : [];
+        
+        const savedProducts = localStorage.getItem('pos_products');
+        products = savedProducts ? JSON.parse(savedProducts) : [];
+    } catch(e) {
+        transactions = generateSampleTransactions();
+        purchases = [];
+        products = [];
+    }
+}
+
+function generateSampleTransactions() {
+    const sample = [];
+    const now = new Date();
+    for (let i = 0; i < 30; i++) {
+        const date = new Date(now);
+        date.setDate(date.getDate() - i);
+        const total = Math.floor(Math.random() * 500000) + 50000;
+        sample.push({
+            id: i + 1,
+            timestamp: date.toISOString(),
+            total: total,
+            items: [
+                { name: Math.random() > 0.5 ? 'Milo Tea' : 'Green Teah', qty: Math.floor(Math.random() * 10) + 1, price: Math.floor(total / 3) }
+            ]
+        });
+    }
+    return sample;
+}
+
+// ===================== FORMAT HELPERS =====================
+function formatPrice(num) {
+    return 'Rp ' + (num || 0).toLocaleString('id-ID');
+}
+
+function formatDate(dateStr) {
+    if (!dateStr) return '-';
+    const d = new Date(dateStr);
+    return d.toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' });
+}
+
+function getStatusBadge(status) {
+    const map = {
+        'pending': '<span class="status-badge status-pending">Menunggu</span>',
+        'approved': '<span class="status-badge status-approved">Disetujui</span>',
+        'rejected': '<span class="status-badge status-rejected">Ditolak</span>'
+    };
+    return map[status] || '<span class="status-badge status-pending">' + status + '</span>';
+}
+
+// ===================== UPDATE DISPLAY =====================
+function updateAdminDisplay() {
+    const nameEl = document.getElementById('owner-name');
+    if (nameEl) nameEl.textContent = ADMIN_PROFILE.name;
+}
+
+function updateDashboard() {
+    const now = new Date();
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+    
+    // Filter this month's transactions
+    const monthlyTransactions = transactions.filter(t => {
+        const date = new Date(t.timestamp);
+        return date >= startOfMonth && date <= now;
+    });
+    
+    const lastMonthTransactions = transactions.filter(t => {
+        const date = new Date(t.timestamp);
+        return date >= lastMonth && date < startOfMonth;
+    });
+    
+    const totalRevenue = monthlyTransactions.reduce((sum, t) => sum + (t.total || 0), 0);
+    const lastMonthRevenue = lastMonthTransactions.reduce((sum, t) => sum + (t.total || 0), 0);
+    
+    const totalExpenses = purchases.filter(p => p.status === 'approved' || p.status === 'pending')
+        .reduce((sum, p) => sum + (p.total || 0), 0);
+    
+    const netProfit = totalRevenue - totalExpenses;
+    const totalTrans = monthlyTransactions.length;
+    const lastMonthTrans = lastMonthTransactions.length;
+    
+    // Calculate changes
+    const revenueChange = lastMonthRevenue > 0 ? ((totalRevenue - lastMonthRevenue) / lastMonthRevenue * 100) : 0;
+    const transChange = lastMonthTrans > 0 ? ((totalTrans - lastMonthTrans) / lastMonthTrans * 100) : 0;
+    const profitMargin = totalRevenue > 0 ? (netProfit / totalRevenue * 100) : 0;
+    
+    // Update stat cards
+    document.getElementById('total-revenue').textContent = formatPrice(totalRevenue);
+    document.getElementById('net-profit').textContent = formatPrice(netProfit);
+    document.getElementById('profit-margin').textContent = profitMargin.toFixed(1) + '%';
+    document.getElementById('total-transactions').textContent = totalTrans;
+    
+    document.getElementById('revenue-change').textContent = (revenueChange >= 0 ? '+' : '') + revenueChange.toFixed(0) + '%';
+    document.getElementById('profit-change').textContent = (revenueChange >= 0 ? '+' : '') + revenueChange.toFixed(0) + '%';
+    document.getElementById('margin-change').textContent = '0%';
+    document.getElementById('trans-change').textContent = (transChange >= 0 ? '+' : '') + transChange.toFixed(0) + '%';
+    
+    // Update financial summary
+    document.getElementById('fin-revenue').textContent = formatPrice(totalRevenue);
+    document.getElementById('fin-expenses').textContent = formatPrice(totalExpenses);
+    document.getElementById('fin-gross-profit').textContent = formatPrice(totalRevenue - totalExpenses);
+    document.getElementById('fin-net-profit').textContent = formatPrice(netProfit);
+    
+    // Update category
+    updateCategoryStats(monthlyTransactions);
+    
+    // Update charts
+    updateRevenueChart();
+    updateTopProducts(monthlyTransactions);
+    updatePendingApprovals();
+}
+
+// ===================== CATEGORY STATS =====================
+function updateCategoryStats(monthlyTransactions) {
+    const categoryMap = {};
+    monthlyTransactions.forEach(t => {
+        if (t.items) {
+            t.items.forEach(item => {
+                const product = products.find(p => p.name === item.name);
+                const category = product ? product.category || 'Lainnya' : 'Lainnya';
+                categoryMap[category] = (categoryMap[category] || 0) + (item.qty || 0);
+            });
+        }
+    });
+    
+    const total = Object.values(categoryMap).reduce((a, b) => a + b, 0);
+    document.getElementById('category-total').textContent = total;
+    
+    const foodPercent = total > 0 ? Math.round(((categoryMap['Makanan'] || 0) / total) * 100) : 0;
+    const drinkPercent = total > 0 ? Math.round(((categoryMap['Minuman'] || 0) / total) * 100) : 0;
+    
+    document.getElementById('food-percent').textContent = foodPercent + '%';
+    document.getElementById('drink-percent').textContent = drinkPercent + '%';
+    
+    updateCategoryChart(foodPercent, drinkPercent);
+}
+
+// ===================== REVENUE CHART =====================
+function updateRevenueChart() {
+    const canvas = document.getElementById('revenueChart');
+    if (!canvas) return;
+    
+    const ctx = canvas.getContext('2d');
+    
+    // Get last 6 months
+    const now = new Date();
+    const months = [];
+    const revenueData = [];
+    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Ags', 'Sep', 'Okt', 'Nov', 'Des'];
+    
+    for (let i = 5; i >= 0; i--) {
+        const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
+        const monthEnd = new Date(now.getFullYear(), now.getMonth() - i + 1, 0);
+        months.push(monthNames[date.getMonth()] + ' ' + date.getFullYear());
+        
+        const monthlyTotal = transactions.filter(t => {
+            const txDate = new Date(t.timestamp);
+            return txDate >= date && txDate <= monthEnd;
+        }).reduce((sum, t) => sum + (t.total || 0), 0);
+        revenueData.push(monthlyTotal);
+    }
+    
+    document.getElementById('chart-period-label').textContent = months[0] + ' – ' + months[months.length - 1];
+    
+    if (chartInstance) {
+        chartInstance.destroy();
+    }
+    
+    chartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: months,
+            datasets: [{
+                label: 'Pendapatan',
+                data: revenueData,
+                backgroundColor: 'rgba(99, 89, 233, 0.7)',
+                borderColor: '#6359E9',
+                borderWidth: 2,
+                borderRadius: 4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    labels: { color: '#cac4d2', boxWidth: 12, padding: 15, font: { size: 11 } }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        color: '#cac4d2',
+                        callback: function(value) {
+                            return 'Rp ' + (value / 1000).toFixed(0) + 'k';
+                        }
+                    },
+                    grid: { color: '#333535' }
+                },
+                x: {
+                    ticks: { color: '#cac4d2' },
+                    grid: { color: '#333535' }
+                }
+            }
+        }
+    });
+}
+
+// ===================== CATEGORY CHART =====================
+function updateCategoryChart(foodPercent, drinkPercent) {
+    const canvas = document.getElementById('categoryChart');
+    if (!canvas) return;
+    
+    const ctx = canvas.getContext('2d');
+    
+    if (categoryChartInstance) {
+        categoryChartInstance.destroy();
+    }
+    
+    categoryChartInstance = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Makanan', 'Minuman'],
+            datasets: [{
+                data: [foodPercent || 50, drinkPercent || 50],
+                backgroundColor: ['#513b8f', '#e5c367'],
+                borderWidth: 2,
+                borderColor: '#121414'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            cutout: '70%'
+        }
+    });
+}
+
+// ===================== TOP PRODUCTS =====================
+function updateTopProducts(monthlyTransactions) {
+    const productSales = {};
+    monthlyTransactions.forEach(t => {
+        if (t.items) {
+            t.items.forEach(item => {
+                const name = item.name || 'Unknown';
+                productSales[name] = (productSales[name] || 0) + (item.qty || 0);
+            });
+        }
+    });
+    
+    const sorted = Object.entries(productSales)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 5);
+    
+    const list = document.getElementById('top-products-list');
+    if (sorted.length === 0) {
+        list.innerHTML = '<div class="text-center py-4 text-on-surface-variant text-sm">Belum ada data penjualan</div>';
+        return;
+    }
+    
+    list.innerHTML = sorted.map(([name, qty], index) => `
+        <div class="flex items-center justify-between p-3 rounded-xl bg-surface-container-lowest">
+            <div class="flex items-center gap-4">
+                <div class="w-8 h-8 rounded-lg bg-on-surface text-surface flex items-center justify-center font-bold">${index + 1}</div>
+                <span class="font-body-md">${name}</span>
+            </div>
+            <span class="font-bold">${qty}</span>
+        </div>
+    `).join('');
+}
+
+// ===================== PENDING APPROVALS =====================
+function updatePendingApprovals() {
+    const pending = purchases.filter(p => p.status === 'pending');
+    const list = document.getElementById('pending-approvals');
+    
+    if (pending.length === 0) {
+        list.innerHTML = '<div class="text-center py-4 text-on-surface-variant text-sm">Tidak ada pengajuan menunggu</div>';
+        return;
+    }
+    
+    list.innerHTML = pending.slice(0, 3).map(p => `
+        <div class="flex items-center justify-between p-3 rounded-xl bg-surface-container-lowest cursor-pointer hover:bg-surface-container-high transition" onclick="openDetail(${p.id})">
+            <div>
+                <p class="font-body-md text-on-surface">${p.itemName}</p>
+                <p class="text-xs text-on-surface-variant">${p.supplier} · ${formatPrice(p.total)}</p>
+            </div>
+            <span class="status-badge status-pending">Menunggu</span>
+        </div>
+    `).join('');
+}
+
+// ===================== OPEN DETAIL =====================
+function openDetail(id) {
+    const p = purchases.find(item => item.id === id);
+    if (!p) return;
+    
+    document.getElementById('detail-title').textContent = `Detail Pengajuan #${p.id}`;
+    document.getElementById('d-supplier').textContent = p.supplier;
+    document.getElementById('d-date').textContent = formatDate(p.date);
+    document.getElementById('d-item').textContent = p.itemName;
+    document.getElementById('d-qty').textContent = p.qty + ' unit';
+    document.getElementById('d-total').textContent = formatPrice(p.total);
+    document.getElementById('d-status').innerHTML = getStatusBadge(p.status);
+    document.getElementById('d-notes').textContent = p.notes || '-';
+    document.getElementById('d-submitted-by').textContent = p.submittedBy || 'Admin Gudang';
+    
+    const actions = document.getElementById('detail-actions');
+    if (p.status === 'pending') {
+        actions.innerHTML = `
+            <button class="flex-1 bg-green-600 text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-green-700 transition" onclick="approvePurchase(${p.id})">Setujui</button>
+            <button class="flex-1 bg-red-600 text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-red-700 transition" onclick="rejectPurchase(${p.id})">Tolak</button>
+            <button class="flex-1 bg-gray-700 text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-gray-600 transition" onclick="closeModal('detail-modal')">Tutup</button>
+        `;
+    } else {
+        actions.innerHTML = `
+            <button class="flex-1 bg-gray-700 text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-gray-600 transition" onclick="closeModal('detail-modal')">Tutup</button>
+        `;
+    }
+    
+    document.getElementById('detail-modal').classList.add('active');
+}
+
+// ===================== APPROVE PURCHASE =====================
+function approvePurchase(id) {
+    const p = purchases.find(item => item.id === id);
+    if (!p) return;
+    if (!confirm(`Setujui pembelian "${p.itemName}" dari ${p.supplier}?`)) return;
+    
+    p.status = 'approved';
+    p.approvedBy = ADMIN_PROFILE.name;
+    p.approvedAt = new Date().toISOString();
+    localStorage.setItem('pos_purchases', JSON.stringify(purchases));
+    closeModal('detail-modal');
+    updateDashboard();
+    showNotification('Pembelian berhasil disetujui!', 'success');
+}
+
+// ===================== REJECT PURCHASE =====================
+function rejectPurchase(id) {
+    const p = purchases.find(item => item.id === id);
+    if (!p) return;
+    const reason = prompt('Masukkan alasan penolakan:');
+    if (reason === null) return;
+    if (reason.trim() === '') {
+        alert('Alasan penolakan harus diisi!');
+        return;
+    }
+    
+    p.status = 'rejected';
+    p.rejectedBy = ADMIN_PROFILE.name;
+    p.rejectedAt = new Date().toISOString();
+    p.reason = reason.trim();
+    localStorage.setItem('pos_purchases', JSON.stringify(purchases));
+    closeModal('detail-modal');
+    updateDashboard();
+    showNotification('Pembelian ditolak!', 'error');
+}
+
+// ===================== NOTIFICATION =====================
+function showNotification(message, type = 'success') {
+    const colors = {
+        success: 'bg-green-600',
+        error: 'bg-red-600',
+        warning: 'bg-amber-600',
+        info: 'bg-blue-600'
+    };
+    
+    const notification = document.createElement('div');
+    notification.className = `fixed top-20 right-4 ${colors[type] || 'bg-brand-purple'} text-white px-6 py-3 rounded-xl shadow-lg z-50 transform transition-all duration-500 translate-x-full`;
+    notification.style.transition = 'transform 0.5s ease-in-out';
+    notification.innerHTML = `
+        <div class="flex items-center gap-3">
+            <span class="material-symbols-outlined">${type === 'success' ? 'check_circle' : type === 'error' ? 'error' : 'info'}</span>
+            <span class="font-medium">${message}</span>
+        </div>
+    `;
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.style.transform = 'translateX(0)';
+    }, 100);
+    
+    setTimeout(() => {
+        notification.style.transform = 'translateX(100%)';
+        setTimeout(() => {
+            notification.remove();
+        }, 500);
+    }, 3000);
+}
+
+// ===================== MODAL CONTROLS =====================
+function closeModal(id) {
+    document.getElementById(id).classList.remove('active');
+}
+
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+    overlay.addEventListener('click', function(e) {
+        if (e.target === this) {
+            this.classList.remove('active');
+        }
+    });
+});
+
+// ===================== STORAGE LISTENER =====================
+window.addEventListener('storage', function(e) {
+    if (e.key === 'pos_transactions' || e.key === 'pos_purchases' || e.key === 'pos_products') {
+        loadData();
+        updateDashboard();
+    }
+});
+
+// ===================== INIT =====================
+document.addEventListener('DOMContentLoaded', function() {
+    updateAdminDisplay();
+    loadData();
+    updateDashboard();
+    
+    // Auto refresh setiap 30 detik
+    setInterval(() => {
+        loadData();
+        updateDashboard();
+    }, 30000);
+});
+</script>
+</body>
+</html>

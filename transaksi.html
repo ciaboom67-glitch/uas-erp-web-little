@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html class="dark" lang="id">
+<head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Little Story POS - Transaksi</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-primary-container": "#d6ad6e",
+                        "on-primary-fixed-variant": "#5e410c",
+                        "primary-container": "#5d400b",
+                        "surface-variant": "#353535",
+                        "on-surface-variant": "#d2c4b5",
+                        "on-error-container": "#ffdad6",
+                        "secondary": "#634eba",
+                        "surface": "#131313",
+                        "primary-fixed-dim": "#ebc080",
+                        "on-primary": "#432c00",
+                        "surface-container-high": "#2a2a2a",
+                        "on-error": "#690005",
+                        "on-secondary-fixed-variant": "#483890",
+                        "surface-container": "#1f1f1f",
+                        "secondary-container": "#4b3a93",
+                        "inverse-on-surface": "#303030",
+                        "inverse-surface": "#e2e2e2",
+                        "inverse-primary": "#795923",
+                        "on-background": "#e2e2e2",
+                        "surface-container-low": "#1b1b1b",
+                        "on-secondary-container": "#bcaeff",
+                        "tertiary-fixed": "#e2e2e2",
+                        "tertiary-container": "#444646",
+                        "primary-fixed": "#ffddaf",
+                        "on-tertiary-fixed-variant": "#454747",
+                        "tertiary-fixed-dim": "#c6c6c7",
+                        "on-secondary": "#321e79",
+                        "background": "#000000",
+                        "surface-bright": "#393939",
+                        "on-tertiary-container": "#b3b4b4",
+                        "surface-tint": "#ebc080",
+                        "on-tertiary": "#2f3131",
+                        "on-secondary-fixed": "#1c0062",
+                        "outline-variant": "#4e453a",
+                        "secondary-fixed": "#e6deff",
+                        "primary": "#ebc080",
+                        "error": "#ffb4ab",
+                        "on-surface": "#e2e2e2",
+                        "surface-container-lowest": "#0e0e0e",
+                        "on-primary-fixed": "#281800",
+                        "error-container": "#93000a",
+                        "surface-container-highest": "#353535",
+                        "secondary-fixed-dim": "#cabeff",
+                        "tertiary": "#c6c6c7",
+                        "on-tertiary-fixed": "#1a1c1c",
+                        "surface-dim": "#131313",
+                        "outline": "#9b8f81"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "8px",
+                        "xl": "12px",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "grid-gutter": "24px",
+                        "card-padding": "16px",
+                        "sidebar-width": "240px",
+                        "section-margin": "32px",
+                        "element-gap": "12px"
+                    },
+                    "fontFamily": {
+                        "headline-lg": ["Plus Jakarta Sans"],
+                        "price-display": ["Plus Jakarta Sans"],
+                        "body-md": ["Plus Jakarta Sans"],
+                        "headline-md": ["Plus Jakarta Sans"],
+                        "label-caps": ["Plus Jakarta Sans"],
+                        "body-lg": ["Plus Jakarta Sans"]
+                    },
+                    "fontSize": {
+                        "headline-lg": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
+                        "price-display": ["18px", {"lineHeight": "24px", "fontWeight": "800"}],
+                        "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "500"}],
+                        "headline-md": ["20px", {"lineHeight": "28px", "fontWeight": "700"}],
+                        "label-caps": ["10px", {"lineHeight": "14px", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                        "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "600"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #000000;
+            overflow: hidden;
+            height: 100vh;
+        }
+        * {
+            box-sizing: border-box;
+        }
+        .content-scroll::-webkit-scrollbar { width: 6px; }
+        .content-scroll::-webkit-scrollbar-track { background: #000000; }
+        .content-scroll::-webkit-scrollbar-thumb { background: #ebc080; border-radius: 3px; }
+
+        .cart-badge {
+            background-color: #ef4444;
+            color: white;
+            border-radius: 50%;
+            padding: 1px 6px;
+            font-size: 10px;
+            font-weight: bold;
+            margin-left: 4px;
+            min-width: 18px;
+            text-align: center;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        .notification-slide {
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .cart-item-new {
+            animation: fadeInUp 0.3s ease-out;
+        }
+
+        .product-out-of-stock {
+            opacity: 0.6;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+        .product-out-of-stock .add-to-cart-btn {
+            opacity: 0.4;
+        }
+        .product-out-of-stock .out-of-stock-badge {
+            display: inline-block;
+        }
+        .out-of-stock-badge {
+            display: none;
+            background: #ef4444;
+            color: white;
+            font-size: 9px;
+            padding: 2px 8px;
+            border-radius: 9999px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* Fix untuk layout */
+        .main-wrapper {
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+        .content-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+        .pos-content {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+        }
+        .product-area {
+            flex: 1;
+            overflow-y: auto;
+            min-width: 0;
+        }
+        .cart-sidebar {
+            width: 380px;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            border-left: 1px solid rgba(255,255,255,0.05);
+        }
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 16px;
+        }
+        @media (min-width: 1024px) {
+            .product-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+        @media (min-width: 1280px) {
+            .product-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="main-wrapper">
+    <!-- Sidebar -->
+    <aside class="w-sidebar-width h-full flex-shrink-0 bg-primary-container flex flex-col py-6 z-50 overflow-y-auto no-scrollbar">
+        <div class="px-6 mb-10 flex items-center gap-3 flex-shrink-0">
+            <div class="w-10 h-10 bg-on-primary-fixed-variant rounded-lg flex items-center justify-center">
+                <span class="material-symbols-outlined text-primary" style="font-variation-settings: &quot;FILL&quot; 1;">coffee</span>
+            </div>
+            <div>
+                <h1 class="font-headline-md text-headline-md font-bold text-on-primary-container leading-none">Little Story</h1>
+                <span class="font-label-caps text-label-caps text-on-primary-container/60 uppercase tracking-widest">ENTERPRISE ERP</span>
+            </div>
+        </div>
+        <nav class="flex-1 space-y-1">
+            <a class="text-on-primary-container/70 hover:bg-white/5 hover:text-on-primary-container mx-2 flex items-center gap-element-gap p-3 transition-colors active:scale-95 duration-150" href="s.html">
+                <span class="material-symbols-outlined">dashboard</span>
+                <span class="font-body-md text-body-md">Dashboard</span>
+            </a>
+            <a class="bg-white/10 text-on-primary-container rounded-lg mx-2 flex items-center gap-element-gap p-3 transition-colors active:scale-95 duration-150" href="#">
+                <span class="material-symbols-outlined" style="font-variation-settings: &quot;FILL&quot; 1;">point_of_sale</span>
+                <span class="font-body-md text-body-md">Transaksi</span>
+            </a>
+            <a class="text-on-primary-container/70 hover:bg-white/5 hover:text-on-primary-container mx-2 flex items-center gap-element-gap p-3 transition-colors active:scale-95 duration-150" href="p.html">
+                <span class="material-symbols-outlined">inventory_2</span>
+                <span class="font-body-md text-body-md">Produk</span>
+            </a>
+            <a class="text-on-primary-container/70 hover:bg-white/5 hover:text-on-primary-container mx-2 flex items-center gap-element-gap p-3 transition-colors active:scale-95 duration-150" href="riwayat.html">
+                <span class="material-symbols-outlined">history</span>
+                <span class="font-body-md text-body-md">Riwayat Transaksi</span>
+            </a>
+            <a class="text-on-primary-container/70 hover:bg-white/5 hover:text-on-primary-container mx-2 flex items-center gap-element-gap p-3 transition-colors active:scale-95 duration-150" href="sift.html">
+                <span class="material-symbols-outlined">schedule</span>
+                <span class="font-body-md text-body-md">Shift Kasir</span>
+            </a>
+            <a class="text-on-primary-container/70 hover:bg-white/5 hover:text-on-primary-container mx-2 flex items-center gap-element-gap p-3 transition-colors active:scale-95 duration-150" href="pengaturan.html">
+                <span class="material-symbols-outlined">settings</span>
+                <span class="font-body-md text-body-md">Pengaturan</span>
+            </a>
+        </nav>
+        
+    </aside>
+
+    <!-- Main Content -->
+    <div class="content-wrapper">
+        <!-- Top Bar -->
+        <header class="h-20 w-full flex-shrink-0 bg-background flex justify-between items-center px-6 border-b border-white/5">
+            <div class="flex-1 max-w-md">
+                <div class="relative group">
+                    <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant group-focus-within:text-primary transition-colors">search</span>
+                    <input class="w-full bg-surface-container-high border-none rounded-full py-2.5 pl-12 pr-4 text-on-surface font-body-md focus:ring-2 focus:ring-primary/50 transition-all" placeholder="Cari produk..." type="text" id="search-products">
+                </div>
+            </div>
+            <div class="flex items-center gap-6">
+                <div class="flex items-center gap-4 border-l border-white/10 pl-6">
+                    <div class="text-right">
+                        <p class="font-label-caps text-on-surface-variant uppercase tracking-tighter">Kasir</p>
+                        <p class="font-body-lg text-on-surface" id="cashierNameDisplay">Sarah Wijaya</p>
+                    </div>
+                    <img class="w-10 h-10 rounded-full object-cover border border-primary/20" id="cashierAvatarDisplay" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAYTZwsiM_474tkqVJwk7LI3d_fa4RfQ6jOu2AvL5GcMV-Bqg823Y7Vg_iqC4ol8PiPr1liLPCA0FsntKwylC0mE0eIw6ecFBSYwRztKsiSQkajYOlPVataAMp9qGmTAoYeeON0qiBJ9CruYwcwMEO8E7ayGcReE18EJjgAzUUEaWf3SjsSi1BH-Ybsha2ed21I9T4pkLM65TJSOikrYFLH56NluOJqYUMs91nJnVwlaHVkg72HO2FERzYIoTC4y75pSTy1QHyspX-Q">
+                    <button class="text-on-surface-variant hover:text-primary transition-colors">
+                        <span class="material-symbols-outlined">notifications</span>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- POS Content -->
+        <div class="pos-content">
+            <!-- Product Area -->
+            <div class="product-area px-6 py-4 content-scroll">
+                <!-- Category Filters -->
+                <div class="flex flex-wrap gap-2 mb-6">
+                    <button class="bg-secondary text-white px-5 py-1.5 rounded-full font-body-md text-sm transition-all ring-2 ring-secondary/20" data-filter="all">Semua</button>
+                    <button class="bg-white text-surface px-5 py-1.5 rounded-full font-body-md text-sm hover:bg-opacity-90 transition-all" data-filter="Minuman">Minuman</button>
+                    <button class="bg-white text-surface px-5 py-1.5 rounded-full font-body-md text-sm hover:bg-opacity-90 transition-all" data-filter="Makanan">Makanan</button>
+                    
+                </div>
+
+                <!-- Product Grid -->
+                <div class="product-grid" id="product-grid">
+                    <!-- Products will be rendered by JavaScript -->
+                </div>
+                <div class="h-4"></div>
+            </div>
+
+            <!-- Cart Sidebar -->
+            <div class="cart-sidebar">
+                <div class="p-4 flex justify-between items-center border-b border-white/10 flex-shrink-0">
+                    <h2 class="font-headline-md text-headline-md text-on-surface flex items-center gap-2">
+                        <span class="material-symbols-outlined">shopping_cart</span>
+                        Keranjang
+                        <span id="cart-item-count" class="cart-badge">0</span>
+                    </h2>
+                    <button class="text-error text-sm font-semibold hover:opacity-80 transition" id="reset-cart-btn">Reset</button>
+                </div>
+
+                <!-- Cart Items -->
+                <div class="flex-1 overflow-y-auto px-4 py-2 space-y-3 content-scroll" id="cart-items-container">
+                    <!-- Items rendered by JS -->
+                </div>
+
+                <!-- Checkout -->
+                <div class="bg-surface-container p-4 border-t border-white/10 flex-shrink-0">
+                    <div class="space-y-2 text-sm mb-4">
+                        <div class="flex justify-between text-on-surface-variant">
+                            <span>Subtotal (<span id="item-count-display">0</span> item)</span>
+                            <span id="summary-subtotal">Rp 0</span>
+                        </div>
+                        <div class="flex justify-between text-on-surface-variant">
+                            <span>Pajak (10%)</span>
+                            <span id="summary-tax">Rp 0</span>
+                        </div>
+                        <div class="flex justify-between text-primary">
+                            <span>Diskon Member</span>
+                            <span id="summary-discount">-Rp 0</span>
+                        </div>
+                    </div>
+                    <div class="flex justify-between font-bold text-on-surface text-lg border-t border-white/10 pt-3 mb-4">
+                        <span>Total Pembayaran</span>
+                        <span id="summary-total">Rp 0</span>
+                    </div>
+
+                    <!-- Payment Methods -->
+                    <div class="grid grid-cols-2 gap-2 mb-4" id="payment-methods">
+                        <button class="payment-btn flex flex-col items-center justify-center p-3 bg-surface-container-lowest border border-white/10 rounded-lg hover:border-primary transition">
+                            <span class="material-symbols-outlined text-on-surface">payments</span>
+                            <span class="text-xs font-bold text-on-surface-variant mt-1 uppercase">Cash</span>
+                        </button>
+                        <button class="payment-btn flex flex-col items-center justify-center p-3 bg-surface-container-lowest border-2 border-primary rounded-lg hover:border-primary transition">
+                            <span class="material-symbols-outlined text-primary">qr_code_scanner</span>
+                            <span class="text-xs font-bold text-primary mt-1 uppercase">QRIS</span>
+                        </button>
+                    </div>
+
+                    <button class="w-full bg-primary-container text-white py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-opacity-80 transition text-sm" id="confirm-payment-btn">
+                        <span class="material-symbols-outlined">check_circle</span>
+                        Konfirmasi Pembayaran
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer Stats -->
+        <footer class="h-14 bg-surface border-t border-white/5 flex items-center justify-between px-6 flex-shrink-0">
+            <div class="flex items-center space-x-6">
+                <div>
+                    <p class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider">Transaksi Hari Ini</p>
+                    <p class="font-body-md text-on-surface font-bold" id="today-transactions">0 Order</p>
+                </div>
+                <div>
+                    <p class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider">Total Penjualan</p>
+                    <p class="font-body-md text-on-surface font-bold" id="today-sales">Rp 0</p>
+                </div>
+                <div>
+                    <p class="font-label-caps text-label-caps text-on-surface-variant uppercase tracking-wider">Status Kasir</p>
+                    <div class="flex items-center gap-1.5">
+                        <span class="w-2 h-2 rounded-full bg-green-500"></span>
+                        <span class="text-xs font-semibold text-on-surface-variant">Aktif (Shift 1)</span>
+                    </div>
+                </div>
+            </div>
+            <button class="flex items-center gap-2 text-xs font-semibold text-on-surface-variant border border-white/10 px-3 py-1.5 rounded-lg hover:bg-white/5 transition">
+                <span class="material-symbols-outlined text-sm">bar_chart</span>
+                Lihat Laporan
+            </button>
+        </footer>
+    </div>
+</div>
+
+<script>
+// ===================== GET CASHIER PROFILE =====================
+function getCashierProfile() {
+    try {
+        // Coba ambil dari cashier_profile di localStorage
+        const saved = localStorage.getItem('cashier_profile');
+        if (saved) {
+            const profile = JSON.parse(saved);
+            if (profile && profile.name) {
+                return profile;
+            }
+        }
+        // Coba ambil dari pengaturan kasir
+        const settings = localStorage.getItem('pos_settings');
+        if (settings) {
+            const data = JSON.parse(settings);
+            if (data['cashier-name']) {
+                return {
+                    name: data['cashier-name'],
+                    avatar: data['cashier-avatar'] || 'https://lh3.googleusercontent.com/aida-public/AB6AXuAYTZwsiM_474tkqVJwk7LI3d_fa4RfQ6jOu2AvL5GcMV-Bqg823Y7Vg_iqC4ol8PiPr1liLPCA0FsntKwylC0mE0eIw6ecFBSYwRztKsiSQkajYOlPVataAMp9qGmTAoYeeON0qiBJ9CruYwcwMEO8E7ayGcReE18EJjgAzUUEaWf3SjsSi1BH-Ybsha2ed21I9T4pkLM65TJSOikrYFLH56NluOJqYUMs91nJnVwlaHVkg72HO2FERzYIoTC4y75pSTy1QHyspX-Q'
+                };
+            }
+        }
+    } catch(e) {}
+    // Default profile
+    return {
+        name: 'Sarah Wijaya',
+        avatar: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAYTZwsiM_474tkqVJwk7LI3d_fa4RfQ6jOu2AvL5GcMV-Bqg823Y7Vg_iqC4ol8PiPr1liLPCA0FsntKwylC0mE0eIw6ecFBSYwRztKsiSQkajYOlPVataAMp9qGmTAoYeeON0qiBJ9CruYwcwMEO8E7ayGcReE18EJjgAzUUEaWf3SjsSi1BH-Ybsha2ed21I9T4pkLM65TJSOikrYFLH56NluOJqYUMs91nJnVwlaHVkg72HO2FERzYIoTC4y75pSTy1QHyspX-Q'
+    };
+}
+
+// ===================== UPDATE CASHIER DISPLAY =====================
+function updateCashierDisplay() {
+    const profile = getCashierProfile();
+    const nameEl = document.getElementById('cashierNameDisplay');
+    const avatarEl = document.getElementById('cashierAvatarDisplay');
+    
+    if (nameEl) nameEl.textContent = profile.name;
+    if (avatarEl) avatarEl.src = profile.avatar;
+}
+
+// ===================== DATA PRODUK =====================
+let products = [
+    { id: 1, name: 'Thai Tea', sku: 'LS-MIN-001', category: 'Minuman', price: 15000, status: 'tersedia', stock: 45, image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAeeRksBGrTSnK_AP-ZhB3KKB9wtsY5mPBePQ2fG0gDuSSLwgdWR8N7Ks-3mXsdMmCALE91KvHzqRmRzU_k1_BWZofFLalnPeb4PpcP4CqvosdwAAym19AaYwD9f-FXEO1gY44si-ULmG7Zzv9kbhol4KSr0EgIYy07Q_hs4d53_6BJidVcYmWeKvWDea4nheraEodIIadH8nSdkbI8r6GO_4-aDARzf2nlPUFDPaut9RII7Lkb0pSQ9VvIwrTPU-GTYCrgZZb2pxx3' },
+    { id: 2, name: 'Croissant', sku: 'LS-MKN-012', category: 'Makanan', price: 28000, status: 'habis', stock: 0, image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuAVl2olZ4aW7kgs791uLRuVCH71Dy1mw5USgAAeTMpJ6UjynjopkJeYdFLk4qIKZCnqsjMtA6y4RzrhMAe4dp8M0wsjd_kzKeV8-wdH2MUAHoCHkK7c4k6HDwvileMMV4ApCGFg9Q4wj2rdm0FW_jbmI4O-PZ6jAU4JCRvFqm3SS1q6hATfy-qqMMvhny565ReHCL1R2q21haeyyX8UPHweub5xIvqDwjCb6PCK-rKplimPAowO_WPXHUBak6k2twOe41lAXjY_UAlN' },
+    { id: 3, name: 'Cappuccino', sku: 'LS-MIN-002', category: 'Minuman', price: 15000, status: 'tersedia', stock: 32, image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuD-yA0jGVbaV2URE3bTc6RPKh41RhP5OAPrSjJfYz_qYQvCP6rpEG4PnhhiXr47x9RBV-u0RkcQIjECRZo-pHF1Fo7RmlFgSgNd05UepbuNiR25fDl6R_uWvEtROZ1p3HVkvQqH4T86rp9RQZZB4xPJd7pU234f6Pa8kKtF4_3VfQeWKoBXzPEH9zk9qF-rTbQUjVPhUqB1lO4GhRlpIehReFkAVpzOJaIPiIrDYAKOrieqqE9-CwJqtlXw-aNhhMbSMb4J29Ep_2TD' },
+    { id: 4, name: 'Matcha Latte', sku: 'LS-MIN-003', category: 'Minuman', price: 17000, status: 'tersedia', stock: 18, image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuBs_4iDhOispOAIY4veLDTJCzHm2fChrHjyuQbocTSeY111ZWJo9A2B0I9902fMkjBXd6_YX2_TvK4AidLBwW47XiWFst1_4fAEnZHP8T6xk3rD9LVqW7fQ2lfZ2-vnN4C1gNZhHBbzDNuDeX4tieh7hNYzHvAbr4irh2kDzQCHEvebrXrzYNj4NEkNb9eh6BdWcLw0iQXuiTmKgx1bT5u4fwRLkSl8LaooCPYbD-5e5_8d06fmoPq7ShzXYr4YLQRh5LJmh5ngPIG2' },
+    { id: 5, name: 'Gula Aren', sku: 'LS-MIN-004', category: 'Minuman', price: 20000, status: 'tersedia', stock: 25, image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDLpA_xLSOMopD_9XGlO-zQWD47U-S9yKechHxEJ50i8bnqDyUIfbY8wXgNbV1uYiLuulVsb0tHX9zunTZZ-6G6alWZcvqr5GI7eVASYcgzl5tIqLjQoRkSshpgsWRD1LopHwd7QUBpqc-GwwvsPYHi-PHOXt0C1aZ8rfVnE4GHZE0PA6syJ_HKjO5f-6PWyZiH6NbaiuYbHjcbGGXy4b_8epq0-tT2QFefcNnWvOj13mKapNnOS5O413mr0-kZx_uez2BfmB4bDhQs' },
+    { id: 6, name: 'Americano', sku: 'LS-MIN-005', category: 'Minuman', price: 13000, status: 'tersedia', stock: 30, image: 'https://images.unsplash.com/photo-1551030173-1225a8a0f1f0?w=100&h=100&fit=crop' },
+    { id: 7, name: 'Chocolate Croissant', sku: 'LS-MKN-013', category: 'Makanan', price: 32000, status: 'tersedia', stock: 12, image: 'https://images.unsplash.com/photo-1555507036-ab1f4038808a?w=100&h=100&fit=crop' }
+];
+
+const cart = [];
+let transactionCount = 0;
+let totalSales = 0;
+const transactionHistory = [];
+
+function formatPrice(num) {
+    return 'Rp ' + num.toLocaleString('id-ID');
+}
+
+function updateStats() {
+    document.getElementById('today-transactions').textContent = transactionCount + ' Order';
+    document.getElementById('today-sales').textContent = formatPrice(totalSales);
+}
+
+function recordTransaction(cartItems, totalAmount, method) {
+    const now = new Date();
+    const timestamp = now.toLocaleString('id-ID', {
+        day: '2-digit', month: '2-digit', year: 'numeric',
+        hour: '2-digit', minute: '2-digit'
+    });
+    const profile = getCashierProfile();
+    const transaction = {
+        id: 'TRX-' + Date.now().toString().slice(-8),
+        timestamp: timestamp,
+        cashier: profile.name,
+        items: cartItems.map(item => ({
+            name: item.name,
+            price: item.price,
+            qty: item.qty,
+            subtotal: item.price * item.qty
+        })),
+        total: totalAmount,
+        paymentMethod: method
+    };
+    transactionHistory.push(transaction);
+    transactionCount++;
+    totalSales += totalAmount;
+    try {
+        localStorage.setItem('pos_transactions', JSON.stringify(transactionHistory));
+        localStorage.setItem('pos_stats', JSON.stringify({ count: transactionCount, sales: totalSales }));
+    } catch(e) {}
+    updateStats();
+    return transaction;
+}
+
+function loadSavedData() {
+    try {
+        const savedStats = localStorage.getItem('pos_stats');
+        if (savedStats) {
+            const stats = JSON.parse(savedStats);
+            transactionCount = stats.count || 0;
+            totalSales = stats.sales || 0;
+            updateStats();
+        }
+        const savedTransactions = localStorage.getItem('pos_transactions');
+        if (savedTransactions) {
+            transactionHistory.push(...JSON.parse(savedTransactions));
+        }
+    } catch(e) {}
+}
+
+function showNotification(message, type = 'success') {
+    const existing = document.querySelector('.notification-toast');
+    if (existing) existing.remove();
+    const colors = { success: 'bg-green-500', error: 'bg-red-500', warning: 'bg-yellow-500', info: 'bg-blue-500' };
+    const notification = document.createElement('div');
+    notification.className = `notification-toast fixed top-20 right-4 ${colors[type] || colors.success} text-white px-4 py-2 rounded-lg shadow-lg notification-slide z-50`;
+    notification.innerHTML = `
+        <div class="flex items-center gap-2">
+            <span class="material-symbols-outlined">${type === 'error' ? 'error' : 'check_circle'}</span>
+            <span class="text-sm font-medium">${message}</span>
+        </div>
+    `;
+    document.body.appendChild(notification);
+    setTimeout(() => notification.remove(), 2500);
+}
+
+function renderProducts(filteredProducts) {
+    const grid = document.getElementById('product-grid');
+    const productsToRender = filteredProducts || products;
+
+    if (productsToRender.length === 0) {
+        grid.innerHTML = `
+            <div class="col-span-full text-center py-12 text-on-surface-variant">
+                <span class="material-symbols-outlined text-4xl block mb-2">inventory_2</span>
+                <p class="font-body-lg">Tidak ada produk</p>
+                <p class="font-body-md text-on-surface-variant/60">Tambahkan produk di halaman Produk</p>
+            </div>
+        `;
+        return;
+    }
+
+    grid.innerHTML = productsToRender.map(p => {
+        const isOutOfStock = p.status === 'habis' || p.stock <= 0;
+        const stockLabel = isOutOfStock ? 'Habis' : `Stok: ${p.stock}`;
+        
+        return `
+            <div class="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-xl hover:translate-y-[-4px] transition-all duration-200 ${isOutOfStock ? 'product-out-of-stock' : ''}" 
+                 data-category="${p.category}" 
+                 data-name="${p.name}" 
+                 data-price="${p.price}"
+                 data-id="${p.id}"
+                 data-stock="${p.stock}">
+                <img class="w-full aspect-[4/3] object-cover" src="${p.image}" alt="${p.name}" loading="lazy">
+                <div class="p-3">
+                    <div class="flex justify-between items-start">
+                        <div class="min-w-0 flex-1">
+                            <h3 class="font-headline-md text-headline-md text-surface text-sm truncate">${p.name}</h3>
+                            <p class="text-[10px] text-surface-variant/70">${p.sku}</p>
+                        </div>
+                        <span class="out-of-stock-badge bg-error text-white text-[9px] px-2 py-0.5 rounded-full font-bold uppercase ml-1 flex-shrink-0">Habis</span>
+                    </div>
+                    <div class="flex justify-between items-center mt-3">
+                        <div>
+                            <p class="font-price-display text-price-display text-secondary text-sm font-bold">${formatPrice(p.price)}</p>
+                            <p class="text-[10px] text-on-surface-variant/60">${stockLabel}</p>
+                        </div>
+                        <button class="add-to-cart-btn bg-primary-container text-white p-1.5 rounded-lg hover:bg-opacity-80 transition ${isOutOfStock ? 'opacity-40 cursor-not-allowed' : ''}" 
+                                ${isOutOfStock ? 'disabled' : ''}>
+                            <span class="material-symbols-outlined text-sm">add</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+function updateCartUI() {
+    const container = document.getElementById('cart-items-container');
+    const countBadge = document.getElementById('cart-item-count');
+    const countDisplay = document.getElementById('item-count-display');
+    const totalItems = cart.reduce((sum, item) => sum + item.qty, 0);
+    countBadge.textContent = totalItems;
+    if (countDisplay) countDisplay.textContent = totalItems;
+
+    if (!cart.length) {
+        container.innerHTML = `
+            <div class="h-full flex flex-col items-center justify-center text-on-surface-variant space-y-2">
+                <span class="material-symbols-outlined text-4xl">shopping_cart_off</span>
+                <p class="text-sm">Keranjang Kosong</p>
+                <p class="text-xs text-on-surface-variant/60">Tambahkan produk dari daftar</p>
+            </div>`;
+    } else {
+        container.innerHTML = '';
+        cart.forEach((item, index) => {
+            const el = document.createElement('div');
+            el.className = 'flex gap-3 items-center py-2 border-b border-white/5 last:border-0 cart-item-new';
+            el.innerHTML = `
+                <img class="w-12 h-12 rounded-lg object-cover flex-shrink-0" src="${item.img}" loading="lazy">
+                <div class="flex-1 min-w-0">
+                    <div class="flex justify-between items-start">
+                        <div class="truncate">
+                            <span class="text-sm font-semibold text-on-surface block truncate">${item.name}</span>
+                            <span class="text-xs text-on-surface-variant/60">${formatPrice(item.price)} × ${item.qty}</span>
+                        </div>
+                        <span class="text-sm font-bold text-primary ml-2 flex-shrink-0">${formatPrice(item.price * item.qty)}</span>
+                    </div>
+                    <div class="flex items-center justify-between mt-1">
+                        <div class="flex items-center gap-2">
+                            <button class="w-6 h-6 flex items-center justify-center border border-white/20 rounded text-xs font-bold text-on-surface-variant hover:bg-white/10 cart-minus" data-index="${index}">−</button>
+                            <span class="text-on-surface text-sm font-semibold min-w-[20px] text-center">${item.qty}</span>
+                            <button class="w-6 h-6 flex items-center justify-center border border-white/20 rounded text-xs font-bold text-on-surface-variant hover:bg-white/10 cart-plus" data-index="${index}">+</button>
+                        </div>
+                        <button class="text-on-surface-variant/50 hover:text-error cart-remove" data-index="${index}">
+                            <span class="material-symbols-outlined text-sm">delete</span>
+                        </button>
+                    </div>
+                </div>
+            `;
+            container.appendChild(el);
+        });
+    }
+
+    const subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+    const tax = Math.round(subtotal * 0.1);
+    const discount = subtotal > 0 ? 5000 : 0;
+    const total = Math.max(0, subtotal + tax - discount);
+
+    document.getElementById('summary-subtotal').textContent = formatPrice(subtotal);
+    document.getElementById('summary-tax').textContent = formatPrice(tax);
+    document.getElementById('summary-discount').textContent = `- ${formatPrice(discount)}`;
+    document.getElementById('summary-total').textContent = formatPrice(total);
+}
+
+// ===================== EVENT LISTENERS =====================
+document.addEventListener('click', (e) => {
+    const addBtn = e.target.closest('.add-to-cart-btn');
+    if (addBtn) {
+        const card = addBtn.closest('[data-category]');
+        if (card) {
+            const name = card.dataset.name;
+            const price = parseInt(card.dataset.price);
+            const img = card.querySelector('img').src;
+            const stock = parseInt(card.dataset.stock);
+            
+            const existing = cart.find(i => i.name === name);
+            const currentQty = existing ? existing.qty : 0;
+            
+            if (currentQty >= stock) {
+                showNotification(`Stok ${name} tidak mencukupi! (Sisa: ${stock})`, 'error');
+                return;
+            }
+            
+            if (existing) {
+                existing.qty++;
+                showNotification(`${name} jumlah bertambah! (${existing.qty}x)`);
+            } else {
+                cart.push({ name, price, qty: 1, img });
+                showNotification(`${name} ditambahkan ke keranjang!`);
+            }
+            updateCartUI();
+        }
+        return;
+    }
+
+    if (e.target.classList.contains('cart-plus')) {
+        const idx = parseInt(e.target.dataset.index);
+        if (!isNaN(idx) && cart[idx]) {
+            const product = products.find(p => p.name === cart[idx].name);
+            if (product && cart[idx].qty >= product.stock) {
+                showNotification(`Stok ${product.name} tidak mencukupi! (Sisa: ${product.stock})`, 'error');
+                return;
+            }
+            cart[idx].qty++; 
+            updateCartUI();
+        }
+    }
+    if (e.target.classList.contains('cart-minus')) {
+        const idx = parseInt(e.target.dataset.index);
+        if (!isNaN(idx) && cart[idx] && cart[idx].qty > 1) { 
+            cart[idx].qty--; 
+            updateCartUI(); 
+        }
+    }
+    if (e.target.closest('.cart-remove')) {
+        const btn = e.target.closest('.cart-remove');
+        const idx = parseInt(btn.dataset.index);
+        if (!isNaN(idx) && cart[idx]) {
+            const removed = cart[idx];
+            cart.splice(idx, 1);
+            showNotification(`${removed.name} dihapus dari keranjang`);
+            updateCartUI();
+        }
+    }
+
+    if (e.target.id === 'reset-cart-btn' && cart.length > 0) {
+        if (confirm('Yakin ingin mengosongkan keranjang?')) {
+            cart.length = 0;
+            updateCartUI();
+            showNotification('Keranjang telah dikosongkan', 'warning');
+        }
+    }
+
+    const payBtn = e.target.closest('.payment-btn');
+    if (payBtn) {
+        document.querySelectorAll('.payment-btn').forEach(btn => {
+            btn.classList.remove('border-2', 'border-primary');
+            btn.querySelectorAll('.text-primary').forEach(el => el.classList.remove('text-primary'));
+        });
+        payBtn.classList.add('border-2', 'border-primary');
+        payBtn.querySelectorAll('span').forEach(el => el.classList.add('text-primary'));
+    }
+
+    if (e.target.id === 'confirm-payment-btn' || e.target.closest('#confirm-payment-btn')) {
+        const btn = document.getElementById('confirm-payment-btn');
+        if (cart.length === 0) {
+            alert('Keranjang masih kosong! Tambahkan produk terlebih dahulu.');
+            return;
+        }
+        
+        for (const item of cart) {
+            const product = products.find(p => p.name === item.name);
+            if (product && item.qty > product.stock) {
+                alert(`Stok ${product.name} tidak mencukupi! Tersedia: ${product.stock}, Diminta: ${item.qty}`);
+                return;
+            }
+        }
+        
+        const method = document.querySelector('.payment-btn.border-2.border-primary')?.querySelector('span:last-child')?.textContent || 'Cash';
+        const originalContent = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = 'Memproses...';
+
+        const subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+        const tax = Math.round(subtotal * 0.1);
+        const discount = subtotal > 0 ? 5000 : 0;
+        const finalTotal = Math.max(0, subtotal + tax - discount);
+
+        for (const item of cart) {
+            const product = products.find(p => p.name === item.name);
+            if (product) {
+                product.stock -= item.qty;
+                if (product.stock <= 0) {
+                    product.status = 'habis';
+                    product.stock = 0;
+                }
+            }
+        }
+
+        setTimeout(() => {
+            const profile = getCashierProfile();
+            const transaction = recordTransaction([...cart], finalTotal, method.trim());
+            alert(`✅ Pembayaran Berhasil Dikonfirmasi!\n\n` +
+                  `🆔 ${transaction.id}\n` +
+                  `📅 ${transaction.timestamp}\n` +
+                  `👤 Kasir: ${profile.name}\n` +
+                  `💳 ${transaction.paymentMethod}\n` +
+                  `💰 Total: ${formatPrice(finalTotal)}\n` +
+                  `📦 ${cart.length} item\n\n` +
+                  `📊 Total Transaksi Hari Ini: ${transactionCount} Order\n` +
+                  `💰 Total Penjualan: ${formatPrice(totalSales)}`);
+            btn.innerHTML = originalContent;
+            btn.disabled = false;
+            cart.length = 0;
+            renderProducts();
+            updateCartUI();
+            showNotification('✅ Pembayaran berhasil!', 'success');
+        }, 1500);
+    }
+});
+
+// Category filter
+document.querySelectorAll('[data-filter]').forEach(btn => {
+    btn.addEventListener('click', function() {
+        document.querySelectorAll('[data-filter]').forEach(b => {
+            b.classList.remove('bg-secondary', 'text-white', 'ring-2', 'ring-secondary/20');
+            b.classList.add('bg-white', 'text-surface');
+        });
+        this.classList.add('bg-secondary', 'text-white', 'ring-2', 'ring-secondary/20');
+        this.classList.remove('bg-white', 'text-surface');
+
+        const filter = this.dataset.filter;
+        if (filter === 'all') {
+            renderProducts(products);
+        } else {
+            const filtered = products.filter(p => p.category === filter);
+            renderProducts(filtered);
+        }
+    });
+});
+
+// Search
+document.getElementById('search-products').addEventListener('input', function() {
+    const term = this.value.toLowerCase().trim();
+    const filtered = products.filter(p => 
+        p.name.toLowerCase().includes(term) || 
+        p.sku.toLowerCase().includes(term)
+    );
+    renderProducts(filtered);
+});
+
+// Sinkronisasi dengan localStorage
+function syncProductsToStorage() {
+    try {
+        localStorage.setItem('pos_products', JSON.stringify(products));
+    } catch(e) {}
+}
+
+function loadProductsFromStorage() {
+    try {
+        const saved = localStorage.getItem('pos_products');
+        if (saved) {
+            const parsed = JSON.parse(saved);
+            if (parsed && parsed.length > 0) {
+                products = parsed;
+            }
+        }
+    } catch(e) {}
+}
+
+const originalRender = renderProducts;
+renderProducts = function(filteredProducts) {
+    syncProductsToStorage();
+    originalRender(filteredProducts || products);
+};
+
+const originalUpdateCart = updateCartUI;
+updateCartUI = function() {
+    syncProductsToStorage();
+    originalUpdateCart();
+};
+
+// ===================== LISTEN FOR STORAGE CHANGES =====================
+window.addEventListener('storage', function(e) {
+    if (e.key === 'cashier_profile' || e.key === 'pos_settings') {
+        updateCashierDisplay();
+    }
+});
+
+// ===================== INIT =====================
+// Update cashier display
+updateCashierDisplay();
+
+loadProductsFromStorage();
+renderProducts();
+loadSavedData();
+updateCartUI();
+
+// Auto-sync cashier name
+setInterval(() => {
+    updateCashierDisplay();
+}, 3000);
+
+document.querySelectorAll('a, button').forEach(el => {
+    el.addEventListener('mousedown', () => {
+        el.classList.add('scale-95');
+    });
+    el.addEventListener('mouseup', () => {
+        el.classList.remove('scale-95');
+    });
+    el.addEventListener('mouseleave', () => {
+        el.classList.remove('scale-95');
+    });
+});
+</script>
+</body>
+</html>

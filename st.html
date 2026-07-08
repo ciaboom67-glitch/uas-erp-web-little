@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Little Story - Manajemen Stok</title>
+<!-- Tailwind CSS v3 CDN -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Google Fonts: Inter -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            earthy: {
+              DEFAULT: '#4d3310',
+              sidebar: '#4d3310',
+              surface: '#f8f9fa',
+              'surface-dim': '#d9dadb',
+              'surface-container': '#ffffff',
+            },
+            status: {
+              kritis: '#fee2e2',
+              'kritis-text': '#dc2626',
+              rendah: '#ffedd5',
+              'rendah-text': '#ea580c',
+              aman: '#dcfce7',
+              'aman-text': '#16a34a',
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          },
+        }
+      }
+    }
+  </script>
+<style>
+    * { box-sizing: border-box; }
+    body { background-color: #F8F9FA; }
+    .custom-shadow { box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03); }
+    aside::-webkit-scrollbar { width: 4px; }
+    aside::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 2px; }
+    .dashboard-content { padding: 24px 32px; }
+    .status-badge { padding: 4px 12px; border-radius: 9999px; font-size: 11px; font-weight: 600; display: inline-block; white-space: nowrap; }
+    .status-kritis { background: #FEE2E2; color: #DC2626; }
+    .status-rendah { background: #FEF3C7; color: #D97706; }
+    .status-aman { background: #D1FAE5; color: #059669; }
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 100; align-items: center; justify-content: center; }
+    .modal-overlay.active { display: flex; }
+    .modal-content { background: white; border-radius: 16px; max-width: 640px; width: 100%; max-height: 90vh; overflow-y: auto; padding: 32px; margin: 16px; }
+    .table-container { padding: 4px 0; }
+    .table-container table { border-collapse: separate; border-spacing: 0; width: 100%; }
+    .table-container th, .table-container td { padding: 12px 14px; vertical-align: middle; }
+    .table-container thead th { padding: 12px 14px; font-weight: 600; font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em; color: #6B7280; background: #F9FAFB; border-bottom: 2px solid #E5E7EB; }
+    .table-container tbody tr { border-bottom: 1px solid #F3F4F6; transition: background-color 0.15s ease; }
+    .table-container tbody tr:last-child { border-bottom: none; }
+    .table-container tbody tr:hover { background-color: #FAFBFC; }
+    .table-container tbody td { padding: 12px 14px; font-size: 13px; line-height: 1.5; }
+    .action-buttons { display: flex; align-items: center; justify-content: center; gap: 5px; flex-wrap: nowrap; }
+    .action-buttons .btn { padding: 5px 10px; border-radius: 6px; font-size: 11px; font-weight: 600; transition: all 0.15s ease; cursor: pointer; border: none; text-decoration: none; display: inline-flex; align-items: center; gap: 3px; white-space: nowrap; line-height: 1.4; }
+    .action-buttons .btn svg { width: 14px; height: 14px; flex-shrink: 0; }
+    .action-buttons .btn-detail { color: #4d3310; background: #f0ebe6; }
+    .action-buttons .btn-detail:hover { background: #e0d6cc; }
+    .table-container td:first-child, .table-container th:first-child { width: 40px; text-align: center; }
+    .table-container td:last-child, .table-container th:last-child { width: 60px; text-align: center; }
+    /* Stok clickable */
+    .stock-clickable {
+      cursor: pointer;
+      transition: all 0.2s ease;
+      padding: 4px 10px;
+      border-radius: 6px;
+      display: inline-block;
+      font-weight: 700;
+      position: relative;
+    }
+    .stock-clickable:hover {
+      transform: scale(1.05);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .stock-clickable.kritis:hover { background: #FEE2E2; }
+    .stock-clickable.rendah:hover { background: #FEF3C7; }
+    .stock-clickable.aman:hover { background: #D1FAE5; }
+    .stock-clickable .tooltip {
+      visibility: hidden;
+      opacity: 0;
+      width: 160px;
+      background: #1f2937;
+      color: #fff;
+      text-align: center;
+      border-radius: 6px;
+      padding: 6px 10px;
+      position: absolute;
+      z-index: 1;
+      bottom: 130%;
+      left: 50%;
+      transform: translateX(-50%);
+      transition: opacity 0.2s;
+      font-weight: 400;
+      font-size: 11px;
+      white-space: nowrap;
+    }
+    .stock-clickable .tooltip::after {
+      content: "";
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      margin-left: -5px;
+      border-width: 5px;
+      border-style: solid;
+      border-color: #1f2937 transparent transparent transparent;
+    }
+    .stock-clickable:hover .tooltip {
+      visibility: visible;
+      opacity: 1;
+    }
+    @media (max-width: 768px) {
+      .dashboard-content { padding: 16px; }
+      .modal-content { padding: 20px; }
+      .table-container th, .table-container td { padding: 8px 10px; }
+      .table-container tbody td { font-size: 12px; }
+      .action-buttons { flex-wrap: wrap; gap: 3px; }
+      .action-buttons .btn { font-size: 10px; padding: 3px 7px; }
+      .action-buttons .btn svg { width: 12px; height: 12px; }
+    }
+  </style>
+</head>
+<body class="flex min-h-screen text-slate-800 bg-earthy-surface">
+<!-- BEGIN: Sidebar -->
+<aside class="w-64 bg-earthy-sidebar text-white flex-shrink-0 flex flex-col hidden lg:flex h-screen sticky top-0">
+<div class="p-5 flex items-center gap-3">
+<div class="w-8 h-8 bg-white rounded-md flex items-center justify-center flex-shrink-0">
+<div class="w-5 h-5 bg-earthy-sidebar rounded-sm"></div>
+</div>
+<div class="min-w-0">
+<h1 class="text-sm font-bold leading-none">Little Story</h1>
+<span class="text-[10px] opacity-70 tracking-wider">ENTERPRISE ERP</span>
+</div>
+</div>
+<nav class="flex-1 px-3 space-y-1 mt-4 overflow-y-auto">
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-white/60 hover:text-white hover:bg-white/5 transition-colors" href="gudang.html">
+<svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+          Dashboard
+        </a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-white/10 text-white font-medium" href="st.html">
+<svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+          Stok
+        </a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-white/60 hover:text-white hover:bg-white/5 transition-colors" href="bm.html">
+<svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M7 16l-4-4m0 0l4-4m-4 4h18" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+          Barang Masuk
+        </a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-white/60 hover:text-white hover:bg-white/5 transition-colors" href="bk.html">
+<svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M17 8l4 4m0 0l-4 4m4-4H3" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+          Barang Keluar
+        </a>
+
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-white/60 hover:text-white hover:bg-white/5 transition-colors" href="pengajuan.html">
+<svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+          Pengajuan
+        </a>
+
+
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-white/60 hover:text-white hover:bg-white/5 transition-colors" href="pen.html">
+<svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+          Pengaturan
+        </a>
+</nav>
+</aside>
+<!-- END: Sidebar -->
+
+<!-- BEGIN: Main Content -->
+<main class="flex-1 flex flex-col min-w-0 bg-earthy-surface h-screen overflow-hidden">
+<!-- BEGIN: Top Header -->
+<header class="h-16 bg-white border-b border-earthy-surface-dim flex items-center justify-between px-6 lg:px-8 flex-shrink-0">
+<div class="relative w-64 lg:w-96">
+<span class="absolute inset-y-0 left-0 flex items-center pl-3">
+<svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</span>
+<input class="w-full pl-10 pr-4 py-2 bg-slate-100 border-none rounded-lg text-xs focus:ring-1 focus:ring-earthy placeholder:text-slate-400" placeholder="Cari produk..." type="text" id="search-input"/>
+</div>
+<div class="flex items-center gap-4 lg:gap-6 flex-shrink-0">
+<div class="relative">
+<svg class="w-6 h-6 text-slate-500" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+<span class="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-white">3</span>
+</div>
+<div class="flex items-center gap-3">
+<div class="text-right hidden sm:block">
+<p class="text-sm font-semibold text-slate-800" id="admin-name">Budi Sentoso</p>
+<p class="text-xs text-slate-400 font-medium">KEPALA GUDANG</p>
+</div>
+<img alt="Admin Profile" class="w-10 h-10 rounded-full border-2 border-white custom-shadow object-cover flex-shrink-0" id="admin-avatar" src="https://ui-avatars.com/api/?name=Budi+Sentoso&background=4d3310&color=fff&size=128"/>
+<svg class="w-4 h-4 text-slate-400 hidden sm:block" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+</div>
+</div>
+</header>
+<!-- END: Top Header -->
+
+<!-- BEGIN: Dashboard Body -->
+<div class="flex-1 overflow-y-auto dashboard-content">
+<div class="dashboard-container max-w-7xl mx-auto space-y-6">
+<!-- Page Title Row -->
+<div class="flex flex-wrap justify-between items-start gap-4 mb-2">
+<div class="min-w-0">
+<h2 class="text-2xl font-bold text-slate-800">Manajemen Stok</h2>
+<p class="text-sm text-slate-500 mt-1" id="current-date">Kelola stok barang dan pantau ketersediaan produk</p>
+</div>
+</div>
+
+<!-- Summary Cards -->
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+<div class="bg-white rounded-xl custom-shadow border border-slate-100 p-4">
+<p class="text-xs text-slate-400 font-medium">Total Produk</p>
+<p class="text-2xl font-bold text-slate-800" id="total-products">0</p>
+</div>
+<div class="bg-white rounded-xl custom-shadow border border-slate-100 p-4">
+<p class="text-xs text-slate-400 font-medium">Total Stok</p>
+<p class="text-2xl font-bold text-slate-800" id="total-stock">0</p>
+</div>
+<div class="bg-white rounded-xl custom-shadow border border-slate-100 p-4">
+<p class="text-xs text-slate-400 font-medium">Stok Kritis</p>
+<p class="text-2xl font-bold text-red-600" id="critical-stock">0</p>
+</div>
+<div class="bg-white rounded-xl custom-shadow border border-slate-100 p-4">
+<p class="text-xs text-slate-400 font-medium">Stok Rendah</p>
+<p class="text-2xl font-bold text-amber-600" id="low-stock">0</p>
+</div>
+</div>
+
+<!-- Filter & Export -->
+<div class="flex flex-wrap items-center justify-between gap-4">
+<div class="flex flex-wrap gap-2">
+<button class="status-filter-tab px-4 py-1.5 rounded-lg text-sm font-medium bg-earthy text-white" data-filter="all">Semua</button>
+<button class="status-filter-tab px-4 py-1.5 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100" data-filter="kritis">Kritis</button>
+<button class="status-filter-tab px-4 py-1.5 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100" data-filter="rendah">Rendah</button>
+<button class="status-filter-tab px-4 py-1.5 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100" data-filter="aman">Aman</button>
+</div>
+<button class="text-sm text-slate-500 hover:text-earthy flex items-center gap-2" onclick="exportData()">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+Export
+</button>
+</div>
+
+<!-- Stock List -->
+<div class="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden table-container">
+<div class="overflow-x-auto">
+<table>
+<thead>
+<tr>
+<th class="text-center">No.</th>
+<th>Kode</th>
+<th>Nama Produk</th>
+<th class="text-center">Stok</th>
+<th>Satuan</th>
+<th class="text-center">Status</th>
+<th class="text-center">Aksi</th>
+</tr>
+</thead>
+<tbody id="stock-table-body">
+<tr>
+<td colspan="7" class="text-center py-8 text-gray-400">Belum ada data stok</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+<!-- END: Dashboard Body -->
+</main>
+<!-- END: Main Content -->
+
+<!-- BEGIN: Modal Stok (Klik pada angka stok) -->
+<div class="modal-overlay" id="stock-action-modal">
+<div class="modal-content">
+<div class="flex justify-between items-center mb-5">
+<h2 class="text-xl font-bold text-gray-900" id="stock-action-title">Update Stok</h2>
+<button class="text-gray-400 hover:text-gray-600 close-modal-btn">
+<svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12" stroke-width="2"/></svg>
+</button>
+</div>
+<form id="stock-action-form">
+<input type="hidden" id="sa-id" value=""/>
+<div class="space-y-4">
+<div class="bg-gray-50 p-4 rounded-lg">
+<p class="text-sm text-gray-500">Produk</p>
+<p class="font-semibold text-lg" id="sa-product-name">-</p>
+<p class="text-sm text-gray-500 mt-1">Stok saat ini: <span id="sa-current-qty" class="font-bold">0</span> <span id="sa-unit">-</span></p>
+</div>
+<div>
+<label class="text-sm font-semibold text-gray-700 block mb-1">Jenis Transaksi</label>
+<select id="sa-type" class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-earthy focus:border-transparent" required>
+<option value="in">Barang Masuk (Tambah Stok)</option>
+<option value="out">Barang Keluar (Kurangi Stok)</option>
+</select>
+</div>
+<div>
+<label class="text-sm font-semibold text-gray-700 block mb-1">Jumlah</label>
+<input type="number" id="sa-qty" class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-earthy focus:border-transparent" placeholder="0" min="1" required/>
+</div>
+<div id="sa-supplier-field">
+<label class="text-sm font-semibold text-gray-700 block mb-1">Supplier</label>
+<input type="text" id="sa-supplier" class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-earthy focus:border-transparent" placeholder="Nama Supplier"/>
+</div>
+<div id="sa-destination-field" style="display:none;">
+<label class="text-sm font-semibold text-gray-700 block mb-1">Tujuan</label>
+<input type="text" id="sa-destination" class="w-full border border-gray-200 rounded-lg px-4 py-2.5 text-sm focus:ring-2 focus:ring-earthy focus:border-transparent" placeholder="Contoh: Outlet 1 - Sudirman"/>
+</div>
+<div class="flex gap-3 pt-3 border-t border-gray-100">
+<button type="submit" class="flex-1 bg-earthy text-white px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-earthy/90 transition">Update Stok</button>
+<button type="button" class="flex-1 bg-gray-200 text-gray-600 px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-gray-300 transition close-modal-btn">Batal</button>
+</div>
+</div>
+</form>
+</div>
+</div>
+<!-- END: Modal -->
+
+<!-- BEGIN: Modal Detail Stok -->
+<div class="modal-overlay" id="detail-modal">
+<div class="modal-content">
+<div class="flex justify-between items-center mb-5">
+<h2 class="text-xl font-bold text-gray-900" id="detail-title">Detail Stok</h2>
+<button class="text-gray-400 hover:text-gray-600 close-modal-btn">
+<svg class="w-6 h-6" fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12" stroke-width="2"/></svg>
+</button>
+</div>
+<div id="detail-content" class="space-y-3">
+<div class="grid grid-cols-2 gap-3">
+<div><span class="text-gray-500 text-sm">Kode Produk</span><p class="font-semibold" id="d-code">-</p></div>
+<div><span class="text-gray-500 text-sm">Kategori</span><p class="font-semibold" id="d-category">-</p></div>
+</div>
+<div><span class="text-gray-500 text-sm">Nama Produk</span><p class="font-semibold text-lg" id="d-name">-</p></div>
+<div class="grid grid-cols-2 gap-3">
+<div><span class="text-gray-500 text-sm">Stok Saat Ini</span><p class="font-semibold text-2xl" id="d-qty">-</p></div>
+<div><span class="text-gray-500 text-sm">Satuan</span><p class="font-semibold" id="d-unit">-</p></div>
+</div>
+<div><span class="text-gray-500 text-sm">Stok Minimum</span><p class="font-semibold" id="d-min">-</p></div>
+<div><span class="text-gray-500 text-sm">Lokasi Rak</span><p class="font-semibold" id="d-location">-</p></div>
+<div><span class="text-gray-500 text-sm">Status</span><p id="d-status">-</p></div>
+</div>
+<div id="detail-actions" class="flex gap-3 mt-5 pt-4 border-t border-gray-100">
+<button class="flex-1 bg-gray-200 text-gray-600 px-5 py-2.5 rounded-lg text-sm font-semibold hover:bg-gray-300 transition close-modal-btn">Tutup</button>
+</div>
+</div>
+</div>
+<!-- END: Modal Detail -->
+
+<script>
+// ===================== ADMIN PROFILE =====================
+const ADMIN_PROFILE = {
+    name: 'Budi Sentoso',
+    avatar: 'https://ui-avatars.com/api/?name=Budi+Sentoso&background=4d3310&color=fff&size=128'
+};
+
+// ===================== DATA STORE =====================
+let stocks = [];
+let currentFilter = 'all';
+
+// Load data from localStorage
+function loadStocks() {
+    try {
+        const saved = localStorage.getItem('pos_stocks');
+        if (saved) {
+            stocks = JSON.parse(saved);
+        } else {
+            // Sample data
+            stocks = [
+                { id: 1, code: 'BRG-001', name: 'Biji Kopi Arabica', category: 'Kopi', qty: 1.2, unit: 'kg', min: 2, location: 'Rak A-1' },
+                { id: 2, code: 'BRG-002', name: 'Susu Fresh Milk', category: 'Susu', qty: 2, unit: 'liter', min: 5, location: 'Rak B-2' },
+                { id: 3, code: 'BRG-003', name: 'Sirup Vanilla', category: 'Gula', qty: 1, unit: 'botol', min: 3, location: 'Rak C-1' },
+                { id: 4, code: 'BRG-004', name: 'Whipped Cream', category: 'Susu', qty: 3, unit: 'kaleng', min: 5, location: 'Rak B-3' },
+                { id: 5, code: 'BRG-005', name: 'Gula Aren Cair', category: 'Gula', qty: 12, unit: 'botol', min: 3, location: 'Rak C-2' },
+                { id: 6, code: 'BRG-006', name: 'Cokelat Bubuk', category: 'Cokelat', qty: 5, unit: 'kg', min: 2, location: 'Rak D-1' },
+                { id: 7, code: 'BRG-007', name: 'Paper Cup', category: 'Kemasan', qty: 500, unit: 'pcs', min: 100, location: 'Rak E-1' }
+            ];
+            saveStocks();
+        }
+    } catch(e) {
+        stocks = [];
+    }
+}
+
+function saveStocks() {
+    try {
+        localStorage.setItem('pos_stocks', JSON.stringify(stocks));
+    } catch(e) {}
+}
+
+// ===================== HELPERS =====================
+function getStatus(stock) {
+    if (stock.qty <= 0) return 'kritis';
+    if (stock.qty < stock.min) return 'rendah';
+    return 'aman';
+}
+
+function getStatusBadge(status) {
+    const map = {
+        'kritis': '<span class="status-badge status-kritis">Kritis</span>',
+        'rendah': '<span class="status-badge status-rendah">Rendah</span>',
+        'aman': '<span class="status-badge status-aman">Aman</span>'
+    };
+    return map[status] || '<span class="status-badge status-aman">Aman</span>';
+}
+
+function formatDate() {
+    const now = new Date();
+    const d = String(now.getDate()).padStart(2, '0');
+    const m = String(now.getMonth() + 1).padStart(2, '0');
+    const y = now.getFullYear();
+    const h = String(now.getHours()).padStart(2, '0');
+    const min = String(now.getMinutes()).padStart(2, '0');
+    return `${d}/${m}/${y} ${h}:${min}`;
+}
+
+// ===================== UPDATE DISPLAY =====================
+function updateAdminDisplay() {
+    const nameEl = document.getElementById('admin-name');
+    const avatarEl = document.getElementById('admin-avatar');
+    if (nameEl) nameEl.textContent = ADMIN_PROFILE.name;
+    if (avatarEl) avatarEl.src = ADMIN_PROFILE.avatar;
+}
+
+function updateDashboard() {
+    // Update date
+    const now = new Date();
+    const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+    const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+    document.getElementById('current-date').textContent = `Kelola stok barang dan pantau ketersediaan produk - ${days[now.getDay()]}, ${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
+
+    // Filter stocks
+    let filtered = stocks;
+    if (currentFilter !== 'all') {
+        filtered = stocks.filter(p => getStatus(p) === currentFilter);
+    }
+
+    // Search
+    const searchQuery = document.getElementById('search-input')?.value?.toLowerCase() || '';
+    if (searchQuery) {
+        filtered = filtered.filter(p => 
+            p.name.toLowerCase().includes(searchQuery) || 
+            p.code.toLowerCase().includes(searchQuery)
+        );
+    }
+
+    // Update summary
+    document.getElementById('total-products').textContent = stocks.length;
+    document.getElementById('total-stock').textContent = stocks.reduce((sum, p) => sum + p.qty, 0);
+    document.getElementById('critical-stock').textContent = stocks.filter(p => getStatus(p) === 'kritis').length;
+    document.getElementById('low-stock').textContent = stocks.filter(p => getStatus(p) === 'rendah').length;
+
+    // Render table
+    const tbody = document.getElementById('stock-table-body');
+    if (filtered.length === 0) {
+        const msg = currentFilter === 'all' ? 'Belum ada data stok' : 'Tidak ada data dengan status ini';
+        tbody.innerHTML = `<tr><td colspan="7" class="text-center py-8 text-gray-400">${msg}</td></tr>`;
+        return;
+    }
+
+    tbody.innerHTML = filtered.map((p, index) => {
+        const status = getStatus(p);
+        const statusClass = status === 'kritis' ? 'kritis' : status === 'rendah' ? 'rendah' : 'aman';
+        const textColor = status === 'kritis' ? 'text-red-600' : status === 'rendah' ? 'text-amber-600' : 'text-green-600';
+        return `
+        <tr>
+            <td class="text-center font-medium text-gray-500">${index + 1}</td>
+            <td class="text-gray-700 font-mono text-xs">${p.code}</td>
+            <td class="font-semibold text-gray-700">${p.name}</td>
+            <td class="text-center">
+                <span class="stock-clickable ${statusClass} ${textColor}" data-id="${p.id}" title="Klik untuk update stok">
+                    ${p.qty}
+                    <span class="tooltip">Klik untuk tambah/kurangi stok</span>
+                </span>
+            </td>
+            <td class="text-gray-500">${p.unit}</td>
+            <td class="text-center">${getStatusBadge(status)}</td>
+            <td>
+                <div class="action-buttons">
+                    <button class="btn btn-detail detail-btn" data-id="${p.id}" title="Detail Stok">
+                        <svg fill="none" stroke="currentColor" viewbox="0 0 24 24"><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/><path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
+                    </button>
+                </div>
+            </td>
+        </tr>
+    `}).join('');
+
+    // Attach event listeners
+    document.querySelectorAll('.detail-btn').forEach(btn => {
+        btn.addEventListener('click', () => openDetail(parseInt(btn.dataset.id)));
+    });
+    document.querySelectorAll('.stock-clickable').forEach(el => {
+        el.addEventListener('click', function(e) {
+            e.stopPropagation();
+            openStockActionModal(parseInt(this.dataset.id));
+        });
+    });
+}
+
+// ===================== OPEN STOCK ACTION MODAL =====================
+function openStockActionModal(id) {
+    const p = stocks.find(item => item.id === id);
+    if (!p) return;
+
+    document.getElementById('sa-id').value = id;
+    document.getElementById('sa-product-name').textContent = p.name + ' (' + p.code + ')';
+    document.getElementById('sa-current-qty').textContent = p.qty;
+    document.getElementById('sa-unit').textContent = p.unit;
+    document.getElementById('sa-qty').value = '';
+    document.getElementById('sa-supplier').value = '';
+    document.getElementById('sa-destination').value = '';
+    document.getElementById('sa-type').value = 'in';
+    
+    // Toggle fields based on type
+    document.getElementById('sa-supplier-field').style.display = 'block';
+    document.getElementById('sa-destination-field').style.display = 'none';
+    
+    document.getElementById('stock-action-title').textContent = 'Update Stok - ' + p.name;
+    document.getElementById('stock-action-modal').classList.add('active');
+}
+
+// ===================== OPEN DETAIL =====================
+function openDetail(id) {
+    const p = stocks.find(item => item.id === id);
+    if (!p) return;
+
+    const status = getStatus(p);
+    document.getElementById('detail-title').textContent = `Detail Stok - ${p.code}`;
+    document.getElementById('d-code').textContent = p.code;
+    document.getElementById('d-category').textContent = p.category;
+    document.getElementById('d-name').textContent = p.name;
+    document.getElementById('d-qty').textContent = p.qty;
+    document.getElementById('d-unit').textContent = p.unit;
+    document.getElementById('d-min').textContent = p.min + ' ' + p.unit;
+    document.getElementById('d-location').textContent = p.location;
+    document.getElementById('d-status').innerHTML = getStatusBadge(status);
+
+    document.getElementById('detail-modal').classList.add('active');
+}
+
+// ===================== STOCK ACTION FORM (Tambah/Kurangi) =====================
+document.getElementById('stock-action-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const id = parseInt(document.getElementById('sa-id').value);
+    const type = document.getElementById('sa-type').value;
+    const qty = parseFloat(document.getElementById('sa-qty').value);
+    const supplier = document.getElementById('sa-supplier').value.trim();
+    const destination = document.getElementById('sa-destination').value.trim();
+
+    if (!id || isNaN(qty) || qty <= 0) {
+        alert('Harap isi jumlah dengan benar!');
+        return;
+    }
+
+    if (type === 'in' && !supplier) {
+        alert('Harap isi nama supplier!');
+        return;
+    }
+
+    if (type === 'out' && !destination) {
+        alert('Harap isi tujuan!');
+        return;
+    }
+
+    const stock = stocks.find(p => p.id === id);
+    if (!stock) {
+        alert('Produk tidak ditemukan!');
+        return;
+    }
+
+    if (type === 'out' && stock.qty < qty) {
+        alert(`Stok tidak mencukupi! Stok tersedia: ${stock.qty} ${stock.unit}`);
+        return;
+    }
+
+    // Update stok
+    if (type === 'in') {
+        stock.qty += qty;
+        showNotification(`${qty} ${stock.unit} ${stock.name} berhasil ditambahkan dari ${supplier}!`, 'success');
+    } else {
+        stock.qty -= qty;
+        showNotification(`${qty} ${stock.unit} ${stock.name} berhasil dikeluarkan ke ${destination}!`, 'info');
+    }
+
+    saveStocks();
+    document.getElementById('stock-action-modal').classList.remove('active');
+    updateDashboard();
+});
+
+// ===================== TOGGLE FIELDS BASED ON TYPE =====================
+document.getElementById('sa-type').addEventListener('change', function() {
+    if (this.value === 'in') {
+        document.getElementById('sa-supplier-field').style.display = 'block';
+        document.getElementById('sa-destination-field').style.display = 'none';
+        document.getElementById('sa-supplier').required = true;
+        document.getElementById('sa-destination').required = false;
+    } else {
+        document.getElementById('sa-supplier-field').style.display = 'none';
+        document.getElementById('sa-destination-field').style.display = 'block';
+        document.getElementById('sa-supplier').required = false;
+        document.getElementById('sa-destination').required = true;
+    }
+});
+
+// ===================== NOTIFICATION =====================
+function showNotification(message, type = 'success') {
+    const colors = {
+        success: 'bg-green-600',
+        error: 'bg-red-600',
+        warning: 'bg-amber-600',
+        info: 'bg-blue-600'
+    };
+    
+    const notification = document.createElement('div');
+    notification.className = `fixed top-4 right-4 ${colors[type] || 'bg-earthy'} text-white px-6 py-3 rounded-xl shadow-lg z-50 transform transition-all duration-500 translate-x-full`;
+    notification.style.transition = 'transform 0.5s ease-in-out';
+    notification.innerHTML = `
+        <div class="flex items-center gap-3">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+                <path d="${type === 'success' ? 'M5 13l4 4L19 7' : type === 'error' ? 'M6 18L18 6M6 6l12 12' : 'M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z'}" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+            </svg>
+            <span class="font-medium">${message}</span>
+        </div>
+    `;
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.style.transform = 'translateX(0)';
+    }, 100);
+    
+    setTimeout(() => {
+        notification.style.transform = 'translateX(100%)';
+        setTimeout(() => {
+            notification.remove();
+        }, 500);
+    }, 3000);
+}
+
+// ===================== EXPORT =====================
+function exportData() {
+    if (stocks.length === 0) {
+        alert('Tidak ada data untuk diexport!');
+        return;
+    }
+    
+    let csv = 'No,Kode,Nama Produk,Stok,Satuan,Stok Minimum,Lokasi,Status\n';
+    stocks.forEach((p, i) => {
+        const status = getStatus(p);
+        const statusText = status === 'kritis' ? 'Kritis' : status === 'rendah' ? 'Rendah' : 'Aman';
+        csv += `${i+1},${p.code},${p.name},${p.qty},${p.unit},${p.min},${p.location},${statusText}\n`;
+    });
+    
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `stok_gudang_${formatDate().replace(/[/: ]/g, '_')}.csv`;
+    a.click();
+    window.URL.revokeObjectURL(url);
+    showNotification('Data berhasil diexport!', 'success');
+}
+
+// ===================== FILTER TABS =====================
+document.querySelectorAll('.status-filter-tab').forEach(tab => {
+    tab.addEventListener('click', function() {
+        document.querySelectorAll('.status-filter-tab').forEach(t => {
+            t.className = 'status-filter-tab px-4 py-1.5 rounded-lg text-sm font-medium text-gray-600 hover:bg-gray-100';
+        });
+        this.className = 'status-filter-tab px-4 py-1.5 rounded-lg text-sm font-medium bg-earthy text-white';
+        currentFilter = this.dataset.filter;
+        updateDashboard();
+    });
+});
+
+// ===================== SEARCH =====================
+document.getElementById('search-input').addEventListener('input', function() {
+    updateDashboard();
+});
+
+// ===================== MODAL CONTROLS =====================
+document.querySelectorAll('.close-modal-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        document.getElementById('detail-modal').classList.remove('active');
+        document.getElementById('stock-action-modal').classList.remove('active');
+    });
+});
+
+// Close modal on overlay click
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+    overlay.addEventListener('click', function(e) {
+        if (e.target === this) {
+            this.classList.remove('active');
+        }
+    });
+});
+
+// ===================== INIT =====================
+document.addEventListener('DOMContentLoaded', function() {
+    updateAdminDisplay();
+    loadStocks();
+    updateDashboard();
+});
+</script>
+</body>
+</html>
